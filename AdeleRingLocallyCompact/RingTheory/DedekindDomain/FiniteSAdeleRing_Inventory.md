@@ -68,3 +68,10 @@ The main results of this file involve homeomorphisms across several topological 
 - `FiniteSAdeleRing.generatingSet_eq`: Explicit characterisation of the generating set of $\mathbb{A}_{S, K, f}$ of the form expected by the infinite product topology. This is the main result that allows us to identify the two sources of topologies on $\mathbb{A}_{S, K, f}$ as the same.
 - `FiniteSAdeleRing.topologicalSpace_eq_piTopologicalSpace`: The two sources of topologies on $\mathbb{A}_{S, K, f}$ coincide (subspace topology of $\mathbb{A}_{K, f}$ equals the subspace topology of $\prod_v K_v$).
 - `FiniteSAdeleRing.homeomorph_piSubtypeProd`: The descended homeomorphism between $\mathbb{A}_{S, K, f}$ and $\prod_{v\in S} K_v \times \prod_{v\in S} O_v$, where the latter is thought of as a subtype of $\prod_v K_v$.
+
+## Namespace structure
+
+- `DedekindDomain`
+    - `SProdAdicCompletions`
+    - `SProdAdicCompletionIntegers`
+    - `FiniteSAdeleRing`

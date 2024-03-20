@@ -2,16 +2,14 @@ import Mathlib
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.InfiniteAdeleRing
 
-open DedekindDomain
-open IsDedekindDomain
+open DedekindDomain IsDedekindDomain
 
-open scoped TensorProduct
 open scoped Classical
 
 namespace DedekindDomain
 
 variable (R K : Type*) [CommRing R] [IsDomain R] [IsDedekindDomain R] [Field K] [NumberField K] [Algebra R K]
-  [IsFractionRing R K] (S : Finset (HeightOneSpectrum R))
+  [IsFractionRing R K]
   (B : (n : ℕ) → Basis (Fin n) ℚ (Fin n → ℚ)) (C : (n : ℕ) → Basis (Fin n) ℝ (Fin n → ℝ))
 
 def adeleRing := infiniteAdeleRing K × finiteAdeleRing R K

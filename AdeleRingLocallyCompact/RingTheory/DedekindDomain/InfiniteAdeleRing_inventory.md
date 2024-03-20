@@ -6,11 +6,9 @@ The main results of this file involve defining the topological space for finite 
 
 ### Definitions
 
-- `ProdAdicCompletions.projection`: $\prod_v K_v \to K_w$ 
-- `ProdAdicCompletions.inclusion`: $K_w \to \prod_v K_v$
-- `FiniteAdeleRing.projection`: $\mathbb{A}_{K, f} \to K_w$
-- `FiniteAdeleRing.inclusion`: $K_w \to \mathbb{A}_{K, f}$
-- `FiniteAdeleRing.generatingSet`: $\{\prod_v U_v \mid U_v\subseteq K_v\ \text{open},\ U_v = O_v\ \text{for all but finitely many v}\}$
+- `DedekindDomain.infiniteAdeleRing`: $\mathbb{A}_{K, \infty} := \mathbb{R} \otimes_{\mathbb{Q}} K$
+- `InfiniteAdeleRing.RatBasis.equiv`: The linear equivalence between $\mathbb{Q}^{\text{dim}_{\mathbb{Q}}(K)}$ and $K$.
+
 
 ### Instances
 
@@ -28,5 +26,5 @@ The main results of this file involve defining the topological space for finite 
 ## Namespace structure
 
 - `DedekindDomain`
-    - `ProdAdicCompletions`
-    - `FiniteAdeleRing`
+    - `LinearMap`
+    - `InfiniteAdeleRing`

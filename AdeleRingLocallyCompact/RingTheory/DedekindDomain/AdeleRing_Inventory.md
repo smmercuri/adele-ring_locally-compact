@@ -12,3 +12,8 @@ The main results of this file involve the definition of the adele ring as the di
 
 - `AdeleRing.topologicalSpace`: $\mathbb{A}_{K}$ is given the product topology.
 
+## Namespace Structure
+
+- `DedekindDomain`
+    - `AdeleRing`
+
