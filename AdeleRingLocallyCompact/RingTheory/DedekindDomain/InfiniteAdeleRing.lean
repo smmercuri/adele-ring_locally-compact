@@ -120,14 +120,19 @@ section DerivedInstances
 
 instance : Ring (Fin n → ℝ) := Pi.ring
 instance piReal_topologicalSpace : TopologicalSpace (Fin n → ℝ) := Pi.topologicalSpace
-instance : ContinuousAdd (Fin n → ℝ) := Pi.continuousAdd
-instance : ContinuousMul (Fin n → ℝ) := Pi.continuousMul
-instance : TopologicalRing (Fin n → ℝ) := TopologicalRing.mk
+--instance : ContinuousAdd (Fin n → ℝ) := Pi.continuousAdd
+--instance : ContinuousMul (Fin n → ℝ) := Pi.continuousMul
+instance : TopologicalRing (Fin n → ℝ) := Pi.instTopologicalRing
 noncomputable instance : CommRing (infiniteAdeleRing K) := Algebra.TensorProduct.instCommRing
 
---noncomputable def ringTopology : RingTopology (infiniteAdeleRing K) := RingTopology.coinduced (real_tensorProduct_numberField_equiv K B C)
-noncomputable instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K) := TopologicalSpace.induced (real_tensorProduct_numberField_equiv K B C) (piReal_topologicalSpace (FiniteDimensional.finrank ℚ K))
---noncomputable instance : TopologicalRing (infiniteAdeleRing K) := (ringTopology K).toTopologicalRing
+--noncomputable def ringTopology : RingTopology (infiniteAdeleRing K) := RingTopology.coinduced (real_tensorProduct_numberField_equiv K B C).symm
+
+noncomputable instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K)
+  := TopologicalSpace.induced
+    (real_tensorProduct_numberField_equiv K B C)
+    (piReal_topologicalSpace (FiniteDimensional.finrank ℚ K))
+--noncomputable instance : @TopologicalRing (infiniteAdeleRing K) (topologicalSpace K B C) _ := (ringTopology K B C).toTopologicalRing
+
 
 end DerivedInstances
 

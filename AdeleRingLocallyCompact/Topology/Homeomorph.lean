@@ -25,3 +25,5 @@ theorem locallyCompactSpace [i : LocallyCompactSpace Y] (h : X ≃ₜ Y) :
   rw [← h.preimage_subset]
   simp
   exact hT.2
+
+  end Homeomorph
