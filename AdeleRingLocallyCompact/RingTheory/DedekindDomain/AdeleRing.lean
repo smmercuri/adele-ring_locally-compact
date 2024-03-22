@@ -1,5 +1,5 @@
 import Mathlib
-import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
+import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteSAdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.InfiniteAdeleRing
 
 open DedekindDomain IsDedekindDomain
@@ -21,6 +21,12 @@ section DerivedInstances
 noncomputable instance topologicalSpace : TopologicalSpace (adeleRing R K) := @instTopologicalSpaceProd _ _ (InfiniteAdeleRing.topologicalSpace K B C) _
 
 end DerivedInstances
+
+theorem locallyCompactSpace
+  : @LocallyCompactSpace (adeleRing R K) (DedekindDomain.AdeleRing.topologicalSpace R K B C) := by
+  haveI := InfiniteAdeleRing.locallyCompactSpace K
+  haveI := FiniteAdeleRing.locallyCompactSpace R K
+  exact @Prod.locallyCompactSpace (infiniteAdeleRing K) (finiteAdeleRing R K) (InfiniteAdeleRing.topologicalSpace K B C) _ _ _
 
 end AdeleRing
 

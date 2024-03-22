@@ -1,5 +1,7 @@
 import Mathlib
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
+import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
+import AdeleRingLocallyCompact.Topology.Homeomorph
 
 noncomputable section
 
@@ -23,7 +25,7 @@ def SProdAdicCompletionIntegers' :=
 
 namespace SProdAdicCompletions
 
-noncomputable instance : Coe (SProdAdicCompletionIntegers R K S) (SProdAdicCompletions R K S) where
+instance : Coe (SProdAdicCompletionIntegers R K S) (SProdAdicCompletions R K S) where
   coe := λ x => (λ (v : S) => x.1 v, λ (v : {v // v ∉ S}) => (x.2 v : v.val.adicCompletion K))
 
 theorem coe_injective : (Coe.coe : SProdAdicCompletionIntegers R K S → SProdAdicCompletions R K S).Injective := by
@@ -46,9 +48,9 @@ instance : TopologicalSpace (SProdAdicCompletions R K S) := instTopologicalSpace
 
 instance : TopologicalSpace (SProdAdicCompletionIntegers' R K S) := instTopologicalSpaceSubtype
 
-noncomputable instance : CommRing (SProdAdicCompletions R K S) := Prod.instCommRing
+instance : CommRing (SProdAdicCompletions R K S) := Prod.instCommRing
 
-noncomputable instance : Inhabited (SProdAdicCompletions R K S) := instInhabitedProd
+instance : Inhabited (SProdAdicCompletions R K S) := instInhabitedProd
 
 end DerivedInstances
 
@@ -60,16 +62,16 @@ end SProdAdicCompletions
 
 namespace SProdAdicCompletionIntegers
 
-noncomputable def piSubtypeProd : SProdAdicCompletionIntegers R K S → ProdAdicCompletions R K :=
+def piSubtypeProd : SProdAdicCompletionIntegers R K S → ProdAdicCompletions R K :=
   λ x v => if hv : v ∈ S then x.1 ⟨v, hv⟩ else x.2 ⟨v, hv⟩
 
 section DerivedInstances
 
 instance topologicalSpace : TopologicalSpace (SProdAdicCompletionIntegers R K S) := instTopologicalSpaceProd
 
-noncomputable instance : CommRing (SProdAdicCompletionIntegers R K S) := Prod.instCommRing
+instance : CommRing (SProdAdicCompletionIntegers R K S) := Prod.instCommRing
 
-noncomputable instance : Inhabited (SProdAdicCompletionIntegers R K S) := instInhabitedProd
+instance : Inhabited (SProdAdicCompletionIntegers R K S) := instInhabitedProd
 
 end DerivedInstances
 
@@ -123,9 +125,21 @@ theorem homeomorph : SProdAdicCompletionIntegers' R K S ≃ₜ SProdAdicCompleti
     continuity
     exact Continuous.snd  ({ isOpen_preimage := fun s a => a })
 
-end SProdAdicCompletionIntegers
+instance : LocallyCompactSpace ((w : S) → w.val.adicCompletion K)
+  := Pi.locallyCompactSpace_of_finite
 
-namespace FiniteSAdeleRing
+instance : LocallyCompactSpace ((w : {v // v ∉ S}) → w.val.adicCompletionIntegers K)
+  := Pi.locallyCompactSpace
+
+instance : LocallyCompactSpace (SProdAdicCompletionIntegers R K S)
+  := Prod.locallyCompactSpace
+    ((w : S) → w.val.adicCompletion K)
+    ((w : {v // v ∉ S}) → w.val.adicCompletionIntegers K)
+
+instance : LocallyCompactSpace (SProdAdicCompletionIntegers' R K S)
+  := Homeomorph.locallyCompactSpace (SProdAdicCompletionIntegers.homeomorph R K S)
+
+end SProdAdicCompletionIntegers
 
 local notation "π" => FiniteAdeleRing.projection R K
 local notation "ι" => FiniteAdeleRing.inclusion R K
@@ -175,13 +189,15 @@ theorem neg {x : ProdAdicCompletions R K} (hx : IsFiniteSAdele R K S x) :
   exact hx v hv
 }
 
-noncomputable def finiteSAdeleRing : Subring (ProdAdicCompletions R K) where
+def finiteSAdeleRing : Subring (ProdAdicCompletions R K) where
   carrier := (setOf (IsFiniteSAdele R K S))
   mul_mem' hx hy := mul R K S hx hy
   one_mem' := one R K S
   add_mem' hx hy := add R K S hx hy
   zero_mem' := zero R K S
   neg_mem' hx := neg R K S hx
+
+namespace FiniteSAdeleRing
 
 theorem mem_isFiniteAdele : x ∈ finiteSAdeleRing R K S → x ∈ finiteAdeleRing R K := by
 {
@@ -244,17 +260,17 @@ theorem projection_range (v : HeightOneSpectrum R) :
     }
   }
 
-noncomputable def embedding : finiteSAdeleRing R K S → finiteAdeleRing R K
+def embedding : finiteSAdeleRing R K S → finiteAdeleRing R K
   := λ x => ⟨x.1, mem_isFiniteAdele R K S x.2⟩
 
 local notation "e" => embedding R K
 
-noncomputable def projection (v : HeightOneSpectrum R) : finiteSAdeleRing R K S → v.adicCompletion K
+def projection (v : HeightOneSpectrum R) : finiteSAdeleRing R K S → v.adicCompletion K
   := (π v) ∘ (e S)
 
 local notation "π_S" => projection R K S
 
-noncomputable instance topologicalSpace: TopologicalSpace (finiteSAdeleRing R K S)
+instance topologicalSpace: TopologicalSpace (finiteSAdeleRing R K S)
   := TopologicalSpace.induced (e S) (TopologicalSpace.generateFrom (FiniteAdeleRing.generatingSet R K))
 
 theorem embeddingInducing : Inducing (e S) := by
@@ -675,6 +691,65 @@ theorem homeomorph_piSubtypeProd : finiteSAdeleRing R K S ≃ₜ SProdAdicComple
     exact h ⟨v, hv⟩
   }
 
+theorem locallyCompactSpace (S : Finset (HeightOneSpectrum R)) : LocallyCompactSpace (finiteSAdeleRing R K S) := by
+  exact Homeomorph.locallyCompactSpace (homeomorph_piSubtypeProd R K S)
+
 end FiniteSAdeleRing
+
+namespace FiniteAdeleRing
+
+local notation "e" => FiniteSAdeleRing.embedding R K
+
+theorem locallyCompactSpace : LocallyCompactSpace (finiteAdeleRing R K) := by
+    have local_compact_nhds : ∀ (x : finiteAdeleRing R K), ∀ n ∈ nhds x, ∃ s ∈ nhds x, s ⊆ n ∧ IsCompact s := by
+      {
+        intros x N hN
+        set setS := setOf (λ (v : HeightOneSpectrum R) => x.val v ∉ v.adicCompletionIntegers K)
+        have hS : setS.Finite := Filter.eventually_cofinite.1 ((mem_finiteAdeleRing_iff x.val).1 x.property)
+        set S := hS.toFinset
+        set A_K_S := finiteSAdeleRing R K S
+
+        have hx : x.val ∈ A_K_S := by
+          {
+            intros v hv
+            rwa [hS.mem_toFinset, Set.nmem_setOf_iff, not_not] at hv
+          }
+
+        obtain ⟨U, hU, hUOpen, hxU⟩ := mem_nhds_iff.1 hN
+        set U_S := (e S) ⁻¹' U
+        have he : e S ⟨x, hx⟩ = x := rfl
+        have hU_S : U_S ∈ nhds ⟨x, hx⟩ := by
+        {
+          rw [mem_nhds_iff]
+          use U_S
+          use subset_rfl
+          use (OpenEmbedding.continuous (FiniteSAdeleRing.embeddingOpen R K S)).isOpen_preimage U hUOpen
+          exact hxU
+        }
+        obtain ⟨N', hN', hNU', hNC'⟩ := (FiniteSAdeleRing.locallyCompactSpace R K S).local_compact_nhds ⟨x, hx⟩ U_S hU_S
+        obtain ⟨V, hV, hVOpen, hxV⟩ := mem_nhds_iff.1 hN'
+        use (e S) '' N'
+        apply And.intro
+        {
+          rw [mem_nhds_iff]
+          use (e S) '' V
+          rw [Set.image_subset_image_iff (FiniteSAdeleRing.embeddingOpen R K S).inj]
+          use hV
+          use OpenEmbedding.isOpenMap (FiniteSAdeleRing.embeddingOpen R K S) V hVOpen
+          use ⟨x, hx⟩
+        }
+        apply And.intro
+        {
+          apply subset_trans _ hU
+          simp
+          exact hNU'
+        }
+        {
+          rwa [← Embedding.isCompact_iff ((openEmbedding_iff _).1 (FiniteSAdeleRing.embeddingOpen R K S)).1]
+        }
+      }
+    exact ⟨local_compact_nhds⟩
+
+end FiniteAdeleRing
 
 end DedekindDomain
