@@ -8,8 +8,7 @@ open scoped TensorProduct
 
 namespace DedekindDomain
 
-variable (R K : Type*) [CommRing R] [IsDomain R] [IsDedekindDomain R] [Field K] [NumberField K] [Algebra R K]
-  [IsFractionRing R K] (n : ℕ)
+variable (K : Type*) [Field K] [NumberField K] (n : ℕ)
 
 def infiniteAdeleRing := (ℝ ⊗[ℚ] K)
 
@@ -28,140 +27,115 @@ theorem real_tensorProduct_rat_equiv : (ℝ ⊗[ℚ] (Fin n → ℚ)) ≃ₗ[ℝ
   toFun := real_tensorProduct_rat_toFun n
   invFun := real_tensorProduct_rat_invFun n
   left_inv := by
-    rw [Function.leftInverse_iff_comp]
-    rw [← LinearMap.coe_comp, ← @LinearMap.id_coe ℝ]
+    rw [Function.leftInverse_iff_comp, ← LinearMap.coe_comp, ← @LinearMap.id_coe ℝ]
     have h : real_tensorProduct_rat_invFun n ∘ₗ real_tensorProduct_rat_toFun n = LinearMap.id := by
       apply Basis.ext (Algebra.TensorProduct.basis ℝ (Pi.basisFun _ _))
       intro i
-      rw [LinearMap.comp_apply]
-      simp
-      rw [real_tensorProduct_rat_invFun, real_tensorProduct_rat_toFun]
-      --have h := (Basis.constr_basis (Algebra.TensorProduct.basis ℝ (Pi.basisFun ℚ (Fin n))) ℝ (Pi.basisFun ℝ (Fin n)) i)
-      --rw [h]
-      --rw [RealBasis.funLike] at h
-      --simp at h
-      --simp --[h]
-      --unfold RatBasis.to_tensorBasis_funLike
-      simp
+      simp only [LinearMap.comp_apply, Algebra.TensorProduct.basis_apply, Pi.basisFun_apply,
+        LinearMap.id_coe, id_eq, real_tensorProduct_rat_invFun, real_tensorProduct_rat_toFun,
+        Basis.constr_apply_fintype, Basis.equivFun_apply,
+        Algebra.TensorProduct.basis_repr_tmul, one_smul, Finsupp.mapRange_apply, Pi.basisFun_repr,
+        LinearMap.stdBasis_apply', RingHom.map_ite_one_zero, Pi.basisFun_apply, ite_smul, zero_smul,
+        Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte, Pi.basisFun_equivFun,
+        LinearEquiv.refl_apply, Algebra.TensorProduct.basis_apply]
     rw [h]
   right_inv := by
-    rw [Function.rightInverse_iff_comp]
-    rw [← LinearMap.coe_comp, ← @LinearMap.id_coe ℝ]
+    rw [Function.rightInverse_iff_comp, ← LinearMap.coe_comp, ← @LinearMap.id_coe ℝ]
     have h : real_tensorProduct_rat_toFun n ∘ₗ real_tensorProduct_rat_invFun n = LinearMap.id := by
       apply Basis.ext (Pi.basisFun _ _)
       intro i
-      simp
-      rw [real_tensorProduct_rat_invFun, real_tensorProduct_rat_toFun]
-      simp
-      /-have h := (Basis.constr_basis (Pi.basisFun ℝ (Fin n)) ℝ (RatBasis.to_tensorBasis_funLike n) i)
-      rw [RatBasis.to_tensorBasis_funLike] at h
-      simp at h
-      simp [h]-/
+      simp only [LinearMap.comp_apply, Algebra.TensorProduct.basis_apply, Pi.basisFun_apply,
+        LinearMap.id_coe, id_eq, real_tensorProduct_rat_invFun, real_tensorProduct_rat_toFun,
+        Basis.constr_apply_fintype, Basis.equivFun_apply,
+        Algebra.TensorProduct.basis_repr_tmul, one_smul, Finsupp.mapRange_apply, Pi.basisFun_repr,
+        LinearMap.stdBasis_apply', RingHom.map_ite_one_zero, Pi.basisFun_apply, ite_smul, zero_smul,
+        Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte, Pi.basisFun_equivFun,
+        LinearEquiv.refl_apply, Algebra.TensorProduct.basis_apply]
     rw [h]
+  map_add' := by simp only [map_add, forall_const]
+  map_smul' := by simp only [map_smul, RingHom.id_apply, forall_const]
 
-  map_add' := by simp
-  map_smul' := by simp
+def real_tensorProduct_numberField_toFun :
+  (ℝ ⊗[ℚ] K) →ₗ[ℝ] (Fin (FiniteDimensional.finrank ℚ K) → ℝ) :=
+  LinearMap.comp
+    (real_tensorProduct_rat_toFun (FiniteDimensional.finrank ℚ K))
+    (LinearMap.baseChange ℝ (ratBasis_equiv K).symm)
 
-def real_tensorProduct_numberField_toFun :  (ℝ ⊗[ℚ] K) →ₗ[ℝ] (Fin (FiniteDimensional.finrank ℚ K) → ℝ) :=
-  LinearMap.comp (real_tensorProduct_rat_toFun (FiniteDimensional.finrank ℚ K)) (LinearMap.baseChange ℝ (ratBasis_equiv K).symm)
-
-def real_tensorProduct_numberField_invFun : (Fin (FiniteDimensional.finrank ℚ K) → ℝ) →ₗ[ℝ] (ℝ ⊗[ℚ] K) :=
-  LinearMap.comp (LinearMap.baseChange ℝ (ratBasis_equiv K).toLinearMap) (real_tensorProduct_rat_invFun (FiniteDimensional.finrank ℚ K))
+def real_tensorProduct_numberField_invFun :
+  (Fin (FiniteDimensional.finrank ℚ K) → ℝ) →ₗ[ℝ] (ℝ ⊗[ℚ] K) :=
+  LinearMap.comp
+    (LinearMap.baseChange ℝ (ratBasis_equiv K).toLinearMap)
+    (real_tensorProduct_rat_invFun (FiniteDimensional.finrank ℚ K))
 
 theorem real_tensorProduct_numberField_equiv : (ℝ ⊗[ℚ] K) ≃ₗ[ℝ] (Fin (FiniteDimensional.finrank ℚ K) → ℝ) where
   toFun := real_tensorProduct_numberField_toFun K
   invFun := real_tensorProduct_numberField_invFun K
   left_inv := by
-    simp
-    rw [Function.leftInverse_iff_comp]
-    rw [← LinearMap.coe_comp]
+    rw [Function.leftInverse_iff_comp, ← LinearMap.coe_comp]
     rw [real_tensorProduct_numberField_invFun, real_tensorProduct_numberField_toFun]
-    simp
-    rw [Function.comp.assoc]
+    simp only [LinearMap.coe_comp, Function.comp.assoc]
     nth_rewrite 2 [← Function.comp.assoc]
     have h := Function.leftInverse_iff_comp.1 (real_tensorProduct_rat_equiv (FiniteDimensional.finrank ℚ K)).left_inv
     unfold real_tensorProduct_rat_equiv at h
-    simp at h
-    rw [h]
-    simp
-    rw [← LinearMap.coe_comp]
-    rw [← LinearMap.baseChange_comp]
-    simp
-    --ext x
-    --unfold LinearMap.baseChange
-    --simp
+    rw [h, Function.id_comp, ← LinearMap.coe_comp, ← LinearMap.baseChange_comp, LinearEquiv.comp_coe,
+      LinearEquiv.symm_trans_self, LinearEquiv.refl_toLinearMap, LinearMap.baseChange_id, LinearMap.id_coe]
   right_inv := by
-    simp
-    rw [Function.rightInverse_iff_comp]
-    rw [← LinearMap.coe_comp]
+    rw [Function.rightInverse_iff_comp, ← LinearMap.coe_comp]
     rw [real_tensorProduct_numberField_invFun, real_tensorProduct_numberField_toFun]
-    simp
-    rw [Function.comp.assoc]
+    simp only [LinearMap.coe_comp, Function.comp.assoc]
     nth_rewrite 2 [← Function.comp.assoc]
     have h := Function.rightInverse_iff_comp.1 (real_tensorProduct_rat_equiv (FiniteDimensional.finrank ℚ K)).right_inv
     unfold real_tensorProduct_rat_equiv at h
-    simp at h
-    rw [← LinearMap.coe_comp]
-    rw [← LinearMap.baseChange_comp]
-    unfold LinearMap.baseChange
-    simp
-    rw [h]
-    --unfold LinearMap.baseChange
-    --simp
-    --rw [h]
-
-  map_add' := by simp
-  map_smul' := by simp
+    rw [← LinearMap.coe_comp, ← LinearMap.baseChange_comp, LinearMap.baseChange, LinearEquiv.comp_coe,
+      LinearEquiv.self_trans_symm, LinearEquiv.refl_toLinearMap, TensorProduct.AlgebraTensorModule.map_id,
+      LinearMap.id_coe, Function.id_comp, h]
+  map_add' := by simp only [map_add, forall_const]
+  map_smul' := by simp only [map_smul, RingHom.id_apply, forall_const]
 
 section DerivedInstances
 
 instance : Ring (Fin n → ℝ) := Pi.ring
 instance piReal_topologicalSpace : TopologicalSpace (Fin n → ℝ) := Pi.topologicalSpace
---instance : ContinuousAdd (Fin n → ℝ) := Pi.continuousAdd
---instance : ContinuousMul (Fin n → ℝ) := Pi.continuousMul
-instance : TopologicalRing (Fin n → ℝ) := Pi.instTopologicalRing
 instance : CommRing (infiniteAdeleRing K) := Algebra.TensorProduct.instCommRing
 
---noncomputable def ringTopology : RingTopology (infiniteAdeleRing K) := RingTopology.coinduced (real_tensorProduct_numberField_equiv K B C).symm
+end DerivedInstances
 
 instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K)
   := TopologicalSpace.induced
     (real_tensorProduct_numberField_equiv K)
     (piReal_topologicalSpace (FiniteDimensional.finrank ℚ K))
---noncomputable instance : @TopologicalRing (infiniteAdeleRing K) (topologicalSpace K B C) _ := (ringTopology K B C).toTopologicalRing
 
 theorem piReal_locallyCompact : LocallyCompactSpace (Fin n → ℝ) := Pi.locallyCompactSpace_of_finite
 
 theorem locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) := by
-    have h := (@piReal_locallyCompact (FiniteDimensional.finrank ℚ K)).local_compact_nhds
-    apply LocallyCompactSpace.mk
-    intro x N hN
-    rw [nhds_induced] at hN
-    simp at hN
+    refine' LocallyCompactSpace.mk (λ x N hN => _)
+    simp only [nhds_induced, Filter.mem_comap] at hN
     obtain ⟨M, hM, hMN⟩ := hN
-    obtain ⟨T, hT, hTM, hTC⟩ := h ((InfiniteAdeleRing.real_tensorProduct_numberField_equiv K) x) M hM
+
+    have h := (piReal_locallyCompact (FiniteDimensional.finrank ℚ K)).local_compact_nhds
+    obtain ⟨T, hT, hTM, hT_compact⟩ := h ((InfiniteAdeleRing.real_tensorProduct_numberField_equiv K) x) M hM
     use (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K) ⁻¹' T
-    refine' ⟨_, _, _⟩
+    refine' ⟨_, subset_trans _ hMN, _⟩
     {
-      rw [nhds_induced]
-      simp
+      rw [nhds_induced, Filter.mem_comap]
       use T
     }
     {
-      apply subset_trans _ hMN
       rw [← LinearEquiv.coe_toEquiv]
-      exact (Equiv.preimage_subset (LinearEquiv.toEquiv (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K)) _ _).2 hTM
+      exact (Equiv.preimage_subset
+        (LinearEquiv.toEquiv (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K)) _ _).2 hTM
     }
     {
       rw [← LinearEquiv.image_symm_eq_preimage (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K) T]
-      apply IsCompact.image hTC--_ _ _ (InfiniteAdeleRing.topologicalSpace K) _ _ hTC
-      have h' : InfiniteAdeleRing.topologicalSpace K = TopologicalSpace.induced (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K).toEquiv (InfiniteAdeleRing.piReal_topologicalSpace (FiniteDimensional.finrank ℚ K)) := rfl
-      rw [← Equiv.coinduced_symm (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K).toEquiv] at h'
-      rw [h']
+      apply IsCompact.image hT_compact
+      have h_topology : InfiniteAdeleRing.topologicalSpace K =
+        TopologicalSpace.induced
+          (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K).toEquiv
+          (InfiniteAdeleRing.piReal_topologicalSpace (FiniteDimensional.finrank ℚ K)) := rfl
+      rw [← Equiv.coinduced_symm (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K).toEquiv] at h_topology
+      rw [h_topology]
       exact continuous_coinduced_rng
     }
-
-end DerivedInstances
 
 end InfiniteAdeleRing
 
