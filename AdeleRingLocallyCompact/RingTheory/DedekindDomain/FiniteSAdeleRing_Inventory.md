@@ -18,7 +18,7 @@ The main results of this file involve homeomorphisms across several topological 
 - `SProdAdicCompletionIntegers`: $\prod_{v \in S} K_v \times \prod_{v\notin S} O_v$
 - `SProdAdicCompletionIntegers.piSubtypeProd`: $\prod_{v \in S} K_v \times \prod_{v\notin S} O_v \to \prod_v K_v$
 - `FiniteSAdeleRing.IsFiniteSAdele`: $\prod_v K_v \to \texttt{Prop}; x \mapsto \forall v\notin S, x_v \in O_v$
-- `FiniteSAdeleRing.finiteSAdeleRing`: Ring $\mathbb{A}_{S, K, f}$ with carrier $\{x \mid IsFiniteSAdele x\}$.
+- `FiniteSAdeleRing.finiteSAdeleRing`: Ring $\mathbb{A}_{S, K, f}$ with carrier $\{x \mid \texttt{IsFiniteSAdele}\ x\}$.
 - `FiniteSAdeleRing.embedding`: $\mathbb{A}_{S, K, f} \to \mathbb{A}_{K, f}$
 - `FiniteSAdeleRing.projection`: $\mathbb{A}_{S, K, f} \to K_w$
 - `FiniteSAdeleRing.generatingSet`: $\{\texttt{embedding}^{-1}(U) \mid U \in \texttt{FiniteAdeleRing.generatingSet}\}$
