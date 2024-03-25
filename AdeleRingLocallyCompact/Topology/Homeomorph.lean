@@ -6,8 +6,7 @@ variable {X : Type*} {Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]
 
 theorem locallyCompactSpace [i : LocallyCompactSpace Y] (h : X ≃ₜ Y) :
   LocallyCompactSpace X := by
-  apply LocallyCompactSpace.mk
-  intro x N hN
+  refine' LocallyCompactSpace.mk (λ x N hN => _)
   rw [ ← h.symm_map_nhds_eq]
   rw [h.nhds_eq_comap, Filter.mem_comap] at hN
   obtain ⟨T, hT, hTN⟩ := hN

@@ -49,12 +49,6 @@ theorem projection_inclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion 
   : projection K v (inclusion K v x) = x := by
   convert projection_inclusion_eq' v x
 
-variable (K)
--- TODO : remove this
-theorem isOpen_adicCompletionIntegers (v : HeightOneSpectrum R) :
-  IsOpen (v.adicCompletionIntegers K : Set (v.adicCompletion K))
-  := Valued.valuationSubring_isOpen _
-
 end ProdAdicCompletions
 
 namespace FiniteAdeleRing

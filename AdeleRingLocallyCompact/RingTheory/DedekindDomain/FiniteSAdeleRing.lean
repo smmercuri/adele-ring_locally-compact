@@ -30,7 +30,7 @@ instance : Coe (SProdAdicCompletionIntegers R K S) (SProdAdicCompletions R K S) 
 
 theorem coe_injective : (Coe.coe : SProdAdicCompletionIntegers R K S → SProdAdicCompletions R K S).Injective := by
   intro x y hxy
-  refine' Prod.ext (Prod.ext_iff.1 hxy).1 _
+  refine Prod.ext (Prod.ext_iff.1 hxy).1 ?_
   {
     funext v
     have h : (x.2 v : v.val.adicCompletion K) = y.2 v := Function.funext_iff.1 ((Prod.ext_iff.1 hxy).2) v
@@ -120,42 +120,32 @@ variable {S}
 
 theorem mul {x y : ProdAdicCompletions R K} (hx : IsFiniteSAdele S x) (hy : IsFiniteSAdele S y) :
     IsFiniteSAdele S (x * y) := by
-{
   intros v hv
   rw [mem_adicCompletionIntegers, Pi.mul_apply, Valued.v.map_mul]
   exact mul_le_one' (hx v hv) (hy v hv)
-}
 
 theorem one : IsFiniteSAdele S (1 : ProdAdicCompletions R K) := by
-{
   intros v _
   rw [mem_adicCompletionIntegers]
   exact le_of_eq (Valued.v.map_one')
-}
 
 theorem add {x y : ProdAdicCompletions R K} (hx : IsFiniteSAdele S x) (hy : IsFiniteSAdele S y) :
   IsFiniteSAdele S (x + y) := by
-{
   intros v hv
   rw [mem_adicCompletionIntegers, Pi.add_apply]
   exact le_trans (Valued.v.map_add_le_max' (x v) (y v)) (max_le (hx v hv) (hy v hv))
-}
 
 theorem zero : IsFiniteSAdele S (0 : ProdAdicCompletions R K) := by
-{
   intros v _
   rw [mem_adicCompletionIntegers]
   convert zero_le_one' (WithZero (Multiplicative ℤ))
   exact Valued.v.map_zero'
-}
 
 theorem neg {x : ProdAdicCompletions R K} (hx : IsFiniteSAdele S x) :
   IsFiniteSAdele S (-x) := by
-{
   intros v hv
   rw [mem_adicCompletionIntegers, Pi.neg_apply, Valuation.map_neg]
   exact hx v hv
-}
 
 variable (R K S)
 
@@ -173,13 +163,11 @@ variable {R K S}
 
 theorem mem_isFiniteAdele {x : ProdAdicCompletions R K} (hx : x ∈ finiteSAdeleRing R K S) :
   x ∈ finiteAdeleRing R K := by
-{
   rw [mem_finiteAdeleRing_iff, ProdAdicCompletions.IsFiniteAdele, Filter.eventually_cofinite]
-  refine' Set.Finite.subset S.finite_toSet (λ v hv => _)
+  refine Set.Finite.subset S.finite_toSet (λ v hv => ?_)
   contrapose hv
   rw [Set.mem_setOf_eq, not_not]
   exact hx v hv
-}
 
 theorem isFiniteSAdele_inclusion (v : HeightOneSpectrum R) (x : v.adicCompletion K) (h : v ∈ S) :
   IsFiniteSAdele S (ι v x).val := by
@@ -188,14 +176,16 @@ theorem isFiniteSAdele_inclusion (v : HeightOneSpectrum R) (x : v.adicCompletion
   simp only [Ne.symm (ne_of_mem_of_not_mem h hw), ↓reduceDite]
   exact (w.adicCompletionIntegers K).one_mem'
 
-theorem isFiniteSAdele_inclusion' (v : HeightOneSpectrum R) (x : v.adicCompletion K) (h : x ∈ v.adicCompletionIntegers K)
-  : IsFiniteSAdele S (ι v x).val := by
+theorem isFiniteSAdele_inclusion' (v : HeightOneSpectrum R) (x : v.adicCompletion K)
+  (hx : x ∈ v.adicCompletionIntegers K) :
+  IsFiniteSAdele S (ι v x).val := by
   intros w _
   simp only [FiniteAdeleRing.inclusion, ProdAdicCompletions.inclusion]
   by_cases hw : w = v
   {
-    rw [hw]
-    simp only [↓reduceDite, h]
+    rw [hw, dif_pos]
+    simp only [hx]
+    rfl
   }
   {
     simp only [↓reduceDite, hw]
@@ -214,8 +204,7 @@ theorem projection_range (v : HeightOneSpectrum R) :
     exact ⟨isFiniteSAdele_inclusion v x hv, FiniteAdeleRing.projection_inclusion_eq v x⟩
   }
   {
-    ext x
-    refine' ⟨λ ⟨y, hy, hyx⟩ => by rw [← hyx]; exact hy v hv, λ hx => _⟩
+    refine Set.ext (λ x => ⟨λ ⟨y, hy, hyx⟩ => by rw [← hyx]; exact hy v hv, λ hx => ?_⟩)
     use ι v x
     exact ⟨isFiniteSAdele_inclusion' v x hx, FiniteAdeleRing.projection_inclusion_eq v x⟩
   }
@@ -245,9 +234,8 @@ theorem embeddingRange_eq_pi : Subtype.val '' Set.range (e S) =
   Set.pi Set.univ (λ v => if (v ∈ S) then Set.univ else (v.adicCompletionIntegers K)) := by
   ext x
   rw [embeddingRange R K]
-  refine' ⟨_, _⟩
+  refine ⟨λ ⟨y, hy₀, hy₁⟩ v _ => ?_, ?_⟩
   {
-    rintro ⟨y, hy₀, hy₁⟩ v _
     by_cases hv : v ∈ S <;> simp only [hv, ↓reduceIte, Set.mem_univ]; rw [← hy₁]; exact hy₀ v hv
   }
   {
@@ -270,23 +258,24 @@ theorem embeddingRange_eq_pi : Subtype.val '' Set.range (e S) =
     }
   }
 
-theorem embeddingOpen : OpenEmbedding (e S)
-  := by
-  use ⟨embeddingInducing R K S, embeddingInjective R K S⟩
-  apply TopologicalSpace.isOpen_generateFrom_of_mem
+theorem embeddingRange_mem_generatingSet : Set.range (e S) ∈ FiniteAdeleRing.generatingSet R K := by
   simp only [FiniteAdeleRing.generatingSet, Filter.eventually_cofinite, Set.mem_image, Set.mem_setOf_eq,
     exists_exists_and_eq_and]
-  use (λ v => if (v ∈ S) then Set.univ else (v.adicCompletionIntegers K))
-  refine' ⟨⟨λ v => _, _⟩, by rw [← embeddingRange_eq_pi, Set.preimage_image_eq _ Subtype.val_injective]⟩
+  use (λ v => ite (v ∈ S) Set.univ (v.adicCompletionIntegers K))
+  refine ⟨⟨λ v => ?_, Set.Finite.subset (Finset.finite_toSet S) (λ v hv => ?_)⟩,
+    by rw [← embeddingRange_eq_pi, Set.preimage_image_eq _ Subtype.val_injective]⟩
   {
-    by_cases hv : v ∈ S <;> simp only [projection_range K S v, hv, if_true, isOpen_univ];
-      exact ProdAdicCompletions.isOpen_adicCompletionIntegers K v
+    by_cases hv : v ∈ S <;> simp only [hv, if_true, if_false, isOpen_univ];
+      exact Valued.valuationSubring_isOpen (v.adicCompletion K)
   }
   {
-    simp only [ite_eq_right_iff, not_forall, exists_prop, Set.setOf_and]
-    apply Set.Finite.inter_of_left
-    simp only [Finset.setOf_mem, Finset.finite_toSet]
+    simp only [Set.mem_setOf_eq, ite_eq_right_iff, not_forall, exists_prop] at hv
+    exact hv.1
   }
+
+theorem embeddingOpen : OpenEmbedding (e S) := by
+  use ⟨embeddingInducing R K S, embeddingInjective R K S⟩
+  exact TopologicalSpace.isOpen_generateFrom_of_mem (embeddingRange_mem_generatingSet R K S)
 
 variable {R K S}
 
@@ -313,27 +302,7 @@ def generatingSet : Set (Set (finiteSAdeleRing R K S))
 
 theorem generateFrom :
   topologicalSpace R K S = TopologicalSpace.generateFrom (FiniteSAdeleRing.generatingSet R K S) := by
-  rw [generatingSet, ← induced_generateFrom_eq]
-  rfl
-
-theorem embeddingRange_mem_generatingSet : Set.range (e S) ∈ FiniteAdeleRing.generatingSet R K := by
-  simp only [FiniteAdeleRing.generatingSet, Filter.eventually_cofinite, Set.mem_image, Set.mem_setOf_eq,
-    exists_exists_and_eq_and]
-  use (λ v => ite (v ∈ S) Set.univ (v.adicCompletionIntegers K))
-  refine' ⟨⟨λ v => _, Set.Finite.subset (Finset.finite_toSet S) (λ v hv => _)⟩, Set.ext_iff.2 (λ x => _)⟩
-  {
-    by_cases hv : v ∈ S <;>
-      simp only [hv, if_true, if_false, isOpen_univ, ProdAdicCompletions.isOpen_adicCompletionIntegers K v]
-  }
-  {
-    simp only [Set.mem_setOf_eq, ite_eq_right_iff, not_forall, exists_prop] at hv
-    exact hv.1
-  }
-  {
-    rw [Set.mem_preimage, embeddingRange, Set.mem_pi]
-    simp only [Set.mem_univ, Set.mem_ite_univ_left, SetLike.mem_coe, forall_true_left]
-    rfl
-  }
+  rw [generatingSet, ← induced_generateFrom_eq]; rfl
 
 theorem set_univ_mem_generatingSet : Set.univ ∈ generatingSet R K S := by
   simp only [generatingSet, Set.mem_image, Set.preimage_eq_univ_iff]
@@ -358,9 +327,8 @@ theorem generatingSet_eq : generatingSet R K S =
   ext x
   simp only [generatingSet, FiniteAdeleRing.generatingSet, Filter.eventually_cofinite, Set.mem_image,
       Set.mem_setOf_eq, exists_exists_and_eq_and]
-  refine' ⟨λ hx => _, λ hx => _⟩
+  refine ⟨λ ⟨V, ⟨hV_open, hV_fin⟩, hV_pi⟩ => ?_, λ ⟨y, ⟨V, I, hV_open, hV_pi⟩, hy⟩ => ?_⟩
   {
-    obtain ⟨V, ⟨hV_open, hV_fin⟩, hV_pi⟩ := hx
     set I := Set.Finite.toFinset hV_fin with IDef
     rw [← Set.preimage_comp, ← subtype_val_embedding] at hV_pi
     rw [← hV_pi]
@@ -372,13 +340,13 @@ theorem generatingSet_eq : generatingSet R K S =
           ) else
         Set.univ
       )
-    refine' ⟨_, _⟩
+    refine ⟨?_, ?_⟩
     {
       use (λ v => ite (v ∈ I) (V v) (v.adicCompletionIntegers K)), I ∪ S
       refine' ⟨λ v _ => _, by rw [Set.univ_pi_ite]; rfl⟩
       {
-        by_cases hv : v ∈ I <;> simp only [dif_pos, dif_neg, hv, if_true, if_false, hV_open v,
-          ProdAdicCompletions.isOpen_adicCompletionIntegers K v]
+        by_cases hv : v ∈ I <;> simp only [dif_pos, dif_neg, hv, if_true, if_false, hV_open v];
+          exact Valued.valuationSubring_isOpen (v.adicCompletion K)
       }
     }
     {
@@ -393,7 +361,6 @@ theorem generatingSet_eq : generatingSet R K S =
     }
   }
   {
-    obtain ⟨y, ⟨V, I, hV_open, hV_pi⟩, hy⟩ := hx
     use (λ v =>
       if (v ∈ I) then
         (V v) else
@@ -402,13 +369,13 @@ theorem generatingSet_eq : generatingSet R K S =
             (v.adicCompletionIntegers K)
           )
         )
-    refine' ⟨⟨λ v => _, _⟩, _⟩
+    refine ⟨⟨λ v => ?_, ?_⟩, ?_⟩
     {
       by_cases hv₀ : v ∈ I <;> by_cases hv₁ : v ∈ S <;> simp [hv₀, hv₁]; exact hV_open v hv₀; exact hV_open v hv₀;
-        exact ProdAdicCompletions.isOpen_adicCompletionIntegers K v
+        exact Valued.valuationSubring_isOpen (v.adicCompletion K)
     }
     {
-      refine' Set.Finite.subset (Set.Finite.union (Finset.finite_toSet S) (Finset.finite_toSet I)) (λ v hv => _)
+      refine Set.Finite.subset (Set.Finite.union (Finset.finite_toSet S) (Finset.finite_toSet I)) (λ v hv => ?_)
       contrapose! hv
       simp only [Set.mem_union, Finset.mem_coe, not_or] at hv
       simp only [Set.mem_setOf_eq, hv, if_false, not_not]
@@ -432,9 +399,9 @@ theorem topologicalSpace_eq_piTopologicalSpace : topologicalSpace R K S = instTo
 
 theorem homeomorph_piSubtypeProd : finiteSAdeleRing R K S ≃ₜ SProdAdicCompletionIntegers_subtype R K S := by
   rw [topologicalSpace_eq_piTopologicalSpace]
-  refine' Homeomorph.subtype (SProdAdicCompletions.homeomorph_piSubtypeProd R K S) (λ x => _)
+  refine Homeomorph.subtype (SProdAdicCompletions.homeomorph_piSubtypeProd R K S) (λ x => ?_)
   unfold SProdAdicCompletions.homeomorph_piSubtypeProd
-  exact  ⟨λ hx v => hx v.1 v.2, λ hx v hv => hx ⟨v, hv⟩⟩
+  exact ⟨λ hx v => hx v.1 v.2, λ hx v hv => hx ⟨v, hv⟩⟩
 
 theorem locallyCompactSpace : LocallyCompactSpace (finiteSAdeleRing R K S) := by
   exact Homeomorph.locallyCompactSpace (homeomorph_piSubtypeProd R K S)
@@ -447,31 +414,25 @@ namespace FiniteAdeleRing
 local notation "e" => FiniteSAdeleRing.embedding R K
 
 theorem locallyCompactSpace : LocallyCompactSpace (finiteAdeleRing R K) := by
-  refine' LocallyCompactSpace.mk (λ x N hN => _)
-
+  refine LocallyCompactSpace.mk (λ x N hN => ?_)
   set S_set := setOf (λ (v : HeightOneSpectrum R) => x.val v ∉ v.adicCompletionIntegers K)
   have hS : S_set.Finite := Filter.eventually_cofinite.1 ((mem_finiteAdeleRing_iff x.val).1 x.property)
   set S := hS.toFinset
   set A_K_S := finiteSAdeleRing R K S
-
   have hx : x.val ∈ A_K_S := λ v hv => by rwa [hS.mem_toFinset, Set.nmem_setOf_iff, not_not] at hv
-
   obtain ⟨U, hU, hUOpen, hxU⟩ := mem_nhds_iff.1 hN
   set U_S := (e S) ⁻¹' U
-
   have he : e S ⟨x, hx⟩ = x := rfl
   have hU_S : U_S ∈ nhds ⟨x, hx⟩ := by
     rw [mem_nhds_iff]
     use U_S
     exact ⟨subset_rfl,
       (OpenEmbedding.continuous (FiniteSAdeleRing.embeddingOpen R K S)).isOpen_preimage U hUOpen, hxU⟩
-
   obtain ⟨N_S, hN_S, hNU_S, hN_S_compact⟩ :=
     (FiniteSAdeleRing.locallyCompactSpace R K S).local_compact_nhds ⟨x, hx⟩ U_S hU_S
   obtain ⟨V, hV, hVOpen, hxV⟩ := mem_nhds_iff.1 hN_S
   use (e S) '' N_S
-
-  refine' ⟨_, subset_trans (Set.image_subset_iff.2 hNU_S) hU,
+  refine ⟨?_, subset_trans (Set.image_subset_iff.2 hNU_S) hU,
     by rwa [← Embedding.isCompact_iff ((openEmbedding_iff _).1 (FiniteSAdeleRing.embeddingOpen R K S)).1]⟩
   {
     rw [mem_nhds_iff]
