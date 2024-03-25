@@ -32,17 +32,13 @@ lemma exists_uniformizer :
   ∃ (π : v.adicCompletionIntegers K), IsUniformizer π.val := by
   obtain ⟨π, hπ⟩ := valuation_exists_uniformizer K v
   refine ⟨⟨π, ?_⟩, ?_⟩
-  {
-    rw [mem_adicCompletionIntegers, valuedAdicCompletion_def]
+  · rw [mem_adicCompletionIntegers, valuedAdicCompletion_def]
     simp only [Valued.extension_extends]
     have h := (le_of_lt (ofAdd_neg_one_lt_one))
     rw [← hπ] at h
     exact le_trans h le_rfl
-  }
-  {
-    simp only [IsUniformizer, ← hπ, valuedAdicCompletion_def, Valued.extension_extends]
+  · simp only [IsUniformizer, ← hπ, valuedAdicCompletion_def, Valued.extension_extends]
     rfl
-  }
 
 def maximalIdeal : Ideal (v.adicCompletionIntegers K) :=
   LocalRing.maximalIdeal (v.adicCompletionIntegers K)
@@ -73,7 +69,6 @@ theorem isUnit_of_valuation_eq_one {x : v.adicCompletionIntegers K} (hx : Valued
     rw [isUnit_iff_ne_zero, ne_zero_iff_valuation_ne_zero]
     simp only [hx, ne_eq, one_ne_zero, not_false_eq_true]
   obtain ⟨u, hu⟩ := hx_unit
-
   have hu₁ : Valued.v u.val ≤ 1 := by
     rw [hu]
     exact x.property
@@ -83,13 +78,11 @@ theorem isUnit_of_valuation_eq_one {x : v.adicCompletionIntegers K} (hx : Valued
   have hwx : w = x := by simp only [w, hu]
   rw [← hwx, isUnit_iff_exists]
   use ⟨u⁻¹.val, hu₂⟩
-
   have h : 1 ∈ v.adicCompletionIntegers K := by
     simp only [mem_adicCompletionIntegers, map_one, le_refl]
   have h₁ : (1 : v.adicCompletion K) = u * u⁻¹ := by simp only [Units.val_inv_eq_inv_val,
     ne_eq, Units.ne_zero, not_false_eq_true, mul_inv_cancel]
   have h₂ : (1 : v.adicCompletionIntegers K) = ⟨(1 : v.adicCompletion K), h⟩ := rfl
-
   exact ⟨by simp only [h₂, h₁]; rfl, by simp only [h₂, h₁, mul_comm]; rfl⟩
 
 lemma isUnit_iff_valuation_eq_one (x : v.adicCompletionIntegers K) : IsUnit x ↔ Valued.v x.val = 1 :=
@@ -113,41 +106,37 @@ theorem isUniformizer_not_isUnit {π : v.adicCompletionIntegers K} (h : IsUnifor
 
 lemma pow_uniformizer {x π : v.adicCompletionIntegers K} (hx : x.val ≠ 0) (hπ : IsUniformizer π.val) :
   ∃ (n : ℕ) (u : (v.adicCompletionIntegers K)ˣ), x = π^n * u := by
-have hx₀ : Valued.v x.val ≠ 0 := (ne_zero_iff_valuation_ne_zero x.val).1 hx
-set m := - Multiplicative.toAdd (WithZero.unzero hx₀)
-have hm₀ : 0 ≤ m := by
-  rw [Right.nonneg_neg_iff, ← toAdd_one, Multiplicative.toAdd_le, ← WithZero.coe_le_coe, WithZero.coe_unzero]
-  exact x.property
-use Int.toNat m
-have hpow : Valued.v (π ^ (-m) * x.val) = 1 := by
-  rw [Valued.v.map_mul, map_zpow₀, hπ, ofAdd_neg, WithZero.coe_inv, inv_zpow', neg_neg, ← WithZero.coe_zpow,
-  ← Int.ofAdd_mul, one_mul, ofAdd_neg, ofAdd_toAdd, WithZero.coe_inv, WithZero.coe_unzero, inv_mul_cancel hx₀]
-set a : v.adicCompletionIntegers K := ⟨π^(-m) * x.val, le_of_eq hpow⟩
-have h_isUnit_a : IsUnit a := isUnit_of_valuation_eq_one hpow
-use h_isUnit_a.unit
-ext
-rw [IsUnit.unit_spec, Subring.coe_mul, Subring.coe_pow, Subtype.coe_mk, ← mul_assoc]
-nth_rewrite 2 [← Int.toNat_of_nonneg hm₀]
-rw [zpow_neg, zpow_coe_nat, mul_inv_cancel, one_mul]
-apply pow_ne_zero
-simp only [ne_eq, ZeroMemClass.coe_eq_zero]
-exact isUniformizer_ne_zero hπ
+  have hx₀ : Valued.v x.val ≠ 0 := (ne_zero_iff_valuation_ne_zero x.val).1 hx
+  set m := - Multiplicative.toAdd (WithZero.unzero hx₀)
+  have hm₀ : 0 ≤ m := by
+    rw [Right.nonneg_neg_iff, ← toAdd_one, Multiplicative.toAdd_le, ← WithZero.coe_le_coe, WithZero.coe_unzero]
+    exact x.property
+  use Int.toNat m
+  have hpow : Valued.v (π ^ (-m) * x.val) = 1 := by
+    rw [Valued.v.map_mul, map_zpow₀, hπ, ofAdd_neg, WithZero.coe_inv, inv_zpow', neg_neg, ← WithZero.coe_zpow,
+    ← Int.ofAdd_mul, one_mul, ofAdd_neg, ofAdd_toAdd, WithZero.coe_inv, WithZero.coe_unzero, inv_mul_cancel hx₀]
+  set a : v.adicCompletionIntegers K := ⟨π^(-m) * x.val, le_of_eq hpow⟩
+  have h_isUnit_a : IsUnit a := isUnit_of_valuation_eq_one hpow
+  use h_isUnit_a.unit
+  ext
+  rw [IsUnit.unit_spec, Subring.coe_mul, Subring.coe_pow, Subtype.coe_mk, ← mul_assoc]
+  nth_rewrite 2 [← Int.toNat_of_nonneg hm₀]
+  rw [zpow_neg, zpow_coe_nat, mul_inv_cancel, one_mul]
+  apply pow_ne_zero
+  simp only [ne_eq, ZeroMemClass.coe_eq_zero]
+  exact isUniformizer_ne_zero hπ
 
 lemma isUniformizer_is_generator {π : v.adicCompletionIntegers K} (hπ : IsUniformizer π.val) :
   maximalIdeal K v = Ideal.span {π} := by
   apply (LocalRing.maximalIdeal.isMaximal _).eq_of_le (Ideal.span_singleton_ne_top (isUniformizer_not_isUnit hπ))
   intro x hx
   by_cases hx₀ : x.val = 0
-  {
-    simp only [ZeroMemClass.coe_eq_zero] at hx₀
+  · simp only [ZeroMemClass.coe_eq_zero] at hx₀
     simp only [hx₀, Ideal.zero_mem]
-  }
-  {
-    obtain ⟨n, ⟨u, hu⟩⟩ := pow_uniformizer hx₀ hπ
+  · obtain ⟨n, ⟨u, hu⟩⟩ := pow_uniformizer hx₀ hπ
     have hn : ¬(IsUnit x) := λ h => (LocalRing.maximalIdeal.isMaximal _).ne_top (Ideal.eq_top_of_isUnit_mem _ hx h)
     replace hn : n ≠ 0 := λ h => by {rw [hu, h, pow_zero, one_mul] at hn; exact hn u.isUnit}
     simpa [Ideal.mem_span_singleton, hu, IsUnit.dvd_mul_right, Units.isUnit] using dvd_pow_self _ hn
-  }
 
 theorem valuation_lt_one_of_maximalIdeal {x : v.adicCompletionIntegers K} (hx : x ∈ maximalIdeal K v) :
   Valued.v (x : v.adicCompletion K) < 1 := by
@@ -158,28 +147,24 @@ theorem valuation_lt_one_of_maximalIdeal {x : v.adicCompletionIntegers K} (hx : 
 theorem valuation_le_pow_of_maximalIdeal (x : v.adicCompletionIntegers K) (n : ℕ) :
   x ∈ (maximalIdeal K v)^n → Valued.v (x : v.adicCompletion K) ≤ Multiplicative.ofAdd (-n : ℤ) := by
   by_cases hn : n = 0
-  {
-    simp only [hn, pow_zero, Ideal.one_eq_top, Submodule.mem_top, CharP.cast_eq_zero, neg_zero,
-      ofAdd_zero, WithZero.coe_one, forall_true_left]
+  · simp only [hn, pow_zero, Ideal.one_eq_top, Submodule.mem_top, CharP.cast_eq_zero, neg_zero,
+      ofAdd_zero, WithZero.coe_one, forall_true_left];
     exact x.property
-  }
-  intro hx
-  obtain ⟨π, hπ⟩ := exists_uniformizer K v
-
-  rw [isUniformizer_is_generator hπ, Ideal.span_singleton_pow, Ideal.mem_span_singleton] at hx
-  obtain ⟨y, hxy⟩ := hx
-  rw [hxy, Subring.coe_mul, Valued.v.map_mul, Subring.coe_pow, Valued.v.map_pow]
-  have h_mul_le_mul :
-    Valued.v (π : v.adicCompletion K) ^ n * Valued.v (y : v.adicCompletion K)
-      ≤ Valued.v (π : v.adicCompletion K) ^ n * 1 := by
-    rw [mul_le_mul_left₀]
-    exact y.property
-    simp only [pow_ne_zero_iff hn, Valuation.ne_zero_iff, ne_eq, ZeroMemClass.coe_eq_zero]
-    exact isUniformizer_ne_zero hπ
-
-  apply le_trans h_mul_le_mul
-  rw [mul_one, hπ, ← WithZero.coe_pow, WithZero.coe_le_coe, ofAdd_neg, ofAdd_neg, inv_pow, inv_le_inv_iff,
-    ← one_mul (n : ℤ), Int.ofAdd_mul, zpow_coe_nat]
+  · intro hx
+    obtain ⟨π, hπ⟩ := exists_uniformizer K v
+    rw [isUniformizer_is_generator hπ, Ideal.span_singleton_pow, Ideal.mem_span_singleton] at hx
+    obtain ⟨y, hxy⟩ := hx
+    rw [hxy, Subring.coe_mul, Valued.v.map_mul, Subring.coe_pow, Valued.v.map_pow]
+    have h_mul_le_mul :
+      Valued.v (π : v.adicCompletion K) ^ n * Valued.v (y : v.adicCompletion K)
+        ≤ Valued.v (π : v.adicCompletion K) ^ n * 1 := by
+      rw [mul_le_mul_left₀]
+      exact y.property
+      simp only [pow_ne_zero_iff hn, Valuation.ne_zero_iff, ne_eq, ZeroMemClass.coe_eq_zero]
+      exact isUniformizer_ne_zero hπ
+    apply le_trans h_mul_le_mul
+    rw [mul_one, hπ, ← WithZero.coe_pow, WithZero.coe_le_coe, ofAdd_neg, ofAdd_neg, inv_pow, inv_le_inv_iff,
+      ← one_mul (n : ℤ), Int.ofAdd_mul, zpow_coe_nat]
 
 instance : Fintype (residueField K v) := sorry
 
@@ -322,28 +307,22 @@ theorem hasFiniteSubcover_of_openBall_eq_one {γ : (WithZero (Multiplicative ℤ
     Set.Finite t ∧
     ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t, {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
   set quotientMap : v.adicCompletionIntegers K → residueField K v := Submodule.Quotient.mk
-
   obtain ⟨π, hπ⟩ := exists_uniformizer K v
   have h := quotient_maximalIdeal_pow_fintype 1 hπ
   rw [pow_one] at h
-
   set T := Quotient.out' '' (h.elems.toSet)
   use T, (Set.Finite.image Subtype.val (Set.Finite.image Quotient.out' (Finset.finite_toSet h.elems)))
-
   intro x hx
   rw [Set.mem_iUnion]
   set y := (Quotient.out' (quotientMap ⟨x, hx⟩))
   use y
   rw [Set.mem_iUnion]
-
   have h_out_mk_mem : Subtype.val (Quotient.out' (quotientMap ⟨x, hx⟩)) ∈ Subtype.val '' T := by
     use y
     exact ⟨Set.mem_image_of_mem Quotient.out' (Finset.mem_coe.2 (h.complete (quotientMap ⟨x, hx⟩))), rfl⟩
   use h_out_mk_mem
-
   have h_sub_zero : y - ⟨x, hx⟩ ∈ maximalIdeal K v := by
     rw [← Submodule.Quotient.eq, ← Submodule.Quotient.mk''_eq_mk, Quotient.out_eq']
-
   rw [hγ]
   exact valuation_lt_one_of_maximalIdeal h_sub_zero
 
@@ -405,33 +384,25 @@ instance compactSpace :  CompactSpace (v.adicCompletionIntegers K) := by
 
 theorem openBall_isCompact (γ : (WithZero (Multiplicative ℤ))ˣ) : IsCompact (openBall K v γ) := by
   by_cases hγ : γ ≤ 1
-  {
-    apply IsCompact.of_isClosed_subset (isCompact K v) (openBall_isClosed K v γ)
-    exact openBall_of_le_one_subset_adicCompletionIntegers K v γ hγ
-  }
-  {
-    rw [not_le] at hγ
+  · exact IsCompact.of_isClosed_subset (isCompact K v) (openBall_isClosed K v γ)
+      (openBall_of_le_one_subset_adicCompletionIntegers K v γ hγ)
+  · rw [not_le] at hγ
     obtain ⟨π, hπ⟩ := exists_uniformizer K v
-
     set f := λ x => π.val^(-Multiplicative.toAdd (μ_v γ)) * x with f_def
-
     have hπ_ne_zero : π.val ≠ 0 := by
       convert isUniformizer_ne_zero hπ
       rw [ZeroMemClass.coe_eq_zero]
-
     have h_range : openBall K v γ ⊆ Set.range f := by
       intro x _
       use π ^ (Multiplicative.toAdd (μ_v γ)) * x
       simp only [f_def, ← mul_assoc, ← zpow_add₀ hπ_ne_zero, add_left_neg,
         zpow_zero, one_mul]
-
     have h_preimage_subset : f⁻¹' (openBall K v γ) ⊆ (v.adicCompletionIntegers K) := by
       intro x hx
       rw [SetLike.mem_coe, mem_adicCompletionIntegers]
       have h_mul_π := mem_openBall_mul_uniformizer_pow K v (f x) π.val hx hπ
       rw [← mul_assoc, ← zpow_add₀ hπ_ne_zero, add_right_neg, zpow_zero, one_mul] at h_mul_π
       exact le_of_lt h_mul_π
-
     have h_image_f_closed :=
       continuous_iff_isClosed.1
         (continuous_mul_left (π.val^(-Multiplicative.toAdd (μ_v γ)))) _
@@ -442,7 +413,6 @@ theorem openBall_isCompact (γ : (WithZero (Multiplicative ℤ))ˣ) : IsCompact 
         (continuous_mul_left (π.val^(-Multiplicative.toAdd (μ_v γ))))
     rw [Set.image_preimage_eq_of_subset h_range] at h_image_preimage_f_compact
     exact h_image_preimage_f_compact
-  }
 
   instance : LocallyCompactSpace (v.adicCompletionIntegers K) := inferInstance
 

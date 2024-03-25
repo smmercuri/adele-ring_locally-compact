@@ -71,8 +71,8 @@ theorem real_tensorProduct_numberField_equiv : (ℝ ⊗[ℚ] K) ≃ₗ[ℝ] (Fin
   toFun := real_tensorProduct_numberField_toFun K
   invFun := real_tensorProduct_numberField_invFun K
   left_inv := by
-    rw [Function.leftInverse_iff_comp, ← LinearMap.coe_comp]
-    rw [real_tensorProduct_numberField_invFun, real_tensorProduct_numberField_toFun]
+    rw [Function.leftInverse_iff_comp, ← LinearMap.coe_comp,
+      real_tensorProduct_numberField_invFun, real_tensorProduct_numberField_toFun]
     simp only [LinearMap.coe_comp, Function.comp.assoc]
     nth_rewrite 2 [← Function.comp.assoc]
     have h := Function.leftInverse_iff_comp.1 (real_tensorProduct_rat_equiv (FiniteDimensional.finrank ℚ K)).left_inv
@@ -80,8 +80,8 @@ theorem real_tensorProduct_numberField_equiv : (ℝ ⊗[ℚ] K) ≃ₗ[ℝ] (Fin
     rw [h, Function.id_comp, ← LinearMap.coe_comp, ← LinearMap.baseChange_comp, LinearEquiv.comp_coe,
       LinearEquiv.symm_trans_self, LinearEquiv.refl_toLinearMap, LinearMap.baseChange_id, LinearMap.id_coe]
   right_inv := by
-    rw [Function.rightInverse_iff_comp, ← LinearMap.coe_comp]
-    rw [real_tensorProduct_numberField_invFun, real_tensorProduct_numberField_toFun]
+    rw [Function.rightInverse_iff_comp, ← LinearMap.coe_comp,
+      real_tensorProduct_numberField_invFun, real_tensorProduct_numberField_toFun]
     simp only [LinearMap.coe_comp, Function.comp.assoc]
     nth_rewrite 2 [← Function.comp.assoc]
     have h := Function.rightInverse_iff_comp.1 (real_tensorProduct_rat_equiv (FiniteDimensional.finrank ℚ K)).right_inv
@@ -108,25 +108,19 @@ instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K)
 theorem piReal_locallyCompact : LocallyCompactSpace (Fin n → ℝ) := Pi.locallyCompactSpace_of_finite
 
 theorem locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) := by
-    refine' LocallyCompactSpace.mk (λ x N hN => _)
+    refine LocallyCompactSpace.mk (λ x N hN => ?_)
     simp only [nhds_induced, Filter.mem_comap] at hN
     obtain ⟨M, hM, hMN⟩ := hN
-
     have h := (piReal_locallyCompact (FiniteDimensional.finrank ℚ K)).local_compact_nhds
     obtain ⟨T, hT, hTM, hT_compact⟩ := h ((InfiniteAdeleRing.real_tensorProduct_numberField_equiv K) x) M hM
     use (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K) ⁻¹' T
-    refine' ⟨_, subset_trans _ hMN, _⟩
-    {
-      rw [nhds_induced, Filter.mem_comap]
+    refine ⟨?_, subset_trans ?_ hMN, ?_⟩
+    · rw [nhds_induced, Filter.mem_comap]
       use T
-    }
-    {
-      rw [← LinearEquiv.coe_toEquiv]
+    · rw [← LinearEquiv.coe_toEquiv]
       exact (Equiv.preimage_subset
         (LinearEquiv.toEquiv (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K)) _ _).2 hTM
-    }
-    {
-      rw [← LinearEquiv.image_symm_eq_preimage (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K) T]
+    · rw [← LinearEquiv.image_symm_eq_preimage (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K) T]
       apply IsCompact.image hT_compact
       have h_topology : InfiniteAdeleRing.topologicalSpace K =
         TopologicalSpace.induced
@@ -135,7 +129,6 @@ theorem locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) := by
       rw [← Equiv.coinduced_symm (InfiniteAdeleRing.real_tensorProduct_numberField_equiv K).toEquiv] at h_topology
       rw [h_topology]
       exact continuous_coinduced_rng
-    }
 
 end InfiniteAdeleRing
 

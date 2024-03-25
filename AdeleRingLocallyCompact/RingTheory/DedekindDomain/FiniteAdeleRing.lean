@@ -19,7 +19,7 @@ def projection (v : HeightOneSpectrum R) :
   ProdAdicCompletions R K → v.adicCompletion K :=
   Pi.evalRingHom _ v
 
-def inclusion (v : HeightOneSpectrum R) :
+def localInclusion (v : HeightOneSpectrum R) :
   v.adicCompletion K → ProdAdicCompletions R K :=
   λ x =>
     (λ w =>
@@ -30,24 +30,23 @@ def inclusion (v : HeightOneSpectrum R) :
 
 variable {K}
 
-theorem isFiniteAdele_inclusion (v : HeightOneSpectrum R) (x : v.adicCompletion K)
-  : (inclusion K v x).IsFiniteAdele := by
+theorem isFiniteAdele_localInclusion (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
+  (localInclusion K v x).IsFiniteAdele := by
   rw [ProdAdicCompletions.IsFiniteAdele, Filter.eventually_cofinite]
-  have h : setOf (λ w => inclusion K v x w ∉ w.adicCompletionIntegers K) ⊆ {v} := by
+  have h : setOf (λ w => localInclusion K v x w ∉ w.adicCompletionIntegers K) ⊆ {v} := by
     intro w hw
     simp only [Set.mem_setOf_eq, Set.mem_singleton_iff] at hw ⊢
     contrapose! hw
-    rw [inclusion]
+    rw [localInclusion]
     simp only [hw, ↓reduceDite]
     exact (w.adicCompletionIntegers K).one_mem'
   exact Set.Finite.subset (Set.finite_singleton _) h
 
-theorem projection_inclusion_eq' (v : HeightOneSpectrum R) (x : v.adicCompletion K)
-  : inclusion K v x v = x := by simp only [inclusion, ↓reduceDite]
+theorem localInclusion_rfl (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
+  localInclusion K v x v = x := by simp only [localInclusion, dif_pos]
 
-theorem projection_inclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion K)
-  : projection K v (inclusion K v x) = x := by
-  convert projection_inclusion_eq' v x
+theorem projection_localInclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
+  projection K v (localInclusion K v x) = x := by convert localInclusion_rfl v x
 
 end ProdAdicCompletions
 
@@ -59,21 +58,21 @@ def projection (v : HeightOneSpectrum R) :
   finiteAdeleRing R K → v.adicCompletion K :=
   (Pi.evalRingHom _ v) ∘ Subtype.val
 
-def inclusion (v : HeightOneSpectrum R) :
+def localInclusion (v : HeightOneSpectrum R) :
   v.adicCompletion K → finiteAdeleRing R K :=
-  λ x => ⟨ProdAdicCompletions.inclusion K v x,
-          ProdAdicCompletions.isFiniteAdele_inclusion v x⟩
+  λ x => ⟨ProdAdicCompletions.localInclusion K v x,
+          ProdAdicCompletions.isFiniteAdele_localInclusion v x⟩
 
 local notation "π" => projection
-local notation "ι" => inclusion
+local notation "ι" => localInclusion
 
-theorem projection_inclusion_eq' (v : HeightOneSpectrum R) (x : v.adicCompletion K)
+theorem localInclusion_rfl (v : HeightOneSpectrum R) (x : v.adicCompletion K)
   : (ι v x).val v = x := by
-  simp only [inclusion, ProdAdicCompletions.projection_inclusion_eq']
+  simp only [localInclusion, ProdAdicCompletions.localInclusion_rfl]
 
-theorem projection_inclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion K)
+theorem projection_localInclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion K)
   : π v (ι v x) = x := by
-  convert projection_inclusion_eq' v x
+  convert localInclusion_rfl v x
 
 variable (R K)
 
