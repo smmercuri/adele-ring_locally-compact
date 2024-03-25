@@ -13,6 +13,7 @@ namespace DedekindDomain
 variable (R : Type*) [CommRing R] [IsDomain R] [IsDedekindDomain R] (K : Type*)
   [Field K] [NumberField K] [Algebra R K] [IsFractionRing R K]
 
+/-- The adele ring of a number field -/
 def adeleRing := infiniteAdeleRing K × finiteAdeleRing R K
 
 namespace AdeleRing
