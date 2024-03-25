@@ -5,6 +5,12 @@ Authors: María Inés de Frutos-Fernández, Filippo A. E. Nuccio, Salvatore Merc
 -/
 import Mathlib
 
+/-!
+# Adjoining a zero/one to semigroups and related algebraic structures
+
+In this file we provide a required result when adding a zero to the multiplicative group of integers.
+-/
+
 namespace Multiplicative
 
 /-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/for_mathlib/with_zero.lean#L129]-/

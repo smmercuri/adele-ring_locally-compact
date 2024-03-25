@@ -5,10 +5,22 @@ Authors: Salvatore Mercuri
 -/
 import Mathlib
 
+/-!
+# Homeomorphisms
+
+In this file we prove that local compactness is preserved by homeomorphisms.
+
+## Main results
+  - `Homeomorph.locallyCompactSpace` : if the codomain of a homeomorphism is a locally
+    compact space, then the domain is also a locally compact space.
+
+-/
 namespace Homeomorph
 
 variable {X : Type*} {Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]
 
+/-- If the codomain of a homeomorphism is a locally compact space, then the domain is
+also a locally compact space. -/
 theorem locallyCompactSpace [i : LocallyCompactSpace Y] (h : X ≃ₜ Y) :
   LocallyCompactSpace X := by
   refine LocallyCompactSpace.mk (λ x N hN => ?_)

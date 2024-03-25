@@ -19,7 +19,7 @@ referenced appropriately in the docstrings.
 Note that one of the main results is not proved here, since the proof is already given elsewhere in Lean 3
 by María Inés de Frutos-Fernández, Filippo A. E. Nuccio in [https://github.com/mariainesdff/local_fields_journal/]
 
-# Main definitions
+## Main definitions
   - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.maximalIdeal K v` is the maximal ideal of the
     ring of integers in the `v`-adic completion of `K`.
   - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField K v` is the residue field of the
@@ -30,7 +30,7 @@ by María Inés de Frutos-Fernández, Filippo A. E. Nuccio in [https://github.co
   - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.toFiniteCoeffs π n` gives the first `n` coefficients
     in the `v`-adic expansion in `π` of a `v`-adic integer modulo the `n`th power of the maximal ideal.
 
-# Main results
+## Main results
   - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField_finite` : the residue field of
     the `v`-adic ring of integers is finite.
   - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.quotient_maximalIdeal_pow_fintype` : the quotient of
