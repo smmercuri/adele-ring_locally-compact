@@ -5,6 +5,13 @@ Authors: Salvatore Mercuri, María Inés de Frutos-Fernández
 -/
 import Mathlib
 
+/-!
+# Number fields
+
+In this file we define the linear equivalence between a number field `K` and `ℚⁿ`, where `n` is the
+degree of the field extension of `K` over `ℚ`.
+-/
+
 noncomputable section
 
 namespace NumberField

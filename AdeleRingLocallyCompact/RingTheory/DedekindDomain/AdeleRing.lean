@@ -14,13 +14,20 @@ Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions an
 If `K` is a number field we define the adele ring and show that it is a locally compact space.
 
 ## Main definitions
-  - `adeleRing R K` is the adele ring of a number field `K`.
+ - `adeleRing R K` is the adele ring of a number field `K`.
 
 ## Main results
-  - `AdeleRing.locallyCompactSpace` : the adele ring of a number field is a locally compact space.
+ - `AdeleRing.locallyCompactSpace` : the adele ring of a number field is a locally compact space.
+
+## References
+ * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
+ * [M.I. de Frutos-Fernàndez, *Formalizing the Ring of Adèles of a Global Field*][defrutosfernandez2022]
 
 ## Tags
-adèle ring, dedekind domain
+adele ring, dedekind domain
+
+## TODO
+ - Show that the adele ring is a topological ring.
 -/
 
 noncomputable section

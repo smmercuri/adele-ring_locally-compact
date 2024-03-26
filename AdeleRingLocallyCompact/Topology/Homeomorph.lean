@@ -11,9 +11,8 @@ import Mathlib
 In this file we prove that local compactness is preserved by homeomorphisms.
 
 ## Main results
-  - `Homeomorph.locallyCompactSpace` : if the codomain of a homeomorphism is a locally
-    compact space, then the domain is also a locally compact space.
-
+ - `Homeomorph.locallyCompactSpace` : if the codomain of a homeomorphism is a locally
+   compact space, then the domain is also a locally compact space.
 -/
 namespace Homeomorph
 

@@ -20,31 +20,34 @@ Note that one of the main results is not proved here, since the proof is already
 by María Inés de Frutos-Fernández, Filippo A. E. Nuccio in [https://github.com/mariainesdff/local_fields_journal/]
 
 ## Main definitions
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.maximalIdeal K v` is the maximal ideal of the
-    ring of integers in the `v`-adic completion of `K`.
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField K v` is the residue field of the
-    ring of integers in the `v`-adic completion of `K`.
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.ofFiniteCoeffs π n` constructs a `v`-adic integer
-    from an `n`-tuple of `v`-adic integers by using them as coefficients in a finite `v`-adic expansionin the
-    uniformizer `π`.
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.toFiniteCoeffs π n` gives the first `n` coefficients
-    in the `v`-adic expansion in `π` of a `v`-adic integer modulo the `n`th power of the maximal ideal.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.maximalIdeal K v` is the maximal ideal of the
+   ring of integers in the `v`-adic completion of `K`.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField K v` is the residue field of the
+   ring of integers in the `v`-adic completion of `K`.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.ofFiniteCoeffs π n` constructs a `v`-adic integer
+   from an `n`-tuple of `v`-adic integers by using them as coefficients in a finite `v`-adic expansionin the
+   uniformizer `π`.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.toFiniteCoeffs π n` gives the first `n` coefficients
+   in the `v`-adic expansion in `π` of a `v`-adic integer modulo the `n`th power of the maximal ideal.
 
 ## Main results
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField_finite` : the residue field of
-    the `v`-adic ring of integers is finite.
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.quotient_maximalIdeal_pow_fintype` : the quotient of
-    the `v`-adic ring of integers by a power of the maximal ideal is finite.
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.isCompact` : the `v`-adic ring of integers is
-    compact.
-  - `IsDedekindDomain.HeightOneSpectrum.locallyCompactSpace` : the `v`-adic Completion of `K` is locally compact.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField_finite` : the residue field of
+   the `v`-adic ring of integers is finite.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.quotient_maximalIdeal_pow_fintype` : the quotient of
+   the `v`-adic ring of integers by a power of the maximal ideal is finite.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.isCompact` : the `v`-adic ring of integers is
+   compact.
+ - `IsDedekindDomain.HeightOneSpectrum.locallyCompactSpace` : the `v`-adic Completion of `K` is locally compact.
 
 ## References
-* [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
-* [M.I. de Frutos-Fernández, F.A.E. Nuccio, *A Formalization of Complete Discrete Valuation Rings and Local Fields*]
+ * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
+ * [M.I. de Frutos-Fernández, F.A.E. Nuccio, *A Formalization of Complete Discrete Valuation Rings and Local Fields*][defrutosfernandez2023]
 
 ## Tags
 dedekind domain, dedekind ring, adic valuation
+
+## TODO
+ - Incorporate the proof that the `v`-adic ring of integers has finite residue field.
 -/
 
 noncomputable section

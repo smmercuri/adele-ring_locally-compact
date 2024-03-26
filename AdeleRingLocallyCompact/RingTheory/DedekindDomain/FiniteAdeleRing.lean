@@ -8,25 +8,30 @@ import Mathlib
 /-!
 # Finite adele ring
 
-The finite adele ring is defined in `Mathlib.RingTheory.DedekindDomain`
+Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions. The finite adele ring of
+`K` is defined in `Mathlib.RingTheory.DedekindDomain.finiteAdeleRing`
 [https://github.com/leanprover-community/mathlib4/blob/1c0ac885c9b8aa4daa1830acb56b755140a8059f/Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean#L274-L280].
 In this file we supplement the theory by defining some local maps and the topological space for the finite adele ring.
 
 ## Main definitions
-- `DedekindDomain.FiniteAdeleRing.projection v` is the map sending a finite adele `x` to its `v`th place `x v` in
-  the `v`-adic completion of `K`.
-- `DedekindDomain.FiniteAdeleRing.localInclusion v` is the map sending an element `x` of the `v`-adic completion
-  of `K` to the finite adele which has `x` in its `v`th place and `1`s everywhere else.
-- `DedekindDomain.FiniteAdeleRing.generatingSet` is the generating set of the topology of the finite adele ring.
+ - `DedekindDomain.FiniteAdeleRing.projection v` is the map sending a finite adele `x` to its `v`th place `x v` in
+   the `v`-adic completion of `K`.
+ - `DedekindDomain.FiniteAdeleRing.localInclusion v` is the map sending an element `x` of the `v`-adic completion
+   of `K` to the finite adele which has `x` in its `v`th place and `1`s everywhere else.
+ - `DedekindDomain.FiniteAdeleRing.generatingSet` is the generating set of the topology of the finite adele ring.
 
 ## Main results
-- `DedekindDomain.FiniteAdeleRing.topologicalSpace` : the topological space on the finite adele ring.
+ - `DedekindDomain.FiniteAdeleRing.topologicalSpace` : the topological space on the finite adele ring.
 
 ## References
-* [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
+ * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
+ * [M.I. de Frutos-Fernàndez, *Formalizing the Ring of Adèles of a Global Field*][defrutosfernandez2022]
 
 ## Tags
-finite adèle ring, dedekind domain
+finite adele ring, dedekind domain
+
+## TODO
+ - Show that the finite adele ring is a topological ring
 -/
 
 noncomputable section

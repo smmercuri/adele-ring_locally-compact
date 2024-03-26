@@ -19,28 +19,32 @@ the topology is the same as in the prior formalization, however we found working
 topology to be easier in later proofs.
 
 ## Main definitions
-- `DedekindDomain.infiniteAdeleRing` of a number field `K` is defined as the tensor product `ℝ ⊗[ℚ] K`.
-- `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_piRat_equiv` is the linear equivalence `ℝ ⊗[ℚ] ℚⁿ ≃ ℝⁿ`.
-- `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_numberField_equiv` is the linear equivalence
-  `infiniteAdeleRing K ≃ ℝⁿ`, where `K` is a number field and `n` is the degree of the field extension
-  of `K` over `ℚ`.
-- `DedekindDomain.InfiniteAdeleRing.topologicalSpace` is the induced topology of the infinite adele ring along
-  the linear equivalence `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_numberField_equiv`.
+ - `DedekindDomain.infiniteAdeleRing` of a number field `K` is defined as the tensor product `ℝ ⊗[ℚ] K`.
+ - `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_piRat_equiv` is the linear equivalence `ℝ ⊗[ℚ] ℚⁿ ≃ ℝⁿ`.
+ - `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_numberField_equiv` is the linear equivalence
+   `infiniteAdeleRing K ≃ ℝⁿ`, where `K` is a number field and `n` is the degree of the field extension
+   of `K` over `ℚ`.
+ - `DedekindDomain.InfiniteAdeleRing.topologicalSpace` is the induced topology of the infinite adele ring along
+   the linear equivalence `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_numberField_equiv`.
 
 ## Main results
-- `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` : the infinite adele ring is a locally compact space
-  since it's topology is induced from a finite product of locally compact spaces.
+ - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` : the infinite adele ring is a locally compact space
+   since it's topology is induced from a finite product of locally compact spaces.
+
+## References
+ * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
+ * [M.I. de Frutos-Fernàndez, *Formalizing the Ring of Adèles of a Global Field*][defrutosfernandez2022]
 
 ## Tags
 infinite adele ring, number field
 
 ## TODO
-- `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_piRat_equiv` should be abstracted to a general linear
-  equivalence along the lines of `RingTheory.TensorProduct.rid`. It actually follows directly from `rid` using
-  distributativity of tensor product over `pi`.
-- `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` should be abstracted to a general result since all it
-  relies on is that the infinite adeles have a topology that is induced by a linear equivalence to a locally compact
-  space.
+ - `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_piRat_equiv` should be abstracted to a general linear
+   equivalence along the lines of `RingTheory.TensorProduct.rid`. It actually follows directly from `rid` using
+   distributativity of tensor product over `pi`.
+ - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` should be abstracted to a general result since all it
+   relies on is that the infinite adeles have a topology that is induced by a linear equivalence to a locally compact
+   space.
 -/
 
 noncomputable section

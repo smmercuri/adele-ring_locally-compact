@@ -8,7 +8,7 @@ import Mathlib
 /-!
 # Adjoining a zero/one to semigroups and related algebraic structures
 
-In this file we provide a required result when adding a zero to the multiplicative group of integers.
+In this file we provide a basic inequality result when adding a zero to the multiplicative group of integers.
 -/
 
 namespace Multiplicative

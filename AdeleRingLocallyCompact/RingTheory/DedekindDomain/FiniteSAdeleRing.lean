@@ -8,6 +8,58 @@ import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
 import AdeleRingLocallyCompact.Topology.Homeomorph
 
+/-!
+# Finite S-adele ring
+
+Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions and `S` a finite set of
+places `v` of `R`. In this file we define the finite S-adele ring, whose carrier is the set of all elements in
+`ProdAdicCompletions R K` which are in the `v`-adic ring of integers outside of `S`, and we show that this is
+locally compact. The finite S-adele ring affords an open embedding into the regular finite adele ring and, moreover,
+cover the finite adele ring. This allows us to show that the finite adele ring is also locally compact.
+
+## Main definitions
+ - `DedekindDomain.SProdAdicCompletionIntegers_subtype` is the direct product whose left type is the product of the
+   `v`-adic completions of `K` over all `v ∈ S` and whose right type is the product of the `v`-adic ring of
+   integers over all `v ∉ S`.
+ - `DedekindDomain.finiteSAdeleRing` is the subring of `ProdAdicCompletions R K` of all finite S-adeles.
+ - `DedekindDomain.FiniteSAdeleRing.toFiniteAdeleRing` is the map embedding the finite S-adele ring into the
+   finite adele ring.
+ - `DedekindDomain.FiniteSAdeleRing.topologicalSpace` is the topological space of the finite S-adele ring, viewed
+   as a subspace of the finite adele ring; this is shown to be equivalent to the topology when viewed as a
+   subspace of `ProdAdicCompletions R K` (that these topologies coincide is an important part of what allows us
+   to show that the finite S-adele ring is locally compact).
+
+## Main results
+ - `DedekindDomain.FiniteSAdeleRing.toFiniteAdeleRing_openEmbedding` : the map sending finite S-adeles to
+   finite adeles is an open embedding; this is crucial so that when we can push the S-adeles to an open covering
+   of the finite adele ring.
+ - `DedekindDomain.FiniteSAdeleRing.generatingSet_eq` : the generating set of the subspace topology of the finite
+   S-adele ring when viewed as a subspace of the finite adele ring is equal to the generating set of the subspace
+   topology when viewed as a subspace of `ProdAdicCompletions R K` and so these two topologies coincide.
+ - `DedekindDomain.FiniteSAdeleRing.homeomorph_piSubtypeProd` : the finite S-adele ring is homeomorphic to
+   `DedekindDomain.SProdAdicCompletionIntegers_subtype`.
+ - `DedekindDomain.FiniteSAdeleRing.locallyCompactSpace` : the finite S-adele ring is locally compact.
+ - `DedekindDomain.FiniteAdeleRing.locallyCompactSpace` : the finite adele ring is locally compact.
+
+## Implementation notes
+ - There are two formalisations of the object `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. These are
+   `DedekindDomain.SProdAdicCompletionIntegers` and `DedekindDomain.SProdAdicCompletionIntegers_subtype`,
+   where the former is viewed as a type and the latter as a subtype of `Π (v ∈ S), Kᵥ × Π (v ∉ S), Kᵥ`.
+   The reason for this is that the former is easily shown to be locally compact
+   (its `fst` is a finite product of locally compact spaces and its `snd` is an infinite product of compact spaces),
+   but it is much easier to show that the latter is homeomorphic to the finite S-adele ring, because we can just
+   descend the natural homeomorphism on parent types. Thus we need to show that these two formalisations are
+   also homeomorphic, which is found in `DedekindDomain.SProdAdicCompletionIntegers.homeomorph`.
+
+## Tags
+finite s-adele ring, dedekind domain
+
+## TODO
+ - Move the local compactness of the finite adele ring to `FiniteAdeleRing.lean`, currently this
+   results in circular imports.
+ - Define the embedding map as a ring homomorphism.
+-/
+
 noncomputable section
 
 open DedekindDomain IsDedekindDomain IsDedekindDomain.HeightOneSpectrum
@@ -19,12 +71,17 @@ namespace DedekindDomain
 variable (R : Type*) [CommRing R] [IsDomain R] [IsDedekindDomain R] (K : Type*)
   [Field K] [Algebra R K] [IsFractionRing R K] (S : Finset (HeightOneSpectrum R))
 
+/-- The type `DedekindDomain.ProdAdicCompletions` split as a product along the predicate `v ∈ S`. -/
 def SProdAdicCompletions :=
   (((v : S) → v.val.adicCompletion K) × ((v : {v // v ∉ S}) → v.val.adicCompletion K))
 
+/-- Binary product split along the predicate `v ∈ S`, whose first element ranges over `v`-adic completions
+of `K` and whose second element ranges over `v`-adic rings of integers. -/
 def SProdAdicCompletionIntegers :=
   (((v : S) → v.val.adicCompletion K) × ((v : {v // v ∉ S}) → v.val.adicCompletionIntegers K))
 
+/-- The subtype of `DedekindDomain.SProdAdicCompletions` whose second product ranges over `v`-adic rings of
+integers. -/
 def SProdAdicCompletionIntegers_subtype :=
   {x : SProdAdicCompletions R K S // ∀ v : {v // v ∉ S}, x.2 v ∈ v.val.adicCompletionIntegers K}
 
@@ -52,17 +109,13 @@ instance : Inhabited (SProdAdicCompletions R K S) := instInhabitedProd
 
 end DerivedInstances
 
--- TOP level
--- Πᵥ Kᵥ is homeomorphic to Πₛ Kᵥ × Π Kᵥ
+/-- The homeomorphism between `Π v, Kᵥ` and `Π (v ∈ S), Kᵥ × Π (v ∉ S), Kᵥ`. -/
 theorem homeomorph_piSubtypeProd : ProdAdicCompletions R K ≃ₜ SProdAdicCompletions R K S :=
   Homeomorph.piEquivPiSubtypeProd _ _
 
 end SProdAdicCompletions
 
 namespace SProdAdicCompletionIntegers
-
-def piSubtypeProd : SProdAdicCompletionIntegers R K S → ProdAdicCompletions R K :=
-  λ x v => if hv : v ∈ S then x.1 ⟨v, hv⟩ else x.2 ⟨v, hv⟩
 
 section DerivedInstances
 
@@ -74,12 +127,14 @@ instance : Inhabited (SProdAdicCompletionIntegers R K S) := instInhabitedProd
 
 end DerivedInstances
 
+/-- The type equivalence between the two formalisations of `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
 theorem subtypeEquiv : SProdAdicCompletionIntegers_subtype R K S ≃ SProdAdicCompletionIntegers R K S where
   toFun := λ x => (x.val.1 , λ v => ⟨x.val.2 v, x.property v⟩)
   invFun := λ x => ⟨x, λ v => SetLike.coe_mem (x.2 v)⟩
   left_inv := λ _ => rfl
   right_inv := λ _ => rfl
 
+/-- The homeomorphism between the two formalisations of `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
 theorem homeomorph : SProdAdicCompletionIntegers_subtype R K S ≃ₜ SProdAdicCompletionIntegers R K S where
   toEquiv := subtypeEquiv R K S
   continuous_toFun := by
@@ -95,15 +150,18 @@ theorem homeomorph : SProdAdicCompletionIntegers_subtype R K S ≃ₜ SProdAdicC
     refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
     exact Continuous.snd  ({ isOpen_preimage := fun s a => a })
 
-instance : LocallyCompactSpace ((w : S) → w.val.adicCompletion K) := Pi.locallyCompactSpace_of_finite
 
-instance : LocallyCompactSpace ((w : {v // v ∉ S}) → w.val.adicCompletionIntegers K) := Pi.locallyCompactSpace
+instance : LocallyCompactSpace ((v : S) → v.val.adicCompletion K) := Pi.locallyCompactSpace_of_finite
 
+instance : LocallyCompactSpace ((v : {v // v ∉ S}) → v.val.adicCompletionIntegers K) := Pi.locallyCompactSpace
+
+/-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact. -/
 instance : LocallyCompactSpace (SProdAdicCompletionIntegers R K S) :=
   Prod.locallyCompactSpace
-    ((w : S) → w.val.adicCompletion K)
-    ((w : {v // v ∉ S}) → w.val.adicCompletionIntegers K)
+    ((v : S) → v.val.adicCompletion K)
+    ((v : {v // v ∉ S}) → v.val.adicCompletionIntegers K)
 
+/-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact. -/
 instance : LocallyCompactSpace (SProdAdicCompletionIntegers_subtype R K S) :=
   Homeomorph.locallyCompactSpace (SProdAdicCompletionIntegers.homeomorph R K S)
 
@@ -148,6 +206,7 @@ theorem neg {x : ProdAdicCompletions R K} (hx : IsFiniteSAdele S x) :
 
 variable (R K S)
 
+/-- The finite S-adele ring. -/
 def finiteSAdeleRing : Subring (ProdAdicCompletions R K) where
   carrier := (setOf (IsFiniteSAdele S))
   mul_mem' hx hy := mul hx hy
@@ -160,6 +219,7 @@ namespace FiniteSAdeleRing
 
 variable {R K S}
 
+/-- A finite S-adele is a finite adele. -/
 theorem mem_isFiniteAdele {x : ProdAdicCompletions R K} (hx : x ∈ finiteSAdeleRing R K S) :
   x ∈ finiteAdeleRing R K := by
   rw [mem_finiteAdeleRing_iff, ProdAdicCompletions.IsFiniteAdele, Filter.eventually_cofinite]
@@ -168,7 +228,8 @@ theorem mem_isFiniteAdele {x : ProdAdicCompletions R K} (hx : x ∈ finiteSAdele
   rw [Set.mem_setOf_eq, not_not]
   exact hx v hv
 
-theorem isFiniteSAdele_localInclusion (v : HeightOneSpectrum R) (x : v.adicCompletion K)
+/-- If `x` is a `v`-adic integer, then the local inclusion of `x` at any place `v` is a finite S-adele. -/
+theorem isFiniteSAdele_localInclusion (v : HeightOneSpectrum R) {x : v.adicCompletion K}
   (hx : x ∈ v.adicCompletionIntegers K) :
   IsFiniteSAdele S (ι v x).val := by
   intros w _
@@ -180,7 +241,8 @@ theorem isFiniteSAdele_localInclusion (v : HeightOneSpectrum R) (x : v.adicCompl
   · simp only [↓reduceDite, hw]
     exact (w.adicCompletionIntegers K).one_mem'
 
-theorem isFiniteSAdele_localInclusion_of_S (v : HeightOneSpectrum R) (x : v.adicCompletion K) (h : v ∈ S) :
+/-- If `v ∈ S` then the local inclusion of any `x` in the `v`-adic completion of `K` is a finite S-adele. -/
+theorem isFiniteSAdele_localInclusion_of_S {v : HeightOneSpectrum R} (x : v.adicCompletion K) (h : v ∈ S) :
   IsFiniteSAdele S (ι v x).val := by
   intros w hw
   simp only [FiniteAdeleRing.localInclusion, ProdAdicCompletions.localInclusion]
@@ -195,19 +257,21 @@ theorem projection_range (v : HeightOneSpectrum R) :
   by_cases hv : v ∈ S <;> simp only [hv, ↓reduceIte, Set.eq_univ_iff_forall]
   · intro x
     use ι v x
-    exact ⟨isFiniteSAdele_localInclusion_of_S v x hv, FiniteAdeleRing.projection_localInclusion_eq v x⟩
+    exact ⟨isFiniteSAdele_localInclusion_of_S x hv, FiniteAdeleRing.projection_localInclusion_eq v x⟩
   · refine Set.ext (λ x => ⟨λ ⟨y, hy, hyx⟩ => by rw [← hyx]; exact hy v hv, λ hx => ?_⟩)
     use ι v x
-    exact ⟨isFiniteSAdele_localInclusion v x hx, FiniteAdeleRing.projection_localInclusion_eq v x⟩
+    exact ⟨isFiniteSAdele_localInclusion v hx, FiniteAdeleRing.projection_localInclusion_eq v x⟩
 
 
 variable (R)
 
+/-- Map sending finite S-adeles to finite adeles. -/
 def toFiniteAdeleRing : finiteSAdeleRing R K S → finiteAdeleRing R K
   := λ x => ⟨x.1, mem_isFiniteAdele x.2⟩
 
 local notation "e" => toFiniteAdeleRing R K
 
+/-- The S-adeles are given the subspace topology viewed as a subspace of the finite adele ring. -/
 instance topologicalSpace: TopologicalSpace (finiteSAdeleRing R K S)
   := TopologicalSpace.induced (e S) (TopologicalSpace.generateFrom (FiniteAdeleRing.generatingSet R K))
 
@@ -219,8 +283,8 @@ theorem toFiniteAdeleRing_injective : (e S).Injective := by
   rw [Subtype.mk.injEq]
   exact hxy
 
-theorem toFiniteAdeleRing_range : Set.range (e S) = setOf (λ x : finiteAdeleRing R K => IsFiniteSAdele S x.val) := by
-  exact (Set.range_eq_iff _ _).2 ⟨λ x => x.2, λ x hx => by {use ⟨x, hx⟩; rfl}⟩
+theorem toFiniteAdeleRing_range : Set.range (e S) = setOf (λ x : finiteAdeleRing R K => IsFiniteSAdele S x.val) :=
+  (Set.range_eq_iff _ _).2 ⟨λ x => x.2, λ x hx => by {use ⟨x, hx⟩; rfl}⟩
 
 theorem toFiniteAdeleRing_range_eq_pi : Subtype.val '' Set.range (e S) =
   Set.pi Set.univ (λ v => if (v ∈ S) then Set.univ else (v.adicCompletionIntegers K)) := by
@@ -242,6 +306,8 @@ theorem toFiniteAdeleRing_range_eq_pi : Subtype.val '' Set.range (e S) =
       simp only [hv, dif_neg, if_false] at hx
       exact hx
 
+/-- The finite S-adele ring embedded into the finite adele ring is in the generating set of the topology of the
+finite adele ring -/
 theorem toFiniteAdeleRing_range_mem_generatingSet : Set.range (e S) ∈ FiniteAdeleRing.generatingSet R K := by
   simp only [FiniteAdeleRing.generatingSet, Filter.eventually_cofinite, Set.mem_image, Set.mem_setOf_eq,
     exists_exists_and_eq_and]
@@ -253,30 +319,12 @@ theorem toFiniteAdeleRing_range_mem_generatingSet : Set.range (e S) ∈ FiniteAd
   · simp only [Set.mem_setOf_eq, ite_eq_right_iff, not_forall, exists_prop] at hv
     exact hv.1
 
+/-- The map sending finite S-adeles to finite adeles is open and injective. -/
 theorem toFiniteAdeleRing_openEmbedding : OpenEmbedding (e S) := by
   use ⟨toFiniteAdeleRing_inducing R K S, toFiniteAdeleRing_injective R K S⟩
   exact TopologicalSpace.isOpen_generateFrom_of_mem (toFiniteAdeleRing_range_mem_generatingSet R K S)
 
-variable {R K S}
-
-theorem isFiniteSAdele_piSubtypeProd (x : SProdAdicCompletionIntegers R K S) :
-  IsFiniteSAdele S (SProdAdicCompletionIntegers.piSubtypeProd R K S x) :=
-  λ v hv => by simp only [SProdAdicCompletionIntegers.piSubtypeProd, hv, ↓reduceDite, SetLike.coe_mem]
-
-variable (R K S)
-
-theorem finiteSAdeleEquiv : finiteSAdeleRing R K S ≃ SProdAdicCompletionIntegers R K S where
-  toFun := λ ⟨x, hx⟩ => (λ (v : S) => x v, λ (v : {v // v ∉ S}) => ⟨x v, hx v.1 v.2⟩)
-  invFun x := ⟨SProdAdicCompletionIntegers.piSubtypeProd R K S x, isFiniteSAdele_piSubtypeProd x⟩
-  right_inv _ := by
-    apply Prod.ext <;>
-      · ext y; rcases y with ⟨val, property⟩; simp only [property, SProdAdicCompletionIntegers.piSubtypeProd]; rfl
-  left_inv := λ ⟨x, hx⟩ => by
-    simp only [Subtype.mk.injEq]
-    funext v
-    by_cases h : v ∈ S <;>
-      · simp only [h, SProdAdicCompletionIntegers.piSubtypeProd, dif_pos, dif_neg, not_false_iff]
-
+/-- The generating set of the topology of the finite S-adele ring. -/
 def generatingSet : Set (Set (finiteSAdeleRing R K S))
   := Set.preimage (e S) '' (FiniteAdeleRing.generatingSet R K)
 
@@ -288,6 +336,7 @@ theorem set_univ_mem_generatingSet : Set.univ ∈ generatingSet R K S := by
   simp only [generatingSet, Set.mem_image, Set.preimage_eq_univ_iff]
   use (Set.range (e S)), toFiniteAdeleRing_range_mem_generatingSet R K S
 
+/-- Subtype val of the finite S-adele ring factors through the embedding into the finite adele ring. -/
 theorem subtype_val_embedding :
   (Subtype.val : finiteSAdeleRing R K S → ProdAdicCompletions R K) = Subtype.val ∘ e S := rfl
 
@@ -296,6 +345,9 @@ theorem subtype_val_range_eq_pi :
     = Set.pi Set.univ (λ v => ite (v ∈ S) Set.univ (v.adicCompletionIntegers K)) := by
   rw [subtype_val_embedding, Set.range_comp, toFiniteAdeleRing_range_eq_pi]
 
+/-- The generating set of the subspace topology of the finite S-adele ring viewed as a subspace of the finite
+adele ring coincides with the generating set of the subspace topology obtained as a subspace of
+`ProdAdicCompletions`. -/
 theorem generatingSet_eq : generatingSet R K S =
   Set.preimage Subtype.val '' (
     setOf (
@@ -352,18 +404,20 @@ theorem generatingSet_eq : generatingSet R K S =
       refine Set.pi_congr rfl (λ v _ => ?_)
       by_cases hv₀ : v ∈ I <;> by_cases hv₁ : v ∈ S <;> simp [hv₀, hv₁]
 
--- BOTTOM-LEFT : finite S-adeles, are given the subspace topology of the finite Adeles
--- we show that this is the _same_ as giving it the subspace topology of Πᵥ Kᵥ (most of this is already above, see generatingSet_eq)
+/-- The subspace topology of the finite S-adele ring viewed as a subspace of the finite adele ring coincides
+with the subspace topology when viewed as a subspace of `ProdAdicCompletions`. -/
 theorem topologicalSpace_eq_piTopologicalSpace : topologicalSpace R K S = instTopologicalSpaceSubtype := by
   rw [generateFrom, instTopologicalSpaceSubtype, instTopologicalSpaceProdAdicCompletions, pi_eq_generateFrom,
     induced_generateFrom_eq, generatingSet_eq]
 
+/-- the finite S-adele ring is homeomorphic to `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
 theorem homeomorph_piSubtypeProd : finiteSAdeleRing R K S ≃ₜ SProdAdicCompletionIntegers_subtype R K S := by
   rw [topologicalSpace_eq_piTopologicalSpace]
   refine Homeomorph.subtype (SProdAdicCompletions.homeomorph_piSubtypeProd R K S) (λ x => ?_)
   unfold SProdAdicCompletions.homeomorph_piSubtypeProd
   exact ⟨λ hx v => hx v.1 v.2, λ hx v hv => hx ⟨v, hv⟩⟩
 
+/-- The finite S-adele ring is locally compact. -/
 theorem locallyCompactSpace : LocallyCompactSpace (finiteSAdeleRing R K S) := by
   exact Homeomorph.locallyCompactSpace (homeomorph_piSubtypeProd R K S)
 
@@ -376,6 +430,7 @@ open FiniteSAdeleRing
 
 local notation "e" => toFiniteAdeleRing R K
 
+/-- The finite adele ring is locally compact. -/
 theorem locallyCompactSpace : LocallyCompactSpace (finiteAdeleRing R K) := by
   refine LocallyCompactSpace.mk (λ x N hN => ?_)
   set S_set := setOf (λ (v : HeightOneSpectrum R) => x.val v ∉ v.adicCompletionIntegers K)
