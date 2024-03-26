@@ -4,10 +4,29 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri, María Inés de Frutos-Fernández
 -/
 import Mathlib
+import AdeleRingLocallyCompact.NumberTheory.NumberField.Basic
+
+/-!
+# Infinite adele ring
+
+This file ports and develops further the Lean 3 formalization of the infinite adele ring found in
+[https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_K.lean#L45].
+While the infinite adele ring there is given the coinduced topology by the linear map `ℝⁿ →ₗ[ℝ] ℝ ⊗[ℚ] K`, where
+`n` is the degree of the field extension `K/ℚ`, in this file we show that this is actually a linear equivalence
+`ℝ ⊗[ℚ] K ≃ₗ[ℝ] ℝⁿ` and instead we give the infinite adele ring the induced topology under the forward
+direction of this equivalence. This is equivalent to the coinduced topology on the reverse direction, so
+the topology is the same as in the prior formalization, however we found working directly with the induced
+topology to be easier in later proofs.
+
+## Main definitions
+
+## Main results
+
+-/
 
 noncomputable section
 
-open DedekindDomain IsDedekindDomain IsDedekindDomain.HeightOneSpectrum
+open DedekindDomain IsDedekindDomain IsDedekindDomain.HeightOneSpectrum NumberField
 
 open scoped TensorProduct
 
@@ -19,25 +38,31 @@ def infiniteAdeleRing := (ℝ ⊗[ℚ] K)
 
 namespace InfiniteAdeleRing
 
-def ratBasis_equiv : (Fin (FiniteDimensional.finrank ℚ K) → ℚ) ≃ₗ[ℚ] K :=
-  LinearEquiv.symm (Basis.equivFun (FiniteDimensional.finBasis ℚ K))
+section DerivedInstances
 
-def real_tensorProduct_rat_toFun : (ℝ ⊗[ℚ] (Fin n → ℚ)) →ₗ[ℝ] (Fin n → ℝ)
+instance : Ring (Fin n → ℝ) := Pi.ring
+instance piReal_topologicalSpace : TopologicalSpace (Fin n → ℝ) := Pi.topologicalSpace
+instance : CommRing (infiniteAdeleRing K) := Algebra.TensorProduct.instCommRing
+
+end DerivedInstances
+
+def real_tensorProduct_piRat_to_piReal : (ℝ ⊗[ℚ] (Fin n → ℚ)) →ₗ[ℝ] (Fin n → ℝ)
   := (Algebra.TensorProduct.basis ℝ (Pi.basisFun _ _)).constr ℝ (Pi.basisFun _ _)
 
-def real_tensorProduct_rat_invFun : (Fin n → ℝ) →ₗ[ℝ] (ℝ ⊗[ℚ] (Fin n → ℚ))
+def piReal_to_real_tensorProduct_piRat : (Fin n → ℝ) →ₗ[ℝ] (ℝ ⊗[ℚ] (Fin n → ℚ))
   := (Pi.basisFun _ _).constr ℝ (Algebra.TensorProduct.basis ℝ (Pi.basisFun ℚ (Fin n)))
 
 theorem real_tensorProduct_rat_equiv : (ℝ ⊗[ℚ] (Fin n → ℚ)) ≃ₗ[ℝ] (Fin n → ℝ) where
-  toFun := real_tensorProduct_rat_toFun n
-  invFun := real_tensorProduct_rat_invFun n
+  toFun := real_tensorProduct_piRat_to_piReal n
+  invFun := piReal_to_real_tensorProduct_piRat n
   left_inv := by
     rw [Function.leftInverse_iff_comp, ← LinearMap.coe_comp, ← @LinearMap.id_coe ℝ]
-    have h : real_tensorProduct_rat_invFun n ∘ₗ real_tensorProduct_rat_toFun n = LinearMap.id := by
+    have h : piReal_to_real_tensorProduct_piRat n ∘ₗ real_tensorProduct_piRat_to_piReal n = LinearMap.id := by
       apply Basis.ext (Algebra.TensorProduct.basis ℝ (Pi.basisFun _ _))
       intro i
       simp only [LinearMap.comp_apply, Algebra.TensorProduct.basis_apply, Pi.basisFun_apply,
-        LinearMap.id_coe, id_eq, real_tensorProduct_rat_invFun, real_tensorProduct_rat_toFun,
+        LinearMap.id_coe, id_eq, piReal_to_real_tensorProduct_piRat, real_tensorProduct_piRat_to_piReal
+      ,
         Basis.constr_apply_fintype, Basis.equivFun_apply,
         Algebra.TensorProduct.basis_repr_tmul, one_smul, Finsupp.mapRange_apply, Pi.basisFun_repr,
         LinearMap.stdBasis_apply', RingHom.map_ite_one_zero, Pi.basisFun_apply, ite_smul, zero_smul,
@@ -46,11 +71,12 @@ theorem real_tensorProduct_rat_equiv : (ℝ ⊗[ℚ] (Fin n → ℚ)) ≃ₗ[ℝ
     rw [h]
   right_inv := by
     rw [Function.rightInverse_iff_comp, ← LinearMap.coe_comp, ← @LinearMap.id_coe ℝ]
-    have h : real_tensorProduct_rat_toFun n ∘ₗ real_tensorProduct_rat_invFun n = LinearMap.id := by
+    have h : real_tensorProduct_piRat_to_piReal n ∘ₗ piReal_to_real_tensorProduct_piRat n = LinearMap.id := by
       apply Basis.ext (Pi.basisFun _ _)
       intro i
       simp only [LinearMap.comp_apply, Algebra.TensorProduct.basis_apply, Pi.basisFun_apply,
-        LinearMap.id_coe, id_eq, real_tensorProduct_rat_invFun, real_tensorProduct_rat_toFun,
+        LinearMap.id_coe, id_eq, piReal_to_real_tensorProduct_piRat, real_tensorProduct_piRat_to_piReal
+      ,
         Basis.constr_apply_fintype, Basis.equivFun_apply,
         Algebra.TensorProduct.basis_repr_tmul, one_smul, Finsupp.mapRange_apply, Pi.basisFun_repr,
         LinearMap.stdBasis_apply', RingHom.map_ite_one_zero, Pi.basisFun_apply, ite_smul, zero_smul,
@@ -60,24 +86,25 @@ theorem real_tensorProduct_rat_equiv : (ℝ ⊗[ℚ] (Fin n → ℚ)) ≃ₗ[ℝ
   map_add' := by simp only [map_add, forall_const]
   map_smul' := by simp only [map_smul, RingHom.id_apply, forall_const]
 
-def real_tensorProduct_numberField_toFun :
-  (ℝ ⊗[ℚ] K) →ₗ[ℝ] (Fin (FiniteDimensional.finrank ℚ K) → ℝ) :=
+def to_piReal :
+  ℝ ⊗[ℚ] K →ₗ[ℝ] (Fin (FiniteDimensional.finrank ℚ K) → ℝ) :=
   LinearMap.comp
-    (real_tensorProduct_rat_toFun (FiniteDimensional.finrank ℚ K))
+    (real_tensorProduct_piRat_to_piReal
+   (FiniteDimensional.finrank ℚ K))
     (LinearMap.baseChange ℝ (ratBasis_equiv K).symm)
 
-def real_tensorProduct_numberField_invFun :
+def of_piReal :
   (Fin (FiniteDimensional.finrank ℚ K) → ℝ) →ₗ[ℝ] (ℝ ⊗[ℚ] K) :=
   LinearMap.comp
     (LinearMap.baseChange ℝ (ratBasis_equiv K).toLinearMap)
-    (real_tensorProduct_rat_invFun (FiniteDimensional.finrank ℚ K))
+    (piReal_to_real_tensorProduct_piRat (FiniteDimensional.finrank ℚ K))
 
 theorem real_tensorProduct_numberField_equiv : (ℝ ⊗[ℚ] K) ≃ₗ[ℝ] (Fin (FiniteDimensional.finrank ℚ K) → ℝ) where
-  toFun := real_tensorProduct_numberField_toFun K
-  invFun := real_tensorProduct_numberField_invFun K
+  toFun := to_piReal K
+  invFun := of_piReal K
   left_inv := by
     rw [Function.leftInverse_iff_comp, ← LinearMap.coe_comp,
-      real_tensorProduct_numberField_invFun, real_tensorProduct_numberField_toFun]
+      of_piReal, to_piReal]
     simp only [LinearMap.coe_comp, Function.comp.assoc]
     nth_rewrite 2 [← Function.comp.assoc]
     have h := Function.leftInverse_iff_comp.1 (real_tensorProduct_rat_equiv (FiniteDimensional.finrank ℚ K)).left_inv
@@ -86,7 +113,7 @@ theorem real_tensorProduct_numberField_equiv : (ℝ ⊗[ℚ] K) ≃ₗ[ℝ] (Fin
       LinearEquiv.symm_trans_self, LinearEquiv.refl_toLinearMap, LinearMap.baseChange_id, LinearMap.id_coe]
   right_inv := by
     rw [Function.rightInverse_iff_comp, ← LinearMap.coe_comp,
-      real_tensorProduct_numberField_invFun, real_tensorProduct_numberField_toFun]
+      of_piReal, to_piReal]
     simp only [LinearMap.coe_comp, Function.comp.assoc]
     nth_rewrite 2 [← Function.comp.assoc]
     have h := Function.rightInverse_iff_comp.1 (real_tensorProduct_rat_equiv (FiniteDimensional.finrank ℚ K)).right_inv
@@ -97,13 +124,7 @@ theorem real_tensorProduct_numberField_equiv : (ℝ ⊗[ℚ] K) ≃ₗ[ℝ] (Fin
   map_add' := by simp only [map_add, forall_const]
   map_smul' := by simp only [map_smul, RingHom.id_apply, forall_const]
 
-section DerivedInstances
 
-instance : Ring (Fin n → ℝ) := Pi.ring
-instance piReal_topologicalSpace : TopologicalSpace (Fin n → ℝ) := Pi.topologicalSpace
-instance : CommRing (infiniteAdeleRing K) := Algebra.TensorProduct.instCommRing
-
-end DerivedInstances
 
 instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K)
   := TopologicalSpace.induced

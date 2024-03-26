@@ -18,7 +18,11 @@ If `K` is a number field we define the adele ring and show that it is a locally 
 
 ## Main results
   - `AdeleRing.locallyCompactSpace` : the adele ring of a number field is a locally compact space.
+
+## Tags
+adèle ring, dedekind domain
 -/
+
 noncomputable section
 
 open DedekindDomain IsDedekindDomain

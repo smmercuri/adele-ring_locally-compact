@@ -42,6 +42,9 @@ by María Inés de Frutos-Fernández, Filippo A. E. Nuccio in [https://github.co
 ## References
 * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
 * [M.I. de Frutos-Fernández, F.A.E. Nuccio, *A Formalization of Complete Discrete Valuation Rings and Local Fields*]
+
+## Tags
+dedekind domain, dedekind ring, adic valuation
 -/
 
 noncomputable section
