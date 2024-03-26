@@ -1,6 +1,6 @@
 # Local Compactness of the Adele Ring
 
-## adicValuation.lean
+## AdicValuation.lean
 
 This file contains results about the $v$-adic completion $K_v$ of the fraction field $K$ of a Dedekind domain $R$ of Krull dimension $1$ and its ring of integers $O_v$. The main results are the local compactness of $K_v$ and the compactness of $O_v$. This file contains mainly results that have been adapted from prior work (M.I. de Frutos-Fernández, F.A.E. Nuccio, *A Formalization of Complete Discrete Valuation Rings and Local Fields*) into Lean 4. One result remains unproven, which is the finiteness of the residue field of $O_v$. This also appears in (M.I. de Frutos-Fernández, F.A.E. Nuccio, *A Formalization of Complete Discrete Valuation Rings and Local Fields*), but porting of that particular result is left for future work.
 

@@ -10,7 +10,7 @@ import AdeleRingLocallyCompact.NumberTheory.NumberField.Basic
 # Infinite adele ring
 
 This file ports and develops further the Lean 3 formalization of the infinite adele ring found in
-[https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_K.lean#L45].
+[https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_K.lean#L45](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_K.lean#L45).
 While the infinite adele ring there is given the coinduced topology by the linear map `ℝⁿ →ₗ[ℝ] ℝ ⊗[ℚ] K`, where
 `n` is the degree of the field extension `K/ℚ`, in this file we show that this is actually a linear equivalence
 `ℝ ⊗[ℚ] K ≃ₗ[ℝ] ℝⁿ` and instead we give the infinite adele ring the induced topology under the forward
@@ -76,7 +76,7 @@ def piReal_to_real_tensorProduct_piRat : (Fin n → ℝ) →ₗ[ℝ] (ℝ ⊗[�
   := (Pi.basisFun _ _).constr ℝ (Algebra.TensorProduct.basis ℝ (Pi.basisFun ℚ (Fin n)))
 
 /-- TODO : This can be abstracted and simplified to a general result along the lines of
-`RingTheory.TensorProduct.rid` [https://github.com/leanprover-community/mathlib4/blob/f5373eed0a601d313dd9b5723fc486548619ac45/Mathlib/RingTheory/TensorProduct/Basic.lean#L764].
+`RingTheory.TensorProduct.rid` [https://github.com/leanprover-community/mathlib4/blob/f5373eed0a601d313dd9b5723fc486548619ac45/Mathlib/RingTheory/TensorProduct/Basic.lean#L764](https://github.com/leanprover-community/mathlib4/blob/f5373eed0a601d313dd9b5723fc486548619ac45/Mathlib/RingTheory/TensorProduct/Basic.lean#L764).
 Or, we may make use of `rid` directly if we show that the tensor product distributes over
 `Fin n → ℚ` (unless this is already in Mathlib).
 -/

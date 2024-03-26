@@ -10,7 +10,7 @@ import Mathlib
 
 Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions. The finite adele ring of
 `K` is defined in `Mathlib.RingTheory.DedekindDomain.finiteAdeleRing`
-[https://github.com/leanprover-community/mathlib4/blob/1c0ac885c9b8aa4daa1830acb56b755140a8059f/Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean#L274-L280].
+[https://github.com/leanprover-community/mathlib4/blob/1c0ac885c9b8aa4daa1830acb56b755140a8059f/Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean#L274-L280](https://github.com/leanprover-community/mathlib4/blob/1c0ac885c9b8aa4daa1830acb56b755140a8059f/Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean#L274-L280).
 In this file we supplement the theory by defining some local maps and the topological space for the finite adele ring.
 
 ## Main definitions
