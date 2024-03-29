@@ -14,10 +14,7 @@ Let $K$ be an algebraic number field over $\mathbb{Q}$, then its ring of integer
 
 Let $v$ be a place of $K$, then we denote by $K\_v$ the completion of $K$ with respect to some representative valuation of the place $v$. The place $v$ extends naturally to a place on $K\_v$, which we denote by $|\cdot|\_v$. The integral closure of $O$ inside $K\_v$ is called the ($v$-adic) ring of integers and is denoted $O\_v$; this corresponds with the ring of all $x \in K\_v$ such that $|x|_v \le 1$. 
 
-The direct product of completions of $K$ at finite places is denoted 
-$$
-    \widehat{K} := \prod\_{v\ \text{finite}} K\_v.
-$$
+The direct product of completions of $K$ at finite places is denoted $$\widehat{K} := \prod\_{v\ \text{finite}} K\_v. $$
 This product is _not_ locally compact, given the product topology. On the other hand, we define the _finite adele ring_ as the _restricted_ direct product
 $$
     \mathbb{A}\_{K, f} = \prod\_{v\ \text{finite}}{'}(K\_v, O\_v) := \{x \in \widehat{K} \mid x\_v \in O\_v\ \text{for all but finitely many $v$}\},
