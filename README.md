@@ -36,7 +36,7 @@ Let $x \in K\_v$ and $N$ be a neighbourhood of $x$. Because any open set is clos
 The local compactness of the finite adele ring is difficult to show directly. Instead, we note that it suffices to cover $\mathbb{A}\_{K, f}$ with _open_ and _locally compact_ subsets. Then any neighbourhood of $x$ contains a compact neighbourhood by intersecting with the compact neighbourhood containing $x$ obtained from one of the locally compact subsets. To achieve this we use the finite $S$-adele ring $\mathbb{A}\_{S, K, f}$, where $S$ is some finite set of finite places, defined by $$\mathbb{A}\_{S, K, f} := \{x \in \widehat{K} \mid x\_v \in O\_v\ \text{for all $v \notin S$}\}.$$
 This clearly belongs to the basis of open sets for $\mathbb{A}_{K, f}$, hence it is open. Moreover, through the map $x\mapsto ((x\_v)\_{v\in S}, (x\_v)\_{v\notin S})$, it is homeomorphic to $$\widehat{K}\_S := \prod\_{v \in S} K\_v \times \prod\_{v\notin S} O\_v,$$
 which is locally compact as $\prod\_{v\in S} K\_v$ is a finite product of locally compact spaces and $\prod\_{v\notin S} O\_v$ is an infinite product of compact spaces.
-Therefore $\mathbb{A}\_{S, K, f}$ is locally compact as well. Finally, the finite $S$-adele rings cover $\mathbb{A}\_{K, f}$ since $x \in \mathbb{A}_{S(x), K, f}$, where $S(x)$ is the (finitely-many) places $v$ such that $x \notin O\_v$. 
+Therefore $\mathbb{A}\_{S, K, f}$ is locally compact as well. Finally, the finite $S$-adele rings cover $\mathbb{A}\_{K, f}$ since $x \in \mathbb{A}\_{S(x), K, f}$, where $S(x)$ is the (finitely-many) places $v$ such that $x \notin O\_v$. 
 
 ### Local compactness of $\mathbb{A}\_{K, \infty}$
 
