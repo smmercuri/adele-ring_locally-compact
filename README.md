@@ -17,7 +17,7 @@ Let $v$ be a place of $K$, then we denote by $K\_v$ the completion of $K$ with r
 The direct product of completions of $K$ at finite places is denoted $$\widehat{K} := \prod\_{v\ \text{finite}} K\_v.$$ This product is _not_ locally compact, given the product topology. On the other hand, we define the _finite adele ring_ as the _restricted_ direct product $$\mathbb{A}\_{K, f} = \prod\_{v\ \text{finite}}{'}(K\_v, O\_v) := \{x \in \widehat{K} \mid x\_v \in O\_v\ \text{for all but finitely many $v$}\},$$ with basis of open sets $$\left\{ \prod\_{v\ \text{finite}} V\_v \mid V\_v \subseteq K\_v\ \text{open and $V\_v = O\_v$ for all but finitely many $v$}\right\}.$$
 We will prove below that $\mathbb{A}\_{K, f}$ _is_ locally compact.
 
-The _infinite adele ring_ is simply given as the (finite) direct product of the real/complex completions of $K$ at the real/complex places $$ \mathbb{A}\_{K, \infty} := \prod_{v\ \text{infinite}} K\_v.$$
+The _infinite adele ring_ is simply given as the (finite) direct product of the real/complex completions of $K$ at the real/complex places $$\mathbb{A}\_{K, \infty} := \prod_{v\ \text{infinite}} K\_v.$$
 
 The _adele ring_ of $K$ is then given as the product of the infinite and finite adele rings: $$\mathbb{A}\_K := \mathbb{A}\_{K, \infty} \times \mathbb{A}\_{K, f}.$$
 
