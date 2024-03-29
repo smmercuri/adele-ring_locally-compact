@@ -238,7 +238,7 @@ theorem eq_pow_uniformizer_mul_unit {x π : v.adicCompletionIntegers K} (hx : x.
   ext
   rw [IsUnit.unit_spec, Subring.coe_mul, Subring.coe_pow, Subtype.coe_mk, ← mul_assoc]
   nth_rewrite 2 [← Int.toNat_of_nonneg hm₀]
-  rw [zpow_neg, zpow_coe_nat, mul_inv_cancel, one_mul]
+  rw [zpow_neg, zpow_natCast, mul_inv_cancel, one_mul]
   apply pow_ne_zero
   simp only [ne_eq, ZeroMemClass.coe_eq_zero]
   exact isUniformizer_ne_zero hπ
@@ -284,7 +284,7 @@ theorem valuation_le_pow_of_maximalIdeal {x : v.adicCompletionIntegers K} (n : �
       exact isUniformizer_ne_zero hπ
     apply le_trans h_mul_le_mul
     rw [mul_one, hπ, ← WithZero.coe_pow, WithZero.coe_le_coe, ofAdd_neg, ofAdd_neg, inv_pow, inv_le_inv_iff,
-      ← one_mul (n : ℤ), Int.ofAdd_mul, zpow_coe_nat]
+      ← one_mul (n : ℤ), Int.ofAdd_mul, zpow_natCast]
 
 /-- The residue field of the `v`-adic integers is finite. -/
 instance residueField_finite : Fintype (residueField K v) := sorry
