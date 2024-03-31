@@ -53,18 +53,12 @@ def baseChange_equiv : A ⊗[R] M ≃ₗ[A] A ⊗[R] N where
   toLinearMap := LinearMap.baseChange A e
   invFun := LinearMap.baseChange A e.symm
   left_inv := by
-    rw [Function.leftInverse_iff_comp]
-    simp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom]
-    rw [← LinearMap.coe_comp]
-    rw [← LinearMap.baseChange_comp]
-    simp only [LinearEquiv.comp_coe, LinearEquiv.self_trans_symm, LinearEquiv.refl_toLinearMap,
-      LinearMap.baseChange_id, LinearMap.id_coe]
+    simp only [Function.leftInverse_iff_comp, AddHom.toFun_eq_coe, LinearMap.coe_toAddHom,
+      ← LinearMap.coe_comp, ← LinearMap.baseChange_comp, LinearEquiv.comp_coe, LinearEquiv.self_trans_symm,
+      LinearEquiv.refl_toLinearMap, LinearMap.baseChange_id, LinearMap.id_coe]
   right_inv := by
-    rw [Function.rightInverse_iff_comp]
-    simp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom]
-    rw [← LinearMap.coe_comp]
-    rw [← LinearMap.baseChange_comp]
-    simp only [LinearEquiv.comp_coe, LinearEquiv.symm_trans_self, LinearEquiv.refl_toLinearMap,
-      LinearMap.baseChange_id, LinearMap.id_coe]
+    simp only [Function.rightInverse_iff_comp, AddHom.toFun_eq_coe, LinearMap.coe_toAddHom,
+    ← LinearMap.coe_comp, ← LinearMap.baseChange_comp, LinearEquiv.comp_coe, LinearEquiv.symm_trans_self,
+    LinearEquiv.refl_toLinearMap, LinearMap.baseChange_id, LinearMap.id_coe]
 
 end LinearMap
