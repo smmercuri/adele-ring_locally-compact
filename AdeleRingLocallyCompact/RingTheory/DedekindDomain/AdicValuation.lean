@@ -17,31 +17,37 @@ concerning the uniformizers of the ring of integers and the finiteness of its re
 referenced appropriately in the docstrings.
 
 Note that one of the main results is not proved here, since the proof is already given elsewhere in Lean 3
-by María Inés de Frutos-Fernández, Filippo A. E. Nuccio in [https://github.com/mariainesdff/local_fields_journal/]
+by María Inés de Frutos-Fernández, Filippo A. E. Nuccio in [https://github.com/mariainesdff/local_fields_journal/](https://github.com/mariainesdff/local_fields_journal/).
 
 ## Main definitions
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.maximalIdeal K v` is the maximal ideal of the
-    ring of integers in the `v`-adic completion of `K`.
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField K v` is the residue field of the
-    ring of integers in the `v`-adic completion of `K`.
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.ofFiniteCoeffs π n` constructs a `v`-adic integer
-    from an `n`-tuple of `v`-adic integers by using them as coefficients in a finite `v`-adic expansionin the
-    uniformizer `π`.
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.toFiniteCoeffs π n` gives the first `n` coefficients
-    in the `v`-adic expansion in `π` of a `v`-adic integer modulo the `n`th power of the maximal ideal.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.maximalIdeal K v` is the maximal ideal of the
+   ring of integers in the `v`-adic completion of `K`.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField K v` is the residue field of the
+   ring of integers in the `v`-adic completion of `K`.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.ofFiniteCoeffs π n` constructs a `v`-adic integer
+   from an `n`-tuple of `v`-adic integers by using them as coefficients in a finite `v`-adic expansionin the
+   uniformizer `π`.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.toFiniteCoeffs π n` gives the first `n` coefficients
+   in the `v`-adic expansion in `π` of a `v`-adic integer modulo the `n`th power of the maximal ideal.
 
 ## Main results
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField_finite` : the residue field of
-    the `v`-adic ring of integers is finite.
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.quotient_maximalIdeal_pow_fintype` : the quotient of
-    the `v`-adic ring of integers by a power of the maximal ideal is finite.
-  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.isCompact` : the `v`-adic ring of integers is
-    compact.
-  - `IsDedekindDomain.HeightOneSpectrum.locallyCompactSpace` : the `v`-adic Completion of `K` is locally compact.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField_finite` : the residue field of
+   the `v`-adic ring of integers is finite.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.quotient_maximalIdeal_pow_fintype` : the quotient of
+   the `v`-adic ring of integers by a power of the maximal ideal is finite.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.isCompact` : the `v`-adic ring of integers is
+   compact.
+ - `IsDedekindDomain.HeightOneSpectrum.locallyCompactSpace` : the `v`-adic Completion of `K` is locally compact.
 
 ## References
-* [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
-* [M.I. de Frutos-Fernández, F.A.E. Nuccio, *A Formalization of Complete Discrete Valuation Rings and Local Fields*]
+ * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
+ * [M.I. de Frutos-Fernández, F.A.E. Nuccio, *A Formalization of Complete Discrete Valuation Rings and Local Fields*][defrutosfernandez2023]
+
+## Tags
+dedekind domain, dedekind ring, adic valuation
+
+## TODO
+ - Incorporate the proof that the `v`-adic ring of integers has finite residue field.
 -/
 
 noncomputable section
@@ -55,13 +61,13 @@ namespace IsDedekindDomain.HeightOneSpectrum
 
 local notation "μ_v" => @WithZero.unitsWithZeroEquiv (Multiplicative ℤ)
 
-/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L137] -/
+/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L137](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L137) -/
 def IsUniformizer (π : v.adicCompletion K) : Prop :=
   Valued.v π = Multiplicative.ofAdd (-1 : ℤ)
 
 variable (K v)
 
-/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L95] -/
+/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L95](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L95) -/
 theorem exists_uniformizer :
   ∃ (π : v.adicCompletion K), IsUniformizer π := by
   obtain ⟨x, hx⟩ := valuation_exists_uniformizer K v
@@ -133,7 +139,7 @@ namespace AdicCompletionIntegers
 
 variable (K v)
 
-/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L79]-/
+/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L79](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L79)-/
 theorem exists_uniformizer :
   ∃ (π : v.adicCompletionIntegers K), IsUniformizer π.val := by
   obtain ⟨π, hπ⟩ := valuation_exists_uniformizer K v
@@ -195,7 +201,7 @@ theorem isUnit_of_valuation_eq_one {x : v.adicCompletionIntegers K} (hx : Valued
 theorem isUnit_iff_valuation_eq_one (x : v.adicCompletionIntegers K) : IsUnit x ↔ Valued.v x.val = 1 :=
   ⟨valuation_eq_one_of_isUnit, isUnit_of_valuation_eq_one⟩
 
-/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L116]-/
+/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L116](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L116)-/
 theorem not_isUnit_iff_valuation_lt_one (x : v.adicCompletionIntegers K) :
   ¬IsUnit x ↔ Valued.v x.val < 1 := by
   rw [← not_le, not_iff_not, isUnit_iff_valuation_eq_one, le_antisymm_iff]
@@ -214,7 +220,7 @@ theorem isUniformizer_not_isUnit {π : v.adicCompletionIntegers K} (h : IsUnifor
   simp only [not_isUnit_iff_valuation_lt_one, h, ← WithZero.coe_one, ← ofAdd_zero, WithZero.coe_lt_coe,
     Multiplicative.ofAdd_lt, Left.neg_neg_iff, zero_lt_one]
 
-/- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L259]-/
+/- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L259](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L259)-/
 theorem eq_pow_uniformizer_mul_unit {x π : v.adicCompletionIntegers K} (hx : x.val ≠ 0) (hπ : IsUniformizer π.val) :
   ∃ (n : ℕ) (u : (v.adicCompletionIntegers K)ˣ), x = π^n * u := by
   have hx₀ : Valued.v x.val ≠ 0 := (ne_zero_iff_valuation_ne_zero x.val).1 hx
@@ -232,12 +238,12 @@ theorem eq_pow_uniformizer_mul_unit {x π : v.adicCompletionIntegers K} (hx : x.
   ext
   rw [IsUnit.unit_spec, Subring.coe_mul, Subring.coe_pow, Subtype.coe_mk, ← mul_assoc]
   nth_rewrite 2 [← Int.toNat_of_nonneg hm₀]
-  rw [zpow_neg, zpow_coe_nat, mul_inv_cancel, one_mul]
+  rw [zpow_neg, zpow_natCast, mul_inv_cancel, one_mul]
   apply pow_ne_zero
   simp only [ne_eq, ZeroMemClass.coe_eq_zero]
   exact isUniformizer_ne_zero hπ
 
-/- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L295]-/
+/- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L295](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L295)-/
 theorem isUniformizer_is_generator {π : v.adicCompletionIntegers K} (hπ : IsUniformizer π.val) :
   maximalIdeal K v = Ideal.span {π} := by
   apply (LocalRing.maximalIdeal.isMaximal _).eq_of_le (Ideal.span_singleton_ne_top (isUniformizer_not_isUnit hπ))
@@ -278,7 +284,7 @@ theorem valuation_le_pow_of_maximalIdeal {x : v.adicCompletionIntegers K} (n : �
       exact isUniformizer_ne_zero hπ
     apply le_trans h_mul_le_mul
     rw [mul_one, hπ, ← WithZero.coe_pow, WithZero.coe_le_coe, ofAdd_neg, ofAdd_neg, inv_pow, inv_le_inv_iff,
-      ← one_mul (n : ℤ), Int.ofAdd_mul, zpow_coe_nat]
+      ← one_mul (n : ℤ), Int.ofAdd_mul, zpow_natCast]
 
 /-- The residue field of the `v`-adic integers is finite. -/
 instance residueField_finite : Fintype (residueField K v) := sorry
@@ -520,7 +526,7 @@ theorem openBall_isCompact (γ : (WithZero (Multiplicative ℤ))ˣ) : IsCompact 
       rw [f_def]
       exact
         Iff.intro
-          (λ ⟨a, ha, hay⟩ => by rw [← hay, Set.mem_setOf_eq, add_sub_cancel]; exact ha)
+          (λ ⟨a, ha, hay⟩ => by simp [← hay, Set.mem_setOf_eq, add_sub_cancel a x]; exact ha)
           (λ hy => by use (y - x); exact ⟨hy, by simp only [sub_add_cancel]⟩)
     have h_image_f_compact := IsCompact.image (openBall_isCompact K v γ) (continuous_add_right x)
     use (f '' (openBall K v γ))

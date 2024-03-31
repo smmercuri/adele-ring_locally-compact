@@ -11,7 +11,7 @@ import AdeleRingLocallyCompact.RingTheory.TensorProduct.Basic
 # Infinite adele ring
 
 This file ports and develops further the Lean 3 formalization of the infinite adele ring found in
-[https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_K.lean#L45].
+[https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_K.lean#L45](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_K.lean#L45).
 While the infinite adele ring there is given the coinduced topology by the linear map `ℝⁿ →ₗ[ℝ] ℝ ⊗[ℚ] K`, where
 `n` is the degree of the field extension `K/ℚ`, in this file we show that this is actually a linear equivalence
 `ℝ ⊗[ℚ] K ≃ₗ[ℝ] ℝⁿ` and instead we give the infinite adele ring the induced topology under the forward
@@ -20,9 +20,32 @@ the topology is the same as in the prior formalization, however we found working
 topology to be easier in later proofs.
 
 ## Main definitions
+ - `DedekindDomain.infiniteAdeleRing` of a number field `K` is defined as the tensor product `ℝ ⊗[ℚ] K`.
+ - `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_piRat_equiv` is the linear equivalence `ℝ ⊗[ℚ] ℚⁿ ≃ ℝⁿ`.
+ - `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_numberField_equiv` is the linear equivalence
+   `infiniteAdeleRing K ≃ ℝⁿ`, where `K` is a number field and `n` is the degree of the field extension
+   of `K` over `ℚ`.
+ - `DedekindDomain.InfiniteAdeleRing.topologicalSpace` is the induced topology of the infinite adele ring along
+   the linear equivalence `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_numberField_equiv`.
 
 ## Main results
+ - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` : the infinite adele ring is a locally compact space
+   since it's topology is induced from a finite product of locally compact spaces.
 
+## References
+ * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
+ * [M.I. de Frutos-Fernàndez, *Formalizing the Ring of Adèles of a Global Field*][defrutosfernandez2022]
+
+## Tags
+infinite adele ring, number field
+
+## TODO
+ - `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_piRat_equiv` should be abstracted to a general linear
+   equivalence along the lines of `RingTheory.TensorProduct.rid`. It actually follows directly from `rid` using
+   distributativity of tensor product over `pi`.
+ - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` should be abstracted to a general result since all it
+   relies on is that the infinite adeles have a topology that is induced by a linear equivalence to a locally compact
+   space.
 -/
 
 noncomputable section
@@ -85,7 +108,7 @@ theorem real_tensorProduct_rat_equiv : (ℝ ⊗[ℚ] (Fin n → ℚ)) ≃ₗ[ℝ
   map_add' := by simp only [map_add, forall_const]
   map_smul' := by simp only [map_smul, RingHom.id_apply, forall_const]
 
-def to_piReal :
+private def to_piReal :
   ℝ ⊗[ℚ] K →ₗ[ℝ] (Fin (FiniteDimensional.finrank ℚ K) → ℝ) :=
   LinearMap.comp
     ((rid_pi ℚ ℝ (Fin (FiniteDimensional.finrank ℚ K))).toLinearMap)
@@ -113,8 +136,8 @@ theorem piReal_equiv : (ℝ ⊗[ℚ] K) ≃ₗ[ℝ] (Fin (FiniteDimensional.finr
       of_piReal, to_piReal]
     simp only [LinearMap.coe_comp, Function.comp.assoc]
     nth_rewrite 2 [← Function.comp.assoc]
-    have h := Function.leftInverse_iff_comp.1 (real_tensorProduct_rat_equiv (FiniteDimensional.finrank ℚ K)).left_inv
-    unfold real_tensorProduct_rat_equiv at h
+    have h := Function.leftInverse_iff_comp.1 (real_tensorProduct_piRat_equiv (FiniteDimensional.finrank ℚ K)).left_inv
+    unfold real_tensorProduct_piRat_equiv at h
     rw [h, Function.id_comp, ← LinearMap.coe_comp, ← LinearMap.baseChange_comp, LinearEquiv.comp_coe,
       LinearEquiv.symm_trans_self, LinearEquiv.refl_toLinearMap, LinearMap.baseChange_id, LinearMap.id_coe]
   right_inv := by
@@ -122,8 +145,8 @@ theorem piReal_equiv : (ℝ ⊗[ℚ] K) ≃ₗ[ℝ] (Fin (FiniteDimensional.finr
       of_piReal, to_piReal]
     simp only [LinearMap.coe_comp, Function.comp.assoc]
     nth_rewrite 2 [← Function.comp.assoc]
-    have h := Function.rightInverse_iff_comp.1 (real_tensorProduct_rat_equiv (FiniteDimensional.finrank ℚ K)).right_inv
-    unfold real_tensorProduct_rat_equiv at h
+    have h := Function.rightInverse_iff_comp.1 (real_tensorProduct_piRat_equiv (FiniteDimensional.finrank ℚ K)).right_inv
+    unfold real_tensorProduct_piRat_equiv at h
     rw [← LinearMap.coe_comp, ← LinearMap.baseChange_comp, LinearMap.baseChange, LinearEquiv.comp_coe,
       LinearEquiv.self_trans_symm, LinearEquiv.refl_toLinearMap, TensorProduct.AlgebraTensorModule.map_id,
       LinearMap.id_coe, Function.id_comp, h]
@@ -135,8 +158,10 @@ instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K)
     (piReal_equiv K)
     (piReal_topologicalSpace (FiniteDimensional.finrank ℚ K))
 
+/-- A finite product of ℝ is locally compact. -/
 theorem piReal_locallyCompact : LocallyCompactSpace (Fin n → ℝ) := Pi.locallyCompactSpace_of_finite
 
+/-- The infinite adele ring is locally compact. -/
 theorem locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) := by
     refine LocallyCompactSpace.mk (λ x N hN => ?_)
     simp only [nhds_induced, Filter.mem_comap] at hN
