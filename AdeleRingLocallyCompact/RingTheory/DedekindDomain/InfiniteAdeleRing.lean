@@ -39,9 +39,6 @@ topology to be easier in later proofs.
 infinite adele ring, number field
 
 ## TODO
- - `DedekindDomain.InfiniteAdeleRing.real_tensorProduct_piRat_equiv` should be abstracted to a general linear
-   equivalence along the lines of `RingTheory.TensorProduct.rid`. It actually follows directly from `rid` using
-   distributativity of tensor product over `pi`.
  - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` should be abstracted to a general result since all it
    relies on is that the infinite adeles have a topology that is induced by a linear equivalence to a locally compact
    space.
