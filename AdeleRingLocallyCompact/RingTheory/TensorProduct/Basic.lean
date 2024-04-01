@@ -12,7 +12,8 @@ In this file we give some additional required results on tensor products of R-al
 supplementing the current mathlib library.
 
 ## Main definitions
- - `Algebra.TensorProduct.rid_pi` : `A ⊗[R] (ι → R) ≃ₗ[A] (ι → A)`
+ - `Algebra.TensorProduct.rid_pi` : `A ⊗[R] (ι → R) ≃ₗ[A] (ι → A)` given by constructing a
+   linear map from the basis map sending `1 ⊗ e i ↦ e i`, where `e i` is the standard basis in `Pi`.
  - `LinaraMap.baseChange_equiv` : If `e : M ≃ₗ[R] N` then this is the linear equivalence
    `A ⊗[R] M ≃ₗ[A] A ⊗[R] N` given by `LinearMap.baseChange A e`.
 -/
@@ -27,11 +28,12 @@ namespace TensorProduct
 
 universe uR uS uA uB uC uD uE uF
 
-variable (R : Type uR)  (A : Type uA)  (S : Type uS)
- [CommSemiring R] [CommSemiring S]  [Algebra R S]  [Semiring A]
-  [Algebra R A] [Algebra S A]  [IsScalarTower R S A]
+variable (R : Type uR)  (A : Type uA)
+ [CommSemiring R] [Semiring A] [Algebra R A]
   (ι : Type uι) [Finite ι]
 
+/-- Constructive right identity for the tensor product of an algebra with a finite product of commutative rings.
+This is the linear map which sends the standard basis `1 ⊗ e i` to `e i`. -/
 def rid_pi :
   A ⊗[R] (ι → R) ≃ₗ[A] (ι → A)
   := Basis.equiv (Algebra.TensorProduct.basis A (Pi.basisFun R ι)) (Pi.basisFun A ι) (Equiv.refl ι)
@@ -45,10 +47,10 @@ namespace LinearMap
 variable {R A M N : Type*} [CommSemiring R] [Semiring A]
   [Algebra R A] [AddCommMonoid M] [AddCommMonoid N] [Module R M]
   [Module R N]
-
 variable (e : M ≃ₗ[R] N)
 variable (A)
 
+/-- The base change equivalence `A ⊗[R] M ≃ₗ[A] A ⊗[R] N` induced by the linear equivalance `e : M ≃ₗ[R] N`.-/
 def baseChange_equiv : A ⊗[R] M ≃ₗ[A] A ⊗[R] N where
   toLinearMap := LinearMap.baseChange A e
   invFun := LinearMap.baseChange A e.symm
