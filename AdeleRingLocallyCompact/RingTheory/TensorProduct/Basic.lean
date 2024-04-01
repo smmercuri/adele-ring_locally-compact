@@ -42,10 +42,10 @@ end Algebra
 
 namespace LinearMap
 
-variable {R A M N : Type*} [CommSemiring R]
-variable [Semiring A] [Algebra R A]
-variable [AddCommMonoid M] [AddCommMonoid N]
-variable [Module R M] [Module R N]
+variable {R A M N : Type*} [CommSemiring R] [Semiring A]
+  [Algebra R A] [AddCommMonoid M] [AddCommMonoid N] [Module R M]
+  [Module R N]
+
 variable (e : M ≃ₗ[R] N)
 variable (A)
 

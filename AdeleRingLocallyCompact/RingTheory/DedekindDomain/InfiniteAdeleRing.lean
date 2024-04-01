@@ -47,7 +47,7 @@ infinite adele ring, number field
 noncomputable section
 
 open DedekindDomain IsDedekindDomain IsDedekindDomain.HeightOneSpectrum NumberField Algebra.TensorProduct
-  Algebra.LinearMap
+  LinearMap
 
 open scoped TensorProduct
 
