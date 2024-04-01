@@ -16,6 +16,9 @@ supplementing the current mathlib library.
    linear map from the basis map sending `1 ⊗ e i ↦ e i`, where `e i` is the standard basis in `Pi`.
  - `LinaraMap.baseChange_equiv` : If `e : M ≃ₗ[R] N` then this is the linear equivalence
    `A ⊗[R] M ≃ₗ[A] A ⊗[R] N` given by `LinearMap.baseChange A e`.
+
+## TODO
+ - Turn `rid_pi` into an algebra equivalence.
 -/
 
 open scoped TensorProduct
@@ -32,9 +35,13 @@ variable (R : Type uR)  (A : Type uA)
  [CommSemiring R] [Semiring A] [Algebra R A]
   (ι : Type uι) [Finite ι]
 
-/-- Constructive right identity for the tensor product of an algebra with a finite product of commutative rings.
-This is the linear map which sends the standard basis `1 ⊗ e i` to `e i`. -/
-def rid_pi :
+/-- Constructive _linear_ right identity for the tensor product of an algebra with a finite product of
+commutative rings.
+
+This is the linear map which sends the standard basis `1 ⊗ e i` to `e i`.
+
+TODO : turn this into an algebra equivalance.-/
+def rid_pi_linearEquiv :
   A ⊗[R] (ι → R) ≃ₗ[A] (ι → A)
   := Basis.equiv (Algebra.TensorProduct.basis A (Pi.basisFun R ι)) (Pi.basisFun A ι) (Equiv.refl ι)
 

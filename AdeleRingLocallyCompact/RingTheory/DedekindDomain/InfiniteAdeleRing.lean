@@ -70,7 +70,7 @@ end DerivedInstances
 theorem piReal_equiv : (ℝ ⊗[ℚ] K) ≃ₗ[ℝ] (Fin (FiniteDimensional.finrank ℚ K) → ℝ) :=
   LinearEquiv.trans
     (baseChange_equiv ℝ (ratBasis_equiv K).symm)
-    (rid_pi ℚ ℝ (Fin (FiniteDimensional.finrank ℚ K)))
+    (rid_pi_linearEquiv ℚ ℝ (Fin (FiniteDimensional.finrank ℚ K)))
 
 instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K)
   := TopologicalSpace.induced
