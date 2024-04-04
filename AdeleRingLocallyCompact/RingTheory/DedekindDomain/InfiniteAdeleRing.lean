@@ -42,6 +42,7 @@ infinite adele ring, number field
  - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` should be abstracted to a general result since all it
    relies on is that the infinite adeles have a topology that is induced by a linear equivalence to a locally compact
    space.
+ - Show that the infinite adele ring is a topological ring.
 -/
 
 noncomputable section

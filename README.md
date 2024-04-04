@@ -85,3 +85,8 @@ We collect some implementation notes and describe the Lean proof of the local co
 - The above homeomorphism then descends to a homeomorphism $\mathbb{A}\_{S, K, f}\cong \prod_{v\in S} K\_v \times \prod_{v\notin S} O\_v$, when the right-hand side is seen as a _subtype_ of $\widehat{K}\_S$.
 - There is a homeomorphism between $\prod_{v\in S} K\_v \times \prod_{v\notin S} O\_v$ when viewed as a subtype of $\widehat{K}\_S$ vs. when it is defined as a topological space in its own right (i.e., with product topology). It is easy to show that the latter is locally compact using standard locally compact product results.
 - This chain of homeomorphisms gives the proof of the local compactness of $\mathbb{A}\_{S, K, f}$. 
+
+## TODOs
+- Incorporate the proof that `v.adicCompletionIntegers K` has finite residue field.
+- Show that the adele ring is a topological ring.
+- Show the idele group is locally compact.
