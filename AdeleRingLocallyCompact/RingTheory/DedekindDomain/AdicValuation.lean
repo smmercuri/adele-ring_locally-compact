@@ -51,6 +51,7 @@ dedekind domain, dedekind ring, adic valuation
 
 ## TODO
  - Incorporate the proof that the `v`-adic ring of integers has finite residue field.
+ - Use `UniformSpace.ball` instead of `openBall`.
 -/
 
 noncomputable section
