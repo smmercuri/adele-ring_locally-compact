@@ -8,6 +8,9 @@ package «adele-ring_locally-compact» {
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git"
 
+require local_class_field_theory from git
+  "https://github.com/mariainesdff/LocalClassFieldTheory.git"
+
 @[default_target]
 lean_lib «AdeleRingLocallyCompact» {
   -- add any library configuration options here
