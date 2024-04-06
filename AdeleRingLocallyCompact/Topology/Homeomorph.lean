@@ -11,27 +11,18 @@ import Mathlib
 In this file we prove that local compactness is preserved by homeomorphisms.
 
 ## Main results
- - `Homeomorph.locallyCompactSpace` : if the codomain of a homeomorphism is a locally
+ - `Homeomorph.locallyCompactSpace_iff` : if the codomain of a homeomorphism is a locally
    compact space, then the domain is also a locally compact space.
 -/
 namespace Homeomorph
 
 variable {X : Type*} {Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]
 
-/-- If the codomain of a homeomorphism is a locally compact space, then the domain is
-also a locally compact space. -/
-theorem locallyCompactSpace [i : LocallyCompactSpace Y] (h : X ≃ₜ Y) :
-  LocallyCompactSpace X := by
-  refine LocallyCompactSpace.mk (λ x N hN => ?_)
-  rw [←h.symm_map_nhds_eq]
-  rw [h.nhds_eq_comap, Filter.mem_comap] at hN
-  obtain ⟨T, hT, hTN⟩ := hN
-  obtain ⟨S, hS, hST, hS_compact⟩ := (i.1 (h x)) T hT
-  use h.symm '' S
-  rw [Filter.mem_map, preimage_image, Set.image_subset_iff, isCompact_image]
-  refine ⟨hS, ?_, hS_compact⟩
-  apply subset_trans hST
-  rw [h.preimage_symm, ← h.preimage_subset, coe_toEquiv, preimage_image]
-  exact hTN
+/-- The codomain of a homeomorphism is a locally compact space if and only if
+the domain is a locally compact space. -/
+theorem locallyCompactSpace_iff (h : X ≃ₜ Y) :
+    LocallyCompactSpace X ↔ LocallyCompactSpace Y := by
+  exact ⟨fun _ => h.symm.openEmbedding.locallyCompactSpace,
+    fun _ => h.closedEmbedding.locallyCompactSpace⟩
 
   end Homeomorph
