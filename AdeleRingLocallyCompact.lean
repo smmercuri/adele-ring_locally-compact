@@ -1,5 +1,6 @@
 import AdeleRingLocallyCompact.Algebra.Group.WithOne.Defs
 import AdeleRingLocallyCompact.NumberTheory.NumberField.Basic
+import AdeleRingLocallyCompact.NumberTheory.NumberField.Embeddings
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
