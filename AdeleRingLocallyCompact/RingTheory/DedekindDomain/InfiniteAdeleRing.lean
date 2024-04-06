@@ -12,12 +12,16 @@ import AdeleRingLocallyCompact.RingTheory.TensorProduct.Basic
 
 This file ports and develops further the Lean 3 formalization of the infinite adele ring found in
 [https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_K.lean#L45](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_K.lean#L45).
-While the infinite adele ring there is given the coinduced topology by the linear map `ℝⁿ →ₗ[ℝ] ℝ ⊗[ℚ] K`, where
+While the infinite adele ring there is given the coinduced _ring topology_ by the linear map `ℝⁿ →ₗ[ℝ] ℝ ⊗[ℚ] K`, where
 `n` is the degree of the field extension `K/ℚ`, in this file we show that this is actually a linear equivalence
 `ℝ ⊗[ℚ] K ≃ₗ[ℝ] ℝⁿ` and instead we give the infinite adele ring the induced topology under the forward
-direction of this equivalence. This is equivalent to the coinduced topology on the reverse direction, so
-the topology is the same as in the prior formalization, however we found working directly with the induced
-topology to be easier in later proofs.
+direction of this equivalence, which is equivalent to the coinduced topology on the reverse direction but not
+necessarily to the coinduced _ring topology_ of prior work
+(because `TopologicalSpace.coinduced ≤ RingTopology.coinduced.toTopologicalSpace`).
+It is a TODO to show that we can build a topological ring structure from the topology defined here. The reason
+for this change is that both directions under the equivalence is used in the proof of local compactness, which
+is possible on the level of topological spaces, but not in the ring topology unless we show the above `≤` is
+actually an equivalence.
 
 ## Main definitions
  - `DedekindDomain.infiniteAdeleRing` of a number field `K` is defined as the tensor product `ℝ ⊗[ℚ] K`.
@@ -39,7 +43,7 @@ topology to be easier in later proofs.
 infinite adele ring, number field
 
 ## TODO
- - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` should be abstracted to a general result since all it
+ - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` could be abstracted to a general result since all it
    relies on is that the infinite adeles have a topology that is induced by a linear equivalence to a locally compact
    space.
  - Show that the infinite adele ring is a topological ring.
