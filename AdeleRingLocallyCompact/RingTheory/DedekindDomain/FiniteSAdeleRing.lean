@@ -12,7 +12,7 @@ import AdeleRingLocallyCompact.Topology.Homeomorph
 # Finite S-adele ring
 
 Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions and `S` a finite set of
-places `v` of `R`. In this file we define the finite S-adele ring, whose carrier is the set of all elements in
+finite places `v` of `R`. In this file we define the finite S-adele ring, whose carrier is the set of all elements in
 `ProdAdicCompletions R K` which are in the `v`-adic ring of integers outside of `S`, and we show that this is
 locally compact. The finite S-adele ring affords an open embedding into the regular finite adele ring and, moreover,
 cover the finite adele ring. This allows us to show that the finite adele ring is also locally compact.
@@ -163,7 +163,7 @@ instance : LocallyCompactSpace (SProdAdicCompletionIntegers R K S) :=
 
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact. -/
 instance : LocallyCompactSpace (SProdAdicCompletionIntegers_subtype R K S) :=
-  Homeomorph.locallyCompactSpace (SProdAdicCompletionIntegers.homeomorph R K S)
+  (Homeomorph.locallyCompactSpace_iff (SProdAdicCompletionIntegers.homeomorph R K S)).2 inferInstance
 
 end SProdAdicCompletionIntegers
 
@@ -418,8 +418,8 @@ theorem homeomorph_piSubtypeProd : finiteSAdeleRing R K S ≃ₜ SProdAdicComple
   exact ⟨λ hx v => hx v.1 v.2, λ hx v hv => hx ⟨v, hv⟩⟩
 
 /-- The finite S-adele ring is locally compact. -/
-theorem locallyCompactSpace : LocallyCompactSpace (finiteSAdeleRing R K S) := by
-  exact Homeomorph.locallyCompactSpace (homeomorph_piSubtypeProd R K S)
+theorem locallyCompactSpace : LocallyCompactSpace (finiteSAdeleRing R K S) :=
+  (Homeomorph.locallyCompactSpace_iff (homeomorph_piSubtypeProd R K S)).2 inferInstance
 
 end FiniteSAdeleRing
 
