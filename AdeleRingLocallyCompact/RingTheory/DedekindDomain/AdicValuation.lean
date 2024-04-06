@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri, María Inés de Frutos-Fernández, Filippo A. E. Nuccio
 -/
 import Mathlib
+import LocalClassFieldTheory.DiscreteValuationRing.ResidueField
+import LocalClassFieldTheory.DiscreteValuationRing.Complete
+import LocalClassFieldTheory.DiscreteValuationRing.Extensions
 import AdeleRingLocallyCompact.Algebra.Group.WithOne.Defs
 
 /-!
@@ -287,7 +290,8 @@ theorem valuation_le_pow_of_maximalIdeal {x : v.adicCompletionIntegers K} (n : �
       ← one_mul (n : ℤ), Int.ofAdd_mul, zpow_natCast]
 
 /-- The residue field of the `v`-adic integers is finite. -/
-instance residueField_finite : Fintype (residueField K v) := sorry
+instance residueField_finite : Fintype (residueField K v) :=
+  sorry--DiscreteValuation.fintypeResidueFieldOfUnitBall (v.adicCompletion K) ℚ _ _
 
 instance : CommRing (Fin n → LocalRing.ResidueField (v.adicCompletionIntegers K)) := inferInstance
 
@@ -324,6 +328,7 @@ theorem finiteExpansion {π : v.adicCompletionIntegers K} (n : ℕ) (x : v.adicC
       Submodule.Quotient.mk_sub, Submodule.Quotient.mk, Quotient.out_eq', Submodule.Quotient.mk''_eq_mk,
       Ideal.Quotient.mk_eq_mk, sub_self]
 
+  rw [mul_comm]
   exact mul_dvd_mul_right h (π^d)
 
 /-- Given a uniformizer `π` of the `v`-adic integers and a `v`-adic integer `x` modulo a power of
