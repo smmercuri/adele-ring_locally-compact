@@ -74,25 +74,23 @@ instance : Inhabited (v.completion K) :=
 
 instance : TopologicalRing (v.completion K) := UniformSpace.Completion.topologicalRing
 
-/-- The extension of Subtype.val to the completion of a number field at an Archimedean place. -/
-def embedding := UniformSpace.Completion.extension (Subfield.subtype (subfield K v))
+/-- The embedding of a completion of a number field at an Archimedean place into `ℂ`. -/
+def extensionEmbedding :=
+  UniformSpace.Completion.extensionHom (Subfield.subtype (subfield K v)) continuous_subtype_val
 
 theorem embedding_uniformInducing :
-  UniformInducing (embedding K v) := by
+  UniformInducing (extensionEmbedding K v) := by
   rw [uniformInducing_iff]
   ext S
   rw [UniformSpace.Completion.mem_uniformity_dist]
   rw [Filter.mem_comap]
   sorry
 
-instance closedEmbedding : ClosedEmbedding (embedding K v) := by
+theorem closedEmbedding : ClosedEmbedding (extensionEmbedding K v) := by
   apply ClosedEmbedding.mk
   · apply Embedding.mk
     · exact (embedding_uniformInducing K v).inducing
-    · intro x y hxy
-      unfold embedding at hxy
-      simp at hxy
-      sorry
+    · exact (extensionEmbedding K v).injective
   · apply IsComplete.isClosed
     rw [← completeSpace_iff_isComplete_range]
     · infer_instance
