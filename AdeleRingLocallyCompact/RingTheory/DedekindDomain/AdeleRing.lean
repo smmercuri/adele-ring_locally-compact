@@ -10,11 +10,12 @@ import AdeleRingLocallyCompact.RingTheory.DedekindDomain.InfiniteAdeleRing
 /-!
 # Adele Ring
 
-Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions and `v` a maximal ideal of `R`.
-If `K` is a number field we define the adele ring and show that it is a locally compact space.
+We define the adele ring of a number field `K` as the direct product of the infinite adele ring
+of `K` and the finite adele ring of `K`, whose product is restricted with respect to the ring
+of integers in `K`. We show that the adele ring of `K` is a locally compact space.
 
 ## Main definitions
- - `adeleRing R K` is the adele ring of a number field `K`.
+ - `adeleRing K` is the adele ring of a number field `K`.
 
 ## Main results
  - `AdeleRing.locallyCompactSpace` : the adele ring of a number field is a locally compact space.
@@ -32,31 +33,30 @@ adele ring, dedekind domain
 
 noncomputable section
 
-open DedekindDomain IsDedekindDomain
+open DedekindDomain IsDedekindDomain NumberField
 
 open scoped Classical
 
 namespace DedekindDomain
 
-variable (R : Type*) [CommRing R] [IsDomain R] [IsDedekindDomain R] (K : Type*)
-  [Field K] [NumberField K] [Algebra R K] [IsFractionRing R K]
+variable (K : Type*) [Field K] [NumberField K]
 
 /-- The adele ring of a number field. -/
-def adeleRing := infiniteAdeleRing K × finiteAdeleRing R K
+def adeleRing := infiniteAdeleRing K × finiteAdeleRing (ringOfIntegers K) K
 
 namespace AdeleRing
 
 section DerivedInstances
 
-instance topologicalSpace : TopologicalSpace (adeleRing R K) :=
+instance topologicalSpace : TopologicalSpace (adeleRing K) :=
   instTopologicalSpaceProd
 
 end DerivedInstances
 
 /-- The adele ring of a number field is a locally compact space. -/
-theorem locallyCompactSpace : LocallyCompactSpace (adeleRing R K) := by
+theorem locallyCompactSpace : LocallyCompactSpace (adeleRing K) := by
   haveI := InfiniteAdeleRing.locallyCompactSpace K
-  haveI := FiniteAdeleRing.locallyCompactSpace R K
+  haveI := FiniteAdeleRing.locallyCompactSpace (ringOfIntegers K) K
   exact Prod.locallyCompactSpace _ _
 
 end AdeleRing
