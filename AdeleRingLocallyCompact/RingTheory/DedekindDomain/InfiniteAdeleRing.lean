@@ -49,12 +49,22 @@ section DerivedInstances
 
 instance : Ring (infiniteAdeleRing K) := Pi.ring
 
+instance : Inhabited (infiniteAdeleRing K) := ⟨0⟩
+
+instance : Nontrivial (infiniteAdeleRing K) := Pi.nontrivial
+
 end DerivedInstances
 
 instance : TopologicalSpace (infiniteAdeleRing K)
   := Pi.topologicalSpace
 
 instance : TopologicalRing (infiniteAdeleRing K) := Pi.instTopologicalRing
+
+def globalEmbedding : K →+* infiniteAdeleRing K :=
+  Pi.ringHom (fun (v : InfinitePlace K) => InfinitePlace.Completion.coeRingHom K v)
+
+theorem globalEmbedding_injective : Function.Injective (globalEmbedding K) :=
+  (globalEmbedding K).injective
 
 /-- The infinite adele ring is locally compact. -/
 theorem locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) :=

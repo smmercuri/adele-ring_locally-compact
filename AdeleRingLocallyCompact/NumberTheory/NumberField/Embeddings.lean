@@ -29,6 +29,9 @@ namespace NumberField.InfinitePlace
 
 variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
 
+instance : Inhabited (InfinitePlace K) :=
+  ⟨Classical.choice (instNonemptyInfinitePlace K)⟩
+
 /-- The embedding of K as a subfield in ℂ using the embedding associated to the infinite place
 `v`. -/
 def subfield (v : InfinitePlace K) : Subfield ℂ where
@@ -58,12 +61,6 @@ instance : UniformSpace (v.completion K) :=
 instance : CompleteSpace (v.completion K) :=
   @UniformSpace.Completion.completeSpace _ (subfield_uniformSpace K v)
 
-instance : Coe (subfield K v) (v.completion K) :=
-  (inferInstance : Coe (subfield K v) (@UniformSpace.Completion (subfield K v) (subfield_uniformSpace K v)))
-
-instance : Coe K (v.completion K) where
-  coe := (↑) ∘ v.toSubfield K
-
 instance : NormedDivisionRing (subfield K v) :=
   NormedDivisionRing.induced _ _ (Subfield.subtype (subfield K v)) Subtype.val_injective
 
@@ -79,6 +76,15 @@ instance HDist : Dist (v.completion K) :=
 
 instance : T0Space (v.completion K) :=
   @UniformSpace.Completion.t0Space _ (subfield_uniformSpace K v)
+
+instance : Coe (subfield K v) (v.completion K) :=
+  (inferInstance : Coe (subfield K v) (@UniformSpace.Completion (subfield K v) (subfield_uniformSpace K v)))
+
+instance : Coe K (v.completion K) where
+  coe := (↑) ∘ v.toSubfield K
+
+def coeRingHom : K →+* v.completion K :=
+  RingHom.comp UniformSpace.Completion.coeRingHom (v.toSubfield K)
 
 /-- The embedding `Kᵥ → ℂ` of a completion of a number field at an Archimedean
 place into `ℂ`. -/
