@@ -87,6 +87,10 @@ We collect some implementation notes and describe the Lean proof of the local co
 - This chain of homeomorphisms gives the proof of the local compactness of $\mathbb{A}\_{S, K, f}$. 
 
 ## TODOs
+- Refactor `InfiniteAdeleRing.lean` and `AdeleRing.lean` to `NumberTheory/NumberField` and use `R = ringOfIntegers K`.
+- Delete unnecessary files (e.g., `TensorProduct`).
+- Turn `FiniteSAdeleRing.embedding` and `projection` and `localInclusion` (and rename to `localEmbedding` maps into ring homomorphisms).
 - Incorporate the proof that `v.adicCompletionIntegers K` has finite residue field.
 - Show that the adele ring is a topological ring.
+- Define global embedding for finite adele ring and adele ring.
 - Show the idele group is locally compact.
