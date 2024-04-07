@@ -262,12 +262,15 @@ theorem projection_range (v : HeightOneSpectrum R) :
     use ι v x
     exact ⟨isFiniteSAdele_localInclusion v hx, FiniteAdeleRing.projection_localInclusion_eq v x⟩
 
-
 variable (R)
 
-/-- Map sending finite S-adeles to finite adeles. -/
-def toFiniteAdeleRing : finiteSAdeleRing R K S → finiteAdeleRing R K
-  := λ x => ⟨x.1, mem_isFiniteAdele x.2⟩
+/-- Ring homomorphism sending finite S-adeles to finite adeles. -/
+def toFiniteAdeleRing : finiteSAdeleRing R K S →+* finiteAdeleRing R K where
+  toFun := λ x => ⟨x.1, mem_isFiniteAdele x.2⟩
+  map_add' _ _ := rfl
+  map_one' := rfl
+  map_zero' := rfl
+  map_mul' _ _ := rfl
 
 local notation "e" => toFiniteAdeleRing R K
 
@@ -277,10 +280,10 @@ instance topologicalSpace: TopologicalSpace (finiteSAdeleRing R K S)
 
 theorem toFiniteAdeleRing_inducing : Inducing (e S) := by rw [inducing_iff]; rfl
 
-theorem toFiniteAdeleRing_injective : (e S).Injective := by
+theorem toFiniteAdeleRing_injective : Function.Injective (e S) := by
   intro x y hxy
-  simp only [toFiniteAdeleRing, Subtype.mk.injEq] at  hxy
-  rw [Subtype.mk.injEq]
+  simp only [toFiniteAdeleRing, Subtype.mk.injEq, RingHom.coe_mk, MonoidHom.coe_mk,
+    OneHom.coe_mk, Subtype.mk.injEq, SetLike.coe_eq_coe] at hxy
   exact hxy
 
 theorem toFiniteAdeleRing_range : Set.range (e S) = setOf (λ x : finiteAdeleRing R K => IsFiniteSAdele S x.val) :=

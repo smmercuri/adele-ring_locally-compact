@@ -51,7 +51,7 @@ variable {R}
 
 /-- Sends an element of the product of all `adicCompletions` to a local place. -/
 def projection (v : HeightOneSpectrum R) :
-  ProdAdicCompletions R K → v.adicCompletion K :=
+  ProdAdicCompletions R K →+* v.adicCompletion K :=
   Pi.evalRingHom _ v
 
 /-- Sends a local element to the product of all `adicCompletions` filled with `1`s elsewhere. -/
@@ -95,8 +95,8 @@ variable {R K}
 
 /-- Sends a finite adele to a local place. -/
 def projection (v : HeightOneSpectrum R) :
-  finiteAdeleRing R K → v.adicCompletion K :=
-  (Pi.evalRingHom _ v) ∘ Subtype.val
+  finiteAdeleRing R K →+* v.adicCompletion K :=
+  RingHom.comp (Pi.evalRingHom _ v) (Subring.subtype _)
 
 /-- Sends a local element to a finite adele filled with `1`s elsewhere. -/
 def localInclusion (v : HeightOneSpectrum R) :

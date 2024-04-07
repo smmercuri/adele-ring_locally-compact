@@ -88,9 +88,6 @@ We collect some implementation notes and describe the Lean proof of the local co
 
 ## TODOs
 - Refactor `InfiniteAdeleRing.lean` and `AdeleRing.lean` to `NumberTheory/NumberField`.
-- Delete unnecessary files (e.g., `TensorProduct`).
-- Turn `FiniteSAdeleRing.embedding` and `projection` and `localInclusion` (and rename to 
-    `localEmbedding` maps into ring homomorphisms).
 - Incorporate the proof that `v.adicCompletionIntegers K` has finite residue field.
 - Show that the adele ring is a topological ring.
 - Define global embedding for finite adele ring and adele ring.
