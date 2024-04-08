@@ -48,10 +48,20 @@ namespace AdeleRing
 
 section DerivedInstances
 
+instance : CommRing (adeleRing K) := Prod.instCommRing
+
+instance : Inhabited (adeleRing K) := ⟨0⟩
+
 instance topologicalSpace : TopologicalSpace (adeleRing K) :=
   instTopologicalSpaceProd
 
 end DerivedInstances
+
+def globalEmbedding : K →+* adeleRing K :=
+  RingHom.prod (InfiniteAdeleRing.globalEmbedding K) (FiniteAdeleRing.globalEmbedding _ _)
+
+theorem globalEmbedding_injective : Function.Injective (globalEmbedding K) :=
+  λ _ _ hxy => InfiniteAdeleRing.globalEmbedding_injective K (Prod.ext_iff.1 hxy).1
 
 /-- The adele ring of a number field is a locally compact space. -/
 theorem locallyCompactSpace : LocallyCompactSpace (adeleRing K) := by

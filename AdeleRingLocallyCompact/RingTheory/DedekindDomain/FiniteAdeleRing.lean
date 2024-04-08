@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
 import Mathlib
+import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
 
 /-!
 # Finite adele ring
@@ -46,6 +47,9 @@ variable (R : Type*) [CommRing R] [IsDomain R] [IsDedekindDomain R] (K : Type*)
   [Field K] [Algebra R K] [IsFractionRing R K]
 
 namespace ProdAdicCompletions
+
+def globalEmbedding : K →+* ProdAdicCompletions R K :=
+  Pi.ringHom (λ v => AdicCompletion.coeRingHom K v)
 
 variable {R}
 
@@ -91,7 +95,7 @@ end ProdAdicCompletions
 
 namespace FiniteAdeleRing
 
-variable {R K}
+variable {R}
 
 /-- Sends a finite adele to a local place. -/
 def projection (v : HeightOneSpectrum R) :
@@ -104,8 +108,10 @@ def localInclusion (v : HeightOneSpectrum R) :
   λ x => ⟨ProdAdicCompletions.localInclusion K v x,
           ProdAdicCompletions.isFiniteAdele_localInclusion v x⟩
 
-local notation "π" => projection
-local notation "ι" => localInclusion
+local notation "π" => projection K
+local notation "ι" => localInclusion K
+
+variable {K}
 
 /-- The `v`th place of the local inclusion is the original element. -/
 theorem localInclusion_rfl (v : HeightOneSpectrum R) (x : v.adicCompletion K)
@@ -133,6 +139,59 @@ def generatingSet : Set (Set (finiteAdeleRing R K)) :=
 
 instance topologicalSpace : TopologicalSpace (finiteAdeleRing R K)
   := TopologicalSpace.generateFrom (generatingSet R K)
+
+/-- [https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685)-/
+theorem globalEmbedding_isFiniteAdele (x : K) :
+    ProdAdicCompletions.IsFiniteAdele (ProdAdicCompletions.globalEmbedding R K x) := by
+  set supp := setOf (fun (v : HeightOneSpectrum R) =>
+    (ProdAdicCompletions.globalEmbedding R K) x v ∉ adicCompletionIntegers K v
+  )
+  obtain ⟨r, ⟨d, hd⟩, hx⟩ := IsLocalization.mk'_surjective (nonZeroDivisors R) x
+  have hd_ne_zero : Ideal.span {d} ≠ (0 : Ideal R) := by
+    rw [Ideal.zero_eq_bot, Ne.def, Ideal.span_singleton_eq_bot]
+    exact nonZeroDivisors.ne_zero hd
+  have hsubset : supp ⊆ { v : HeightOneSpectrum R | v.asIdeal ∣ Ideal.span {d}} := by
+    intro v hv
+    simp only [supp, mem_adicCompletionIntegers, not_le, not_lt, Set.mem_setOf_eq] at hv
+    rw [Set.mem_setOf_eq, ← int_valuation_lt_one_iff_dvd]
+    by_contra! h_one_le
+    simp only [IsFractionRing.mk'_eq_div] at hx
+    have h_val : Valued.v ((ProdAdicCompletions.globalEmbedding R K x v)) =
+      Valued.v (x : v.adicCompletion K) := by
+      have h : Pi.ringHom (λ v => AdicCompletion.coeRingHom K v) x v = (x : v.adicCompletion K) := by
+        simp only [Pi.ringHom_apply]; rfl
+      rw [← h, Pi.ringHom_apply]
+      rfl
+    simp only [h_val, Valued.valuedCompletion_apply, adicValued_apply, HeightOneSpectrum.valuation_def] at hv
+    simp only [← hx, map_div₀, Valuation.extendToLocalization_apply_map_apply] at hv
+    have h_val_d : intValuation v d = 1 :=
+      by rw [←le_antisymm (v.int_valuation_le_one d) h_one_le]; rfl
+    rw [h_val_d, div_one] at hv
+    exact not_lt.2 (v.int_valuation_le_one r) hv
+  exact Set.Finite.subset (Ideal.finite_factors hd_ne_zero) hsubset
+
+def globalEmbedding : K →+* finiteAdeleRing R K where
+  toFun := λ x => ⟨ProdAdicCompletions.globalEmbedding R K x, globalEmbedding_isFiniteAdele R K x⟩
+  map_one' := rfl
+  map_zero' := rfl
+  map_mul' x y := by simp only [map_mul]; rfl
+  map_add' x y := by simp only [map_add]; rfl
+
+theorem nontrivial_of_nonEmpty [i : Nonempty (HeightOneSpectrum R)] :
+    Nontrivial (finiteAdeleRing R K) := by
+  obtain v := (Classical.inhabited_of_nonempty i).default
+  use 0, ι v 1
+  simp only [ne_eq, ← Subtype.val_inj, ZeroMemClass.coe_zero, localInclusion]
+  unfold ProdAdicCompletions.localInclusion
+  intro h
+  have h := congrFun h v
+  simp only [dif_pos] at h
+  exact zero_ne_one h
+
+theorem globalEmbedding_injective [i : Nonempty (HeightOneSpectrum R)] :
+    Function.Injective (globalEmbedding R K) := by
+  haveI := nontrivial_of_nonEmpty
+  exact (globalEmbedding R K).injective
 
 end FiniteAdeleRing
 

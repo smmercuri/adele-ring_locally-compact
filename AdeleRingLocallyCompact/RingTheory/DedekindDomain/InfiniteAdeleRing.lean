@@ -45,7 +45,7 @@ namespace InfiniteAdeleRing
 
 section DerivedInstances
 
-instance : Ring (infiniteAdeleRing K) := Pi.ring
+instance : CommRing (infiniteAdeleRing K) := Pi.commRing
 
 instance : Inhabited (infiniteAdeleRing K) := ⟨0⟩
 

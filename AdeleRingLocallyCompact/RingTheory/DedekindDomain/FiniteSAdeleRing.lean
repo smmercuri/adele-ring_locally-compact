@@ -167,8 +167,8 @@ instance : LocallyCompactSpace (SProdAdicCompletionIntegers_subtype R K S) :=
 
 end SProdAdicCompletionIntegers
 
-local notation "π" => FiniteAdeleRing.projection
-local notation "ι" => FiniteAdeleRing.localInclusion
+local notation "π" => FiniteAdeleRing.projection K
+local notation "ι" => FiniteAdeleRing.localInclusion K
 
 variable {R K}
 

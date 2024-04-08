@@ -65,11 +65,16 @@ namespace IsDedekindDomain.HeightOneSpectrum
 
 local notation "μ_v" => @WithZero.unitsWithZeroEquiv (Multiplicative ℤ)
 
+namespace AdicCompletion
+
 /-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L137](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L137) -/
 def IsUniformizer (π : v.adicCompletion K) : Prop :=
   Valued.v π = Multiplicative.ofAdd (-1 : ℤ)
 
 variable (K v)
+
+def coeRingHom : K →+* v.adicCompletion K :=
+  @UniformSpace.Completion.coeRingHom K _ v.adicValued.toUniformSpace _ _
 
 /-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L95](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L95) -/
 theorem exists_uniformizer :
@@ -139,7 +144,11 @@ variable {K v}
 theorem ne_zero_iff_valuation_ne_zero (x : v.adicCompletion K) :
   x ≠ 0 ↔ Valued.v x ≠ 0 := by simp only [ne_eq, map_eq_zero]
 
+end AdicCompletion
+
 namespace AdicCompletionIntegers
+
+open AdicCompletion
 
 variable (K v)
 
@@ -484,6 +493,7 @@ instance : LocallyCompactSpace (v.adicCompletionIntegers K) := inferInstance
 
 end AdicCompletionIntegers
 
+open AdicCompletion
 open AdicCompletionIntegers
 
 variable (K v)
