@@ -37,7 +37,9 @@ def subfield (v : InfinitePlace K) : Subfield ℂ where
   toSubring := v.embedding.range
   inv_mem' _ := by intro ⟨y, hy⟩; exact ⟨y⁻¹, by simp only [map_inv₀, hy]⟩
 
-/-- The embedding sending a number field to its subfield in ℂ. -/
+/-- The embedding sending a number field to its subfield in ℂ.
+
+TODO: this is a ring isomorphism. -/
 def toSubfield : K →+* v.subfield K where
   toFun := fun x => ⟨v.embedding x, Set.mem_range_self x⟩
   map_one' := by simp only [map_one, Submonoid.mk_eq_one]
@@ -82,6 +84,8 @@ instance : Coe (subfield K v) (v.completion K) :=
 instance : Coe K (v.completion K) where
   coe := (↑) ∘ v.toSubfield K
 
+/-- TODO:  this should be composed with symm direction of `toSubfield` so that it always sends `k` to `k`. E.g., currently one 
+embedding sends `1 + sqrt(2)` to `1 + sqrt(2)` and the other sends it to `1 - sqrt(2)` in `Q(sqrt(2))`-/
 def coeRingHom : K →+* v.completion K :=
   RingHom.comp UniformSpace.Completion.coeRingHom (v.toSubfield K)
 
