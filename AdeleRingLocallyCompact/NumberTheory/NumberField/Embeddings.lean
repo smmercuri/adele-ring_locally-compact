@@ -27,8 +27,8 @@ This file defines the completion of a number field with respect to an infinite p
   note that the absolute values associated to infinite places are given by composing
   the various embeddings of `K →+* ℂ` with the usual complex absolute value. So we
   can first embed `K` into a `Subfield ℂ` type, and then complete the embedding
-  using `UniformSpace.Completion` with respect to the usual absolute value. `Subfield ℂ`
-  already has instances such as `completableTopField`.
+  using `UniformSpace.Completion` with respect to the usual complex absolute value.
+  `Subfield ℂ` already has instances such as `completableTopField`.
  - By splitting out the embedding from the completion, the consequence of this approach
   is that the inferred absolute value on `v.completion K` is just the complex absolute value.
   In the literature, the absolute value is the composition of the embedding with the complex
