@@ -15,11 +15,22 @@ are formalised in `AdeleRingLocallyCompact.NumberTheory.NumberField.Embeddings`.
 
 ## Main definitions
  - `DedekindDomain.infiniteAdeleRing` of a number field `K` is defined as the product of the completions
-   of `K` over its Archimedean places.
+  of `K` over its Archimedean places.
 
 ## Main results
  - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` : the infinite adele ring is a locally compact space
-   since it's topology is induced from a finite product of locally compact spaces.
+  since it's topology is induced from a finite product of locally compact spaces.
+
+## Implementation notes
+ - In the literature, the global embedding is usually defined by `x ↦ (x, x, ..., x)`, where
+  the absolute value at each infinite place is the embedding associated to `v` composed with
+  the complex absolute value. Here the formalisation of `v.completion K` is obtained by
+  injecting `K` to a `Subfield ℂ` type using the embedding associated to `v` and then
+  completing this image with respect to the complex absolute value (see the implementation
+  notes of `NumberTheory/NumberField/Embeddings.lean`). Thus, in our case
+  the global embedding is defined by `x ↦ (e₁(x), ..., eₙ(x))`, where `eᵢ` are the embeddings
+  and the absolute value at each infinite place is the usual complex absolute value. These two
+  definitions are clearly equivalent.
 
 ## References
  * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
