@@ -22,7 +22,7 @@ This file defines the completion of a number field with respect to an infinite p
  - There are two main choices for formalising the completion of a number field `K` at
   an infinite place `v`. One is to complete `K` directly using `UniformSpace.Completion`
   and the uniform space induced by the absolute value associated to `v`. To show that
-  the resultant completion of a field requires one to prove that `K` has a
+  the resultant completion is a field requires one to prove that `K` has a
   `completableTopField` instance. Alternatively, and the approach taken here, is to
   note that the absolute values associated to infinite places are given by composing
   the various embeddings of `K →+* ℂ` with the usual complex absolute value. So we
