@@ -57,7 +57,6 @@ finite s-adele ring, dedekind domain
 ## TODO
  - Move the local compactness of the finite adele ring to `FiniteAdeleRing.lean`, currently this
    results in circular imports.
- - Define the embedding map as a ring homomorphism.
 -/
 
 noncomputable section
