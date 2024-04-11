@@ -89,5 +89,4 @@ We collect some implementation notes and describe the Lean proof of the local co
 ## TODOs
 - Refactor `InfiniteAdeleRing.lean` and `AdeleRing.lean` to `NumberTheory/NumberField`.
 - Incorporate the proof that `v.adicCompletionIntegers K` has finite residue field.
-- Show that the adele ring is a topological ring.
 - Show the idele group is locally compact.

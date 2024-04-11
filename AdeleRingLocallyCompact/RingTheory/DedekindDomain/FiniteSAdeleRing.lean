@@ -274,7 +274,7 @@ def toFiniteAdeleRing : finiteSAdeleRing R K S →+* finiteAdeleRing R K where
 local notation "e" => toFiniteAdeleRing R K
 
 /-- The S-adeles are given the subspace topology viewed as a subspace of the finite adele ring. -/
-instance topologicalSpace: TopologicalSpace (finiteSAdeleRing R K S)
+instance topologicalSpace : TopologicalSpace (finiteSAdeleRing R K S)
   := TopologicalSpace.induced (e S) (TopologicalSpace.generateFrom (FiniteAdeleRing.generatingSet R K))
 
 theorem toFiniteAdeleRing_inducing : Inducing (e S) := by rw [inducing_iff]; rfl

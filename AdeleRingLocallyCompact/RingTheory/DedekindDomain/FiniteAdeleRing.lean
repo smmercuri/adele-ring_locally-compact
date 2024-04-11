@@ -30,9 +30,6 @@ In this file we supplement the theory by defining some local maps and the topolo
 
 ## Tags
 finite adele ring, dedekind domain
-
-## TODO
- - Show that the finite adele ring is a topological ring
 -/
 
 noncomputable section
@@ -147,18 +144,134 @@ theorem continuous_add' :
   intro U ⟨V, ⟨W, hW, hWV⟩, hVU⟩
   rw [isOpen_prod_iff]
   intro x y hxy
+  rw [← hVU, ← hWV] at hxy
 
   have hxy' : ∀ v, (x.val v, y.val v) ∈
-      (λ p : v.adicCompletion K × v.adicCompletion K => p.1 + p.2) ⁻¹' W v := by
-    intro v
-    rw [← hVU, ← hWV] at hxy
-    simp only [Set.mem_preimage, Subsemiring.coe_add, Subring.coe_toSubsemiring,] at hxy ⊢
-    rw [Set.mem_univ_pi] at hxy
-    exact hxy v
+      (λ p : v.adicCompletion K × v.adicCompletion K => p.1 + p.2) ⁻¹' W v :=
+    λ v => Set.mem_univ_pi.1 hxy v
 
   have hW' : ∀ v, IsOpen
-      ((λ p : v.adicCompletion K × v.adicCompletion K => p.1 + p.2) ⁻¹' W v) := by
-    exact λ v => Continuous.isOpen_preimage continuous_add (W v) (hW.1 v)
+      ((λ p : v.adicCompletion K × v.adicCompletion K => p.1 + p.2) ⁻¹' W v) :=
+    λ v => Continuous.isOpen_preimage continuous_add (W v) (hW.1 v)
+
+  set Sx := (mem_finiteAdeleRing_iff _).1 x.property
+  set Sy := (mem_finiteAdeleRing_iff _).1 y.property
+  rw [ProdAdicCompletions.IsFiniteAdele] at Sx Sy
+  set Sxy := Sx.toFinset ∪ Sy.toFinset
+  set SV := hW.2.toFinset
+  set S := Sxy ∪ SV
+
+  -- define Vx, nhd of x, which is Oᵥ outside S, and left preimage of Wᵥ inside S
+  set Vx := λ v => ite (v ∈ S)
+    (Classical.choose (isOpen_prod_iff.1 (hW' v) _ _ (Set.mem_univ_pi.1 hxy v)))
+    (v.adicCompletionIntegers K)
+
+  -- define Vy, nhd of y, which is Oᵥ outside S, and right preimage of Wᵥ inside S
+  set Vy := λ v => ite (v ∈ S)
+    (Classical.choose (Classical.choose_spec (isOpen_prod_iff.1 (hW' v) _ _ (hxy' v))))
+    (v.adicCompletionIntegers K)
+
+  use Subtype.val ⁻¹' Set.pi Set.univ Vx, Subtype.val ⁻¹' Set.pi Set.univ Vy
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  -- Vx and Vy are in the generating set so open
+  · apply TopologicalSpace.isOpen_generateFrom_of_mem
+    unfold generatingSet
+    simp
+    refine ⟨Vx, ⟨?_, ?_⟩, rfl⟩
+    · intro v
+      by_cases hv : v ∈ S
+      · simp only [Vx, hv, if_true]
+        exact (Classical.choose_spec (Classical.choose_spec (isOpen_prod_iff.1 (hW' v) (x.1 v) (y.1 v) (hxy' v)))).1
+      · simp [Vx, hv]
+        exact Valued.valuationSubring_isOpen (v.adicCompletion K)
+    · apply Set.Finite.subset S.finite_toSet
+      intro v hv
+      simp at hv
+      contrapose! hv
+      simp [Vx]
+      intro h
+      exfalso
+      exact hv h
+  · apply TopologicalSpace.isOpen_generateFrom_of_mem
+    unfold generatingSet
+    simp
+    refine ⟨Vy, ⟨?_, ?_⟩, rfl⟩
+    · intro v
+      by_cases hv : v ∈ S
+      · simp only [Vy, hv, if_true]
+        exact (Classical.choose_spec (Classical.choose_spec (isOpen_prod_iff.1 (hW' v) (x.1 v) (y.1 v) (hxy' v)))).2.1
+      · simp [Vy, hv]
+        exact Valued.valuationSubring_isOpen (v.adicCompletion K)
+    · apply Set.Finite.subset S.finite_toSet
+      intro v hv
+      simp at hv
+      contrapose! hv
+      simp [Vy]
+      intro h
+      exfalso
+      exact hv h
+  -- Vx contains x
+  · intro v _
+    simp only [Vx]
+    split_ifs with h
+    · exact (Classical.choose_spec (Classical.choose_spec (isOpen_prod_iff.1 (hW' v) (x.1 v) (y.1 v) (hxy' v)))).2.2.1
+    · rw [Finset.not_mem_union, Finset.not_mem_union, Set.Finite.mem_toFinset, Set.mem_compl_iff, not_not] at h
+      exact h.1.1
+  -- Vy contains y
+  · intro v _
+    simp only [Vy]
+    split_ifs with h
+    · exact (Classical.choose_spec (Classical.choose_spec (isOpen_prod_iff.1 (hW' v) (x.1 v) (y.1 v) (hxy' v)))).2.2.2.1
+    · rw [Finset.not_mem_union, Finset.not_mem_union] at h
+      simp only [Set.Finite.mem_toFinset, Set.mem_compl_iff, not_not] at h
+      exact h.1.2
+  -- direct product of Vx and Vy is in the preimage of U
+  · intro p
+    simp only [Set.mem_prod, Set.mem_preimage]
+    intro ⟨hp₁, hp₂⟩
+    rw [← hVU, ← hWV]
+    intro v _
+    have h := (Classical.choose_spec (Classical.choose_spec (isOpen_prod_iff.1 (hW' v) (x.1 v) (y.1 v) (hxy' v)))).2.2.2.2
+    by_cases hv : v ∈ S
+    · rw [Set.mem_univ_pi] at hp₁ hp₂
+      specialize hp₁ v
+      specialize hp₂ v
+      simp only [Vx, hv, if_true] at hp₁
+      simp only [Vy, hv, if_true] at hp₂
+      simp
+      rw [← Set.image_subset_iff] at h
+      apply h
+      simp only [Set.mem_image, Set.mem_prod, Prod.exists]
+      exact ⟨_, _, ⟨hp₁, hp₂⟩, rfl⟩
+    · rw [Set.mem_univ_pi] at hp₁ hp₂
+      specialize hp₁ v
+      specialize hp₂ v
+      simp only [Vx, hv, if_false] at hp₁
+      simp only [Vy, hv, if_false] at hp₂
+      rw [Finset.not_mem_union] at hv
+      simp only [SV, Set.Finite.mem_toFinset, Set.mem_compl_iff, not_not, Set.mem_setOf_eq] at hv
+      rw [hv.2]
+      simp
+      rw [Pi.add_apply]
+      simp at hp₁ hp₂
+      exact (v.adicCompletionIntegers K).add_mem' hp₁ hp₂
+
+/-- [https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L585](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L585)-/
+theorem continuous_mul' :
+    Continuous (λ x : finiteAdeleRing R K × finiteAdeleRing R K => x.1 * x.2) := by
+  rw [continuous_generateFrom_iff]
+  intro U ⟨V, ⟨W, hW, hWV⟩, hVU⟩
+  rw [isOpen_prod_iff]
+  intro x y hxy
+  rw [← hVU, ← hWV] at hxy
+
+  have hxy' : ∀ v, (x.val v, y.val v) ∈
+      (λ p : v.adicCompletion K × v.adicCompletion K => p.1 * p.2) ⁻¹' W v :=
+    λ v => Set.mem_univ_pi.1 hxy v
+
+  have hW' : ∀ v, IsOpen
+      ((λ p : v.adicCompletion K × v.adicCompletion K => p.1 * p.2) ⁻¹' W v) :=
+    λ v => Continuous.isOpen_preimage continuous_mul (W v) (hW.1 v)
 
   set Sx := (mem_finiteAdeleRing_iff _).1 x.property
   set Sy := (mem_finiteAdeleRing_iff _).1 y.property
@@ -258,20 +371,17 @@ theorem continuous_add' :
       simp only [SV, Set.Finite.mem_toFinset, Set.mem_compl_iff, not_not, Set.mem_setOf_eq] at hv
       rw [hv.2]
       simp
-      rw [Pi.add_apply]
+      rw [Pi.mul_apply]
       simp at hp₁ hp₂
-      exact (v.adicCompletionIntegers K).add_mem' hp₁ hp₂
+      exact (v.adicCompletionIntegers K).mul_mem' hp₁ hp₂
 
-theorem continuous_mul' :
-    Continuous (λ x : finiteAdeleRing R K × finiteAdeleRing R K => x.1 * x.2) := sorry
-
-theorem continuous_neg' :
-    Continuous (λ x : finiteAdeleRing R K => - x) := sorry
+instance : ContinuousAdd (finiteAdeleRing R K) := ⟨continuous_add' R K⟩
+instance : ContinuousMul (finiteAdeleRing R K) := ⟨continuous_mul' R K⟩
+instance : ContinuousNeg (finiteAdeleRing R K) := TopologicalSemiring.continuousNeg_of_mul
 
 instance topologicalRing : TopologicalRing (finiteAdeleRing R K) where
   continuous_add := continuous_add' R K
   continuous_mul := continuous_mul' R K
-  continuous_neg := continuous_neg' R K
 
 /-- [https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685)-/
 theorem globalEmbedding_isFiniteAdele (x : K) :

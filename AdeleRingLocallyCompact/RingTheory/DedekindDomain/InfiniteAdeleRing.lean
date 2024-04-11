@@ -64,10 +64,10 @@ instance : Nontrivial (infiniteAdeleRing K) := Pi.nontrivial
 
 end DerivedInstances
 
-instance : TopologicalSpace (infiniteAdeleRing K)
+instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K)
   := Pi.topologicalSpace
 
-instance : TopologicalRing (infiniteAdeleRing K) := Pi.instTopologicalRing
+instance topologicalRing : TopologicalRing (infiniteAdeleRing K) := Pi.instTopologicalRing
 
 def globalEmbedding : K →+* infiniteAdeleRing K :=
   Pi.ringHom (fun (v : InfinitePlace K) => InfinitePlace.Completion.coeRingHom K v)

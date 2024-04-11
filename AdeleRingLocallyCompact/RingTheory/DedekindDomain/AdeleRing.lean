@@ -26,9 +26,6 @@ of integers in `K`. We show that the adele ring of `K` is a locally compact spac
 
 ## Tags
 adele ring, dedekind domain
-
-## TODO
- - Show that the adele ring is a topological ring.
 -/
 
 noncomputable section
@@ -54,6 +51,10 @@ instance : Inhabited (adeleRing K) := ⟨0⟩
 
 instance topologicalSpace : TopologicalSpace (adeleRing K) :=
   instTopologicalSpaceProd
+
+instance topologicalRing : TopologicalRing (adeleRing K) := by
+  unfold adeleRing
+  infer_instance
 
 end DerivedInstances
 
