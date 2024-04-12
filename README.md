@@ -54,26 +54,27 @@ The high-level code structure is modelled after the structure of Mathlib version
 
 The proofs that $O\_v$ is totally bounded, complete, and therefore compact can be found in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean).
 
-- The result that $O\_v$ is compact is [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/0e55b3c2fcf96b0fac2e7718ad2f1d66de9e22e0/AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean#L472).
+- The result that $O\_v$ is compact is [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/a9feae07a47508d93fd56f90753951d0f3ddff1f/AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean#L458).
 
 ### Local compactness of $K\_v$
 
-- The result that $K\_v$ is locally compact for finite places $v$ is given in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean), specifically [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/0e55b3c2fcf96b0fac2e7718ad2f1d66de9e22e0/AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean#L519).
+- The result that $K\_v$ is locally compact for finite places $v$ is given in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean), specifically [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/a9feae07a47508d93fd56f90753951d0f3ddff1f/AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean#L507).
 
 ### Local compactness of $\mathbb{A}\_{K, f}$
 
 - The topology of the finite adele ring and other related definitions are found in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteAdeleRing.lean).
 - The definition of the finite $S$-adele ring and the proof that it is locally compact can be found in 
-[AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/0e55b3c2fcf96b0fac2e7718ad2f1d66de9e22e0/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean#L210) and [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/0e55b3c2fcf96b0fac2e7718ad2f1d66de9e22e0/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean#L421).
-- The proof that the finite adele ring is locally compact can also be found in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean), specifically [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/0e55b3c2fcf96b0fac2e7718ad2f1d66de9e22e0/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean#L434).
+[AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/a9feae07a47508d93fd56f90753951d0f3ddff1f/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean#L208) and [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/a9feae07a47508d93fd56f90753951d0f3ddff1f/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean#L409).
+- The proof that the finite adele ring is locally compact can also be found in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean), specifically [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/a9feae07a47508d93fd56f90753951d0f3ddff1f/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean#L422).
 
 ### Local compactness of $\mathbb{A}\_{K, \infty}$
 
-- The definition, topology and local compactness of the infinite adele ring are found in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/InfiniteAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/InfiniteAdeleRing.lean).
+- The completion of a number field at the infinite places is formalised in [AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean). The definition is [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/a9feae07a47508d93fd56f90753951d0f3ddff1f/AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean#L79) and the proof it is locally compact is [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/a9feae07a47508d93fd56f90753951d0f3ddff1f/AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean#L156).
+- The definition, topology and local compactness of the infinite adele ring are found in [AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
 
 ### Local compactness of $\mathbb{A}\_{K}$
 
-- The definition and local compactness of the adele ring are found in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdeleRing.lean).
+- The definition and local compactness of the adele ring are found in [AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
 
 ## Implementation notes
 
@@ -94,7 +95,7 @@ We collect some implementation notes and describe the Lean proof of the local co
     - This is enough to show that $K$ is a discrete subgroup.
     - Prove base change for adele rings : if $K/L$ then $\mathbb{A}\_L = \mathbb{A}\_K\otimes\_K L$.
     - Helper result: for all finite places $v$, if $y \in K\_v$ then there exists $x \in K$ such that $\|y - x\|\_v\le 1$ and $\|x\|\_w \le 1$ for all $w \ne v$.
-    - This is enough to show that $\mathbb{A}\_{\mathbb{Q}}/\mathbb{Q}$ is compact, since it's the continuous image of the compact set $\\{x \in \mathbb{A}\_{\mathbb{Q}}\mid \forall v, \|a\|\_v \le 1\\}$. Then use base change for general $K$.
+    - This is enough to show that $\mathbb{A}\_{\mathbb{Q}}/\mathbb{Q}$ is compact, since it's the continuous image of the compact set $\\{x \in \mathbb{A}\_{\mathbb{Q}}\mid \forall v, \|x\|\_v \le 1\\}$. Then use base change for general $K$.
 - v3.0 : Show the idele group is locally compact. Probably requires refactoring the current code as follows.
     - Define `ProdAdicCompletions.IsRestrictedProduct (X : Subring (ProdAdicCompletions R K) (U : v \\to (Subring (v.adicCompletion K))))`
     - Refactor the current proof of local compactness of adele ring to show that `ProdAdicCompletions.IsRestrictedProduct` is locally compact (requires the assumption that `U v` are all compact).
