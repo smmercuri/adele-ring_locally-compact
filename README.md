@@ -29,7 +29,7 @@ For $O\_v$ to be totally bounded means that for some fixed radius $\gamma$ > 0, 
 
 ### Local compactness of $K\_v$
 
-Let $x \in K\_v$ and $N$ be a neighbourhood of $x$. Because any open set is closed, the maximal ideal $\mathfrak{m}\_v$ is closed and, since it is a closed subset of the compact space $O\_v$, it is also compact. Then $N$ contains a compact neighbourhood of $x$ because: we can always translate and shrink/inflate $\mathfrak{m}\_v$ so that it is inside $N$; the continuous image of an open compact set is also compact; and the image under translation and shrinking/inflating evidently remains open.
+Let $x \in K\_v$ and $N$ be a neighbourhood of $x$. Because any open set is closed, the maximal ideal $\mathfrak{m}\_v$ is closed and, since it is a closed subset of the compact space $O\_v$, it is also compact. Then $N$ contains a compact neighbourhood of $x$ because: we can always translate and shrink $\mathfrak{m}\_v$ so that it is inside $N$; the continuous image of an open compact set is also compact; and the image under translation and shrinking evidently remains open.
 
 ### Local compactness of $\mathbb{A}\_{K, f}$
 
