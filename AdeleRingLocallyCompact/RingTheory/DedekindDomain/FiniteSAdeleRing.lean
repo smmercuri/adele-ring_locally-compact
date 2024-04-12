@@ -61,7 +61,7 @@ finite s-adele ring, dedekind domain
 
 noncomputable section
 
-open DedekindDomain IsDedekindDomain IsDedekindDomain.HeightOneSpectrum
+open IsDedekindDomain IsDedekindDomain.HeightOneSpectrum
 
 open scoped Classical
 
@@ -148,7 +148,6 @@ theorem homeomorph : SProdAdicCompletionIntegers_subtype R K S ≃ₜ SProdAdicC
     refine continuous_pi (λ v => Continuous.subtype_val ?_)
     refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
     exact Continuous.snd  ({ isOpen_preimage := fun s a => a })
-
 
 instance : LocallyCompactSpace ((v : S) → v.val.adicCompletion K) := Pi.locallyCompactSpace_of_finite
 
@@ -248,20 +247,7 @@ theorem isFiniteSAdele_localInclusion_of_S {v : HeightOneSpectrum R} (x : v.adic
   simp only [Ne.symm (ne_of_mem_of_not_mem h hw), ↓reduceDite]
   exact (w.adicCompletionIntegers K).one_mem'
 
-variable (K S)
-
-theorem projection_range (v : HeightOneSpectrum R) :
-  π v '' (setOf (λ (x : finiteAdeleRing R K) => IsFiniteSAdele S x.val)) =
-     if (v ∈ S) then Set.univ else (v.adicCompletionIntegers K) := by
-  by_cases hv : v ∈ S <;> simp only [hv, ↓reduceIte, Set.eq_univ_iff_forall]
-  · intro x
-    use ι v x
-    exact ⟨isFiniteSAdele_localInclusion_of_S x hv, FiniteAdeleRing.projection_localInclusion_eq v x⟩
-  · refine Set.ext (λ x => ⟨λ ⟨y, hy, hyx⟩ => by rw [← hyx]; exact hy v hv, λ hx => ?_⟩)
-    use ι v x
-    exact ⟨isFiniteSAdele_localInclusion v hx, FiniteAdeleRing.projection_localInclusion_eq v x⟩
-
-variable (R)
+variable (R K S)
 
 /-- Ring homomorphism sending finite S-adeles to finite adeles. -/
 def toFiniteAdeleRing : finiteSAdeleRing R K S →+* finiteAdeleRing R K where

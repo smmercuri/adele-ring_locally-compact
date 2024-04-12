@@ -87,6 +87,11 @@ We collect some implementation notes and describe the Lean proof of the local co
 - This chain of homeomorphisms gives the proof of the local compactness of $\mathbb{A}\_{S, K, f}$. 
 
 ## TODOs
-- Refactor `InfiniteAdeleRing.lean` and `AdeleRing.lean` to `NumberTheory/NumberField`.
+- Show that `K` is discrete and cocompact inside the adele ring of `K`.
 - Incorporate the proof that `v.adicCompletionIntegers K` has finite residue field.
-- Show the idele group is locally compact.
+- v2.0 : Show the idele group is locally compact. Probably requires refactoring the current project.
+    - Define `ProdAdicCompletions.IsRestrictedProduct (X : Subring (ProdAdicCompletions R K) (U : v \\to (Subring (v.adicCompletion K))))`
+    - Refactor the current proof of local compactness of adele ring to show that `ProdAdicCompletions.IsRestrictedProduct` is locally compact (requires the assumption that `U v` are all compact).
+    - Then local compactness of finite adele ring follows immediateley with `U v = v.adicCompletionIntegers K`
+    - Define idele ring as group of units with unit topology.
+    - Show this is `IsRestrictedProduct` where `U v = (v.adicCompletionIntegers K)^*`, therefore locally compact.

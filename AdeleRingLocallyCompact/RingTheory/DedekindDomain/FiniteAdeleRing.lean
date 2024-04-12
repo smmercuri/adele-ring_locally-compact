@@ -34,7 +34,7 @@ finite adele ring, dedekind domain
 
 noncomputable section
 
-open DedekindDomain IsDedekindDomain IsDedekindDomain.HeightOneSpectrum
+open IsDedekindDomain IsDedekindDomain.HeightOneSpectrum
 
 open scoped Classical
 

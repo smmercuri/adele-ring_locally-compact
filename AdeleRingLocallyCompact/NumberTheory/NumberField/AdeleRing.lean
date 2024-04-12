@@ -5,7 +5,7 @@ Authors: Salvatore Mercuri
 -/
 import Mathlib
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteSAdeleRing
-import AdeleRingLocallyCompact.RingTheory.DedekindDomain.InfiniteAdeleRing
+import AdeleRingLocallyCompact.NumberTheory.NumberField.InfiniteAdeleRing
 
 /-!
 # Adele Ring
@@ -30,11 +30,9 @@ adele ring, dedekind domain
 
 noncomputable section
 
-open DedekindDomain IsDedekindDomain NumberField
+open DedekindDomain
 
-open scoped Classical
-
-namespace DedekindDomain
+namespace NumberField
 
 variable (K : Type*) [Field K] [NumberField K]
 
@@ -72,4 +70,4 @@ theorem locallyCompactSpace : LocallyCompactSpace (adeleRing K) := by
 
 end AdeleRing
 
-end DedekindDomain
+end NumberField

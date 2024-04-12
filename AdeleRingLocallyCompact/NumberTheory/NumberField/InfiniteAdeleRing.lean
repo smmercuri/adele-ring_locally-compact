@@ -41,12 +41,7 @@ infinite adele ring, number field
 
 noncomputable section
 
-open DedekindDomain IsDedekindDomain IsDedekindDomain.HeightOneSpectrum NumberField Algebra.TensorProduct
-  LinearMap
-
-open scoped TensorProduct
-
-namespace DedekindDomain
+namespace NumberField
 
 variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
 
@@ -81,4 +76,4 @@ theorem locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) :=
 
 end InfiniteAdeleRing
 
-end DedekindDomain
+end NumberField
