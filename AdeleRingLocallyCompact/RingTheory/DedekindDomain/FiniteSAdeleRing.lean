@@ -243,9 +243,9 @@ theorem isFiniteSAdele_localInclusion (v : HeightOneSpectrum R) {x : v.adicCompl
 theorem isFiniteSAdele_localInclusion_of_S {v : HeightOneSpectrum R} (x : v.adicCompletion K) (h : v ∈ S) :
   IsFiniteSAdele S (ι v x).val := by
   intros w hw
-  simp only [FiniteAdeleRing.localInclusion, ProdAdicCompletions.localInclusion]
-  simp only [Ne.symm (ne_of_mem_of_not_mem h hw), ↓reduceDite]
-  exact (w.adicCompletionIntegers K).one_mem'
+  simp only [FiniteAdeleRing.localInclusion, ProdAdicCompletions.localInclusion, Ne.symm (ne_of_mem_of_not_mem h hw),
+    ↓reduceDite]
+  exact (w.adicCompletionIntegers K).one_mem
 
 variable (R K S)
 
@@ -421,18 +421,15 @@ local notation "e" => toFiniteAdeleRing R K
 /-- The finite adele ring is locally compact. -/
 theorem locallyCompactSpace : LocallyCompactSpace (finiteAdeleRing R K) := by
   refine LocallyCompactSpace.mk (λ x N hN => ?_)
-  set S_set := setOf (λ (v : HeightOneSpectrum R) => x.val v ∉ v.adicCompletionIntegers K)
-  have hS : S_set.Finite := Filter.eventually_cofinite.1 ((mem_finiteAdeleRing_iff x.val).1 x.property)
-  set S := hS.toFinset
+  set S := (Filter.eventually_cofinite.1 ((mem_finiteAdeleRing_iff x.val).1 x.property)).toFinset
   set A_K_S := finiteSAdeleRing R K S
-  have hx : x.val ∈ A_K_S := λ v hv => by rwa [hS.mem_toFinset, Set.nmem_setOf_iff, not_not] at hv
+  have hx : x.val ∈ A_K_S := λ v hv => by rwa [Set.Finite.mem_toFinset, Set.nmem_setOf_iff, not_not] at hv
   obtain ⟨U, hU, hUOpen, hxU⟩ := mem_nhds_iff.1 hN
   set U_S := (e S) ⁻¹' U
   have he : e S ⟨x, hx⟩ = x := rfl
   have hU_S : U_S ∈ nhds ⟨x, hx⟩ := by
     rw [mem_nhds_iff]
-    use U_S
-    exact ⟨subset_rfl,
+    exact ⟨U_S, subset_rfl,
       (OpenEmbedding.continuous (toFiniteAdeleRing_openEmbedding R K S)).isOpen_preimage U hUOpen, hxU⟩
   obtain ⟨N_S, hN_S, hNU_S, hN_S_compact⟩ :=
     (FiniteSAdeleRing.locallyCompactSpace R K S).local_compact_nhds ⟨x, hx⟩ U_S hU_S
@@ -444,6 +441,7 @@ theorem locallyCompactSpace : LocallyCompactSpace (finiteAdeleRing R K) := by
     use (e S) '' V
     rw [Set.image_subset_image_iff (toFiniteAdeleRing_openEmbedding R K S).inj]
     use hV, OpenEmbedding.isOpenMap (toFiniteAdeleRing_openEmbedding R K S) V hVOpen, ⟨x, hx⟩
+
 
 end FiniteAdeleRing
 

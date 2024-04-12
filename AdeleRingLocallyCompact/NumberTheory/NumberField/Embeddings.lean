@@ -94,7 +94,7 @@ instance : Inhabited (v.completion K) :=
 
 instance : TopologicalRing (v.completion K) := UniformSpace.Completion.topologicalRing
 
-instance HDist : Dist (v.completion K) :=
+instance Dist : Dist (v.completion K) :=
   UniformSpace.Completion.instDistCompletionToUniformSpace
 
 instance : T0Space (v.completion K) :=
@@ -122,23 +122,19 @@ variable {K v}
 /-- The embedding `Kᵥ → ℂ` preserves distances. -/
 theorem extensionEmbedding_dist_eq (x y : v.completion K) :
     dist (extensionEmbedding K v x) (extensionEmbedding K v y) =
-      (HDist K v).dist x y := by
+      (Dist K v).dist x y := by
   set p : v.completion K → v.completion K → Prop :=
-    λ x y => dist (extensionEmbedding K v x) (extensionEmbedding K v y) = (HDist K v).dist x y
-  have h := @UniformSpace.Completion.induction_on₂ (subfield K v) _ (subfield K v) _ p x y
-  apply h
+    λ x y => dist (extensionEmbedding K v x) (extensionEmbedding K v y) = (Dist K v).dist x y
+  refine @UniformSpace.Completion.induction_on₂ (subfield K v) _ (subfield K v) _ p x y ?_ (λ x y => ?_)
   · apply isClosed_eq
-    · rw [← continuous_iff_continuous_dist]
-      exact UniformSpace.Completion.continuous_extension
+    · exact continuous_iff_continuous_dist.1 UniformSpace.Completion.continuous_extension
     · exact continuous_dist
-  · intro x y
-    simp only [extensionEmbedding, UniformSpace.Completion.extensionHom, Subfield.coe_subtype,
-      RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, p]
-    rw [@UniformSpace.Completion.dist_eq (v.subfield K) _]
-    have hf : UniformContinuous (subfield K v).subtype := uniformContinuous_subtype_val
-    have h' := UniformSpace.Completion.extension_coe hf
-    simp only [Subfield.coe_subtype, Subtype.forall] at h'
-    rw [h' x, h' y]
+  · simp only [extensionEmbedding, UniformSpace.Completion.extensionHom, Subfield.coe_subtype,
+      RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, p, @UniformSpace.Completion.dist_eq (v.subfield K) _]
+    have h_val : UniformContinuous (subfield K v).subtype := uniformContinuous_subtype_val
+    have h_val_ext := UniformSpace.Completion.extension_coe h_val
+    simp only [Subfield.coe_subtype] at h_val_ext
+    rw [h_val_ext x, h_val_ext y]
     rfl
 
 variable (K v)
@@ -146,16 +142,15 @@ variable (K v)
 /-- The embedding `Kᵥ → ℂ` is uniform inducing. -/
 theorem embedding_uniformInducing :
   UniformInducing (extensionEmbedding K v) := by
-  rw [Filter.HasBasis.uniformInducing_iff Metric.uniformity_basis_dist Metric.uniformity_basis_dist]
-  simp only [Set.mem_setOf_eq, extensionEmbedding_dist_eq, and_self]
+  simp only [Filter.HasBasis.uniformInducing_iff Metric.uniformity_basis_dist Metric.uniformity_basis_dist,
+    Set.mem_setOf_eq, extensionEmbedding_dist_eq, and_self]
   exact fun ε hε => ⟨ε, hε, λ _ _ h => h⟩
 
 /-- The embedding `Kᵥ → ℂ` is a closed embedding. -/
 theorem closedEmbedding : ClosedEmbedding (extensionEmbedding K v) := by
   apply ClosedEmbedding.mk
   · exact ⟨(embedding_uniformInducing K v).inducing, extensionEmbedding_injective K v⟩
-  · apply IsComplete.isClosed
-    exact ((completeSpace_iff_isComplete_range (embedding_uniformInducing K v))).1 inferInstance
+  · exact IsComplete.isClosed (((completeSpace_iff_isComplete_range (embedding_uniformInducing K v))).1 inferInstance)
 
 /-- The completion of a number field at an Archimedean place is locally compact. -/
 instance locallyCompactSpace : LocallyCompactSpace (v.completion K) :=

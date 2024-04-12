@@ -51,8 +51,7 @@ instance topologicalSpace : TopologicalSpace (adeleRing K) :=
   instTopologicalSpaceProd
 
 instance topologicalRing : TopologicalRing (adeleRing K) := by
-  unfold adeleRing
-  infer_instance
+  exact instTopologicalRingProdInstTopologicalSpaceProdInstNonUnitalNonAssocRing
 
 end DerivedInstances
 
@@ -67,6 +66,9 @@ theorem locallyCompactSpace : LocallyCompactSpace (adeleRing K) := by
   haveI := InfiniteAdeleRing.locallyCompactSpace K
   haveI := FiniteAdeleRing.locallyCompactSpace (ringOfIntegers K) K
   exact Prod.locallyCompactSpace _ _
+
+/-- The subgroup of principal adeles `(x)ᵥ` where `x ∈ K`. -/
+def principalSubgroup : AddSubgroup (adeleRing K) := (globalEmbedding K).range.toAddSubgroup
 
 end AdeleRing
 

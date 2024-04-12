@@ -75,8 +75,7 @@ theorem isFiniteAdele_localInclusion (v : HeightOneSpectrum R) (x : v.adicComple
     intro w hw
     simp only [Set.mem_setOf_eq, Set.mem_singleton_iff] at hw ⊢
     contrapose! hw
-    rw [localInclusion]
-    simp only [hw, ↓reduceDite]
+    simp only [localInclusion, hw, ↓reduceDite]
     exact (w.adicCompletionIntegers K).one_mem'
   exact Set.Finite.subset (Set.finite_singleton _) h
 
@@ -95,13 +94,11 @@ namespace FiniteAdeleRing
 variable {R}
 
 /-- Sends a finite adele to a local place. -/
-def projection (v : HeightOneSpectrum R) :
-  finiteAdeleRing R K →+* v.adicCompletion K :=
+def projection (v : HeightOneSpectrum R) : finiteAdeleRing R K →+* v.adicCompletion K :=
   RingHom.comp (Pi.evalRingHom _ v) (Subring.subtype _)
 
 /-- Sends a local element to a finite adele filled with `1`s elsewhere. -/
-def localInclusion (v : HeightOneSpectrum R) :
-  v.adicCompletion K → finiteAdeleRing R K :=
+def localInclusion (v : HeightOneSpectrum R) : v.adicCompletion K → finiteAdeleRing R K :=
   λ x => ⟨ProdAdicCompletions.localInclusion K v x,
           ProdAdicCompletions.isFiniteAdele_localInclusion v x⟩
 
@@ -111,14 +108,12 @@ local notation "ι" => localInclusion K
 variable {K}
 
 /-- The `v`th place of the local inclusion is the original element. -/
-theorem localInclusion_rfl (v : HeightOneSpectrum R) (x : v.adicCompletion K)
-  : (ι v x).val v = x := by
+theorem localInclusion_rfl (v : HeightOneSpectrum R) (x : v.adicCompletion K) : (ι v x).val v = x := by
   simp only [localInclusion, ProdAdicCompletions.localInclusion_rfl]
 
 /-- The projection and local inclusions are inverses on the finite adele ring. -/
-theorem projection_localInclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion K)
-  : π v (ι v x) = x := by
-  convert localInclusion_rfl v x
+theorem projection_localInclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion K) : π v (ι v x) = x := by
+  apply localInclusion_rfl v x
 
 variable (R K)
 
@@ -139,9 +134,16 @@ instance topologicalSpace : TopologicalSpace (finiteAdeleRing R K)
 
 variable {R K}
 
-/-- Abstracted version of
+/-- Consider two finite adeles `x`, `y`, a generating open set `U` of the finite adele ring and a function
+`f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing K` such that `(x, y)` is in the preimage of
+`U` under `f`. If `f` factors through a collection of continuous maps `g v` defined at each place, which
+each preserve the respective ring of integers, then we can obtain two open sets `X` and `Y` of the finite
+adele ring, which contain `x` and `y` respectively, such that their product `X ×ˢ Y` is contained in the
+preimage of `U` under `f`.
+
+Abstracted version of
 [https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L469](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L469)-/
-theorem prod_pullback_of_generateFrom_nhd
+theorem comap_of_generateFrom_nhd₂
   {x y : finiteAdeleRing R K}
   {U : Set (finiteAdeleRing R K)}
   (f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing R K)
@@ -227,6 +229,9 @@ theorem prod_pullback_of_generateFrom_nhd
       rw [h_comm]
       rfl
 
+/-- If `f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing R K` factors through a collection
+of continuous maps `g v` defined at each place, which each preserve the respective ring of integers, then
+`f` is continuous. -/
 theorem continuous_if_factors₂
   (f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing R K)
   (hf : ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
@@ -241,10 +246,12 @@ theorem continuous_if_factors₂
   ) :
     Continuous f := by
   rw [continuous_generateFrom_iff]
-  exact λ _ hU => isOpen_prod_iff.2 (λ _ _ hxy => prod_pullback_of_generateFrom_nhd f hf hU hxy)
+  exact λ _ hU => isOpen_prod_iff.2 (λ _ _ hxy => comap_of_generateFrom_nhd₂ f hf hU hxy)
 
 variable (R K)
 
+/-- Addition on the finite adele ring factors through continuous maps `g v` defined at each place,
+which preserve the ring of integers. -/
 theorem add_factors :
   ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
     ∀ v,
@@ -259,6 +266,8 @@ theorem add_factors :
   ⟨λ v => (λ p : v.adicCompletion K × v.adicCompletion K => p.1 + p.2),
     λ v => ⟨rfl, continuous_add, (v.adicCompletionIntegers K).add_mem⟩⟩
 
+/-- Multiplication on the finite adele ring factors through continuous maps `g v` defined at each place,
+which preserve the ring of integers. -/
 theorem mul_factors :
   ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
     ∀ v,
@@ -273,10 +282,12 @@ theorem mul_factors :
   ⟨λ v => (λ p : v.adicCompletion K × v.adicCompletion K => p.1 * p.2),
     λ v => ⟨rfl, continuous_mul, (v.adicCompletionIntegers K).mul_mem⟩⟩
 
+/-- Addition on the finite adele ring is continuous. -/
 theorem continuous_add' :
     Continuous (λ x : finiteAdeleRing R K × finiteAdeleRing R K => x.1 + x.2) :=
   continuous_if_factors₂ _ (add_factors R K)
 
+/-- Multiplication on the finite adele ring is continuous. -/
 theorem continuous_mul' :
     Continuous (λ x : finiteAdeleRing R K × finiteAdeleRing R K => x.1 * x.2) :=
   continuous_if_factors₂ _ (mul_factors R K)
@@ -285,6 +296,7 @@ instance : ContinuousAdd (finiteAdeleRing R K) := ⟨continuous_add' R K⟩
 instance : ContinuousMul (finiteAdeleRing R K) := ⟨continuous_mul' R K⟩
 instance : ContinuousNeg (finiteAdeleRing R K) := TopologicalSemiring.continuousNeg_of_mul
 
+/-- The topological ring structure on the finite adele ring. -/
 instance topologicalRing : TopologicalRing (finiteAdeleRing R K) where
   continuous_add := continuous_add' R K
   continuous_mul := continuous_mul' R K
@@ -319,6 +331,7 @@ theorem globalEmbedding_isFiniteAdele (x : K) :
     exact not_lt.2 (v.int_valuation_le_one r) hv
   exact Set.Finite.subset (Ideal.finite_factors hd_ne_zero) hsubset
 
+/-- The global embedding sending an element `x ∈ K` to `(x)ᵥ` in the finite adele ring. -/
 def globalEmbedding : K →+* finiteAdeleRing R K where
   toFun := λ x => ⟨ProdAdicCompletions.globalEmbedding R K x, globalEmbedding_isFiniteAdele R K x⟩
   map_one' := rfl
