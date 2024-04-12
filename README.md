@@ -1,6 +1,6 @@
 # Local Compactness of the Adele Ring of a Number Field
 
-This repository contains the proof that the adele ring of a number field is locally compact, formalised in Lean 4.7.0 using Mathlib's version [eaede86](https://github.com/leanprover-community/mathlib4/tree/eaede86aa7777630a3826cd8f3fbf0cbaafa53e6).
+This repository contains the proof that the adele ring of a number field is locally compact, formalised in Lean 4.7.0 using Mathlib's version [eaede86](https://github.com/leanprover-community/mathlib4/tree/eaede86aa7777630a3826cd8f3fbf0cbaafa53e6){:target="_blank"}.
 
 That the adele ring of a number field is locally compact is one of the motivators for defining the adele ring using the _restricted_ direct product over all completions, rather than just the usual direct product. Moreover, this allows one to do harmonic analysis over the subgroup of units of the adele ring which was done in Tate's landmark thesis, a precursor to the Langlands program. 
 
