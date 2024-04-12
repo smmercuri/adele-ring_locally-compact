@@ -10,7 +10,7 @@ This work follows on from prior work of Maria Inés de Frutos-Fernández, who fi
 
 ### Introduction
 
-Let $K$ be an algebraic number field over $\mathbb{Q}$, then its ring of integers $O$ is a Dedekind domain of Krull dimension $1$. By the extension of Ostrowski's theorem to number fields any valuation on $K$ is equivalent to some $\mathfrak{p}$-adic valuation on $K$ or an absolute value arising from the real and complex embeddings of $K$. Equivalence classes of valuations on $K$ are known as _places_. Thus places of $K$ are indexed by the real/complex embeddings of $K$ and by the primes $\mathfrak{p}$ of $O$; the former are called the _infinite_ places and the latter the _finite_ places. 
+Let $K$ be an algebraic number field over $\mathbb{Q}$ and let $O\_K$ be its ring of integers, which is a Dedekind domain of Krull dimension $1$. By the extension of Ostrowski's theorem to number fields any valuation on $K$ is equivalent to some $\mathfrak{p}$-adic valuation on $K$ or an absolute value arising from the real and complex embeddings of $K$. Equivalence classes of valuations on $K$ are known as _places_. Thus places of $K$ are indexed by the real/complex embeddings of $K$ and by the primes $\mathfrak{p}$ of $O$; the former are called the _infinite_ places and the latter the _finite_ places. 
 
 Let $v$ be a place of $K$, then we denote by $K\_v$ the completion of $K$ with respect to some representative valuation of the place $v$. The place $v$ extends naturally to a place on $K\_v$, which we denote by $|\cdot|\_v$. The integral closure of $O$ inside $K\_v$ is called the ($v$-adic) ring of integers and is denoted $O\_v$; this corresponds with the ring of all $x \in K\_v$ such that $|x|_v \le 1$. 
 
