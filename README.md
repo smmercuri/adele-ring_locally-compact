@@ -90,11 +90,11 @@ We collect some implementation notes and describe the Lean proof of the local co
 - Incorporate the proof that `v.adicCompletionIntegers K` has finite residue field.
 - v2.0 : Show that $K$ is a discrete and cocompact subgroup of the additive group of $\mathbb{A}\_K$.
     - Define the adelic norm.
-    - Prove the product formula for global adeles: if $x \in K$ then $\|x\| = 1$.
+    - Prove the product formula for global adeles: if $x \in K \subseteq \mathbb{A}\_K$ then $\|x\| = 1$.
     - This is enough to show that $K$ is a discrete subgroup.
     - Prove base change for adele rings : if $K/L$ then $\mathbb{A}\_L = \mathbb{A}\_K\otimes\_K L$.
     - Helper result: for all finite places $v$, if $y \in K\_v$ then there exists $x \in K$ such that $\|y - x\|\_v\le 1$ and $\|x\|\_w \le 1$ for all $w \ne v$.
-    - This is enough to show that $\mathbb{A}\_{\mathbb{Q}}/\mathbb{Q}$ is compact, since it's the continuous image of the compact set $\{x \in \mathbb{A}\_{\mathbb{Q}}\mid \forall v, \|a\|\_v \le 1\}$. Then use base change for general $K$.
+    - This is enough to show that $\mathbb{A}\_{\mathbb{Q}}/\mathbb{Q}$ is compact, since it's the continuous image of the compact set $\\{x \in \mathbb{A}\_{\mathbb{Q}}\mid \forall v, \|a\|\_v \le 1\\}$. Then use base change for general $K$.
 - v3.0 : Show the idele group is locally compact. Probably requires refactoring the current code as follows.
     - Define `ProdAdicCompletions.IsRestrictedProduct (X : Subring (ProdAdicCompletions R K) (U : v \\to (Subring (v.adicCompletion K))))`
     - Refactor the current proof of local compactness of adele ring to show that `ProdAdicCompletions.IsRestrictedProduct` is locally compact (requires the assumption that `U v` are all compact).
