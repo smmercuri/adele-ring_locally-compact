@@ -74,48 +74,69 @@ def subfieldEquiv : K ≃+* v.subfield K :=
 instance subfield_uniformSpace : UniformSpace (v.subfield K) := inferInstance
 
 /-- The completion of a number field at an Archimedean place. -/
-def completion := (subfield_uniformSpace K v).Completion
+--def completion := @UniformSpace.Completion K v.val.uniformSpace
 
-namespace Completion
 
-instance : UniformSpace (v.completion K) :=
-  @UniformSpace.Completion.uniformSpace _ (subfield_uniformSpace K v)
 
-instance : CompleteSpace (v.completion K) :=
-  @UniformSpace.Completion.completeSpace _ (subfield_uniformSpace K v)
 
 instance : NormedDivisionRing (subfield K v) :=
   NormedDivisionRing.induced _ _ (Subfield.subtype (subfield K v)) Subtype.val_injective
 
-instance : Field (v.completion K) := UniformSpace.Completion.instField
+
+
+instance ndr : NormedDivisionRing K :=
+  NormedDivisionRing.induced _ _ (toSubfield K v) (toSubfield_injective K v)
+
+
+instance pms : PseudoMetricSpace K := (ndr K v).toPseudoMetricSpace
+
+def completion := @UniformSpace.Completion K (pms K v).toUniformSpace
+
+namespace Completion
+
+instance : UniformSpace (v.completion K) :=
+  @UniformSpace.Completion.uniformSpace _ (pms K v).toUniformSpace
+
+instance : CompleteSpace (v.completion K) :=
+  @UniformSpace.Completion.completeSpace _ (pms K v).toUniformSpace
+
+instance uag : @UniformAddGroup K ((pms K v).toUniformSpace) _ :=
+  sorry
+
+instance : @CompletableTopField K _ (pms K v).toUniformSpace := sorry
+
+instance : Field (v.completion K) := @UniformSpace.Completion.instField _ _ (pms K v).toUniformSpace (ndr K v).to_topologicalDivisionRing _ _
 
 instance : Inhabited (v.completion K) :=
   ⟨0⟩
 
-instance : TopologicalRing (v.completion K) := UniformSpace.Completion.topologicalRing
+instance ts : TopologicalSpace K := (pms K v).toUniformSpace.toTopologicalSpace
+instance : @TopologicalDivisionRing K _ (ts K v) := (ndr K v).to_topologicalDivisionRing
+
+instance : TopologicalRing (v.completion K) := @UniformSpace.Completion.topologicalRing K _ (pms K v).toUniformSpace _ (uag K v)
 
 instance Dist : Dist (v.completion K) :=
-  UniformSpace.Completion.instDistCompletionToUniformSpace
+  @UniformSpace.Completion.instDistCompletionToUniformSpace _ (pms K v)
 
 instance : T0Space (v.completion K) :=
-  @UniformSpace.Completion.t0Space _ (subfield_uniformSpace K v)
+  @UniformSpace.Completion.t0Space _ (pms K v).toUniformSpace
 
-instance : Coe (subfield K v) (v.completion K) :=
+/-instance : Coe (subfield K v) (v.completion K) :=
   (inferInstance : Coe (subfield K v) (@UniformSpace.Completion (subfield K v) (subfield_uniformSpace K v)))
 
 instance : Coe K (v.completion K) where
   coe := (↑) ∘ v.toSubfield K
 
 def coeRingHom : K →+* v.completion K :=
-  RingHom.comp UniformSpace.Completion.coeRingHom (v.toSubfield K)
+  RingHom.comp UniformSpace.Completion.coeRingHom (v.toSubfield K)-/
 
 /-- The embedding `Kᵥ → ℂ` of a completion of a number field at an Archimedean
 place into `ℂ`. -/
 def extensionEmbedding :=
-  UniformSpace.Completion.extensionHom (Subfield.subtype (subfield K v)) continuous_subtype_val
+  @UniformSpace.Completion.extension _ (pms K v).toUniformSpace _ _ v.embedding
 
 theorem extensionEmbedding_injective : Function.Injective (extensionEmbedding K v) :=
-  (extensionEmbedding K v).injective
+  sorry --(extensionEmbedding K v).injective
 
 variable {K v}
 
