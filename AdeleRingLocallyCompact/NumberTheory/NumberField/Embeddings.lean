@@ -122,7 +122,7 @@ variable {K v}
 /-- The embedding `Kᵥ → ℂ` preserves distances. -/
 theorem extensionEmbedding_dist_eq (x y : v.completion K) :
     dist (extensionEmbedding K v x) (extensionEmbedding K v y) =
-      (Dist K v).dist x y := by
+      dist x y := by
   set p : v.completion K → v.completion K → Prop :=
     λ x y => dist (extensionEmbedding K v x) (extensionEmbedding K v y) = (Dist K v).dist x y
   refine @UniformSpace.Completion.induction_on₂ (subfield K v) _ (subfield K v) _ p x y ?_ (λ x y => ?_)
@@ -139,18 +139,18 @@ theorem extensionEmbedding_dist_eq (x y : v.completion K) :
 
 variable (K v)
 
+/-- The embedding `Kᵥ → ℂ` is an isometry. -/
+theorem embedding_isometry : Isometry (extensionEmbedding K v) :=
+  Isometry.of_dist_eq (extensionEmbedding_dist_eq)
+
 /-- The embedding `Kᵥ → ℂ` is uniform inducing. -/
 theorem embedding_uniformInducing :
-  UniformInducing (extensionEmbedding K v) := by
-  simp only [Filter.HasBasis.uniformInducing_iff Metric.uniformity_basis_dist Metric.uniformity_basis_dist,
-    Set.mem_setOf_eq, extensionEmbedding_dist_eq, and_self]
-  exact fun ε hε => ⟨ε, hε, λ _ _ h => h⟩
+    UniformInducing (extensionEmbedding K v) :=
+  (embedding_isometry K v).uniformInducing
 
 /-- The embedding `Kᵥ → ℂ` is a closed embedding. -/
-theorem closedEmbedding : ClosedEmbedding (extensionEmbedding K v) := by
-  apply ClosedEmbedding.mk
-  · exact ⟨(embedding_uniformInducing K v).inducing, extensionEmbedding_injective K v⟩
-  · exact IsComplete.isClosed (((completeSpace_iff_isComplete_range (embedding_uniformInducing K v))).1 inferInstance)
+theorem closedEmbedding : ClosedEmbedding (extensionEmbedding K v) :=
+  (embedding_isometry K v).closedEmbedding
 
 /-- The completion of a number field at an Archimedean place is locally compact. -/
 instance locallyCompactSpace : LocallyCompactSpace (v.completion K) :=
