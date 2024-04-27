@@ -108,10 +108,6 @@ instance : Inhabited (SProdAdicCompletions R K S) := instInhabitedProd
 
 end DerivedInstances
 
-/-- The homeomorphism between `Π v, Kᵥ` and `Π (v ∈ S), Kᵥ × Π (v ∉ S), Kᵥ`. -/
-theorem homeomorph_piSubtypeProd : ProdAdicCompletions R K ≃ₜ SProdAdicCompletions R K S :=
-  Homeomorph.piEquivPiSubtypeProd _ _
-
 end SProdAdicCompletions
 
 namespace SProdAdicCompletionIntegers
@@ -215,6 +211,15 @@ def finiteSAdeleRing : Subring (ProdAdicCompletions R K) where
 
 namespace FiniteSAdeleRing
 
+/-- the finite S-adele ring is homeomorphic to `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
+theorem homeomorph_piSubtypeProd : finiteSAdeleRing R K S ≃ₜ SProdAdicCompletionIntegers_subtype R K S := by
+  refine Homeomorph.subtype (Homeomorph.piEquivPiSubtypeProd _ _) (λ x => ?_)
+  exact ⟨λ hx v => hx v.1 v.2, λ hx v hv => hx ⟨v, hv⟩⟩
+
+/-- The finite S-adele ring is locally compact. -/
+theorem locallyCompactSpace : LocallyCompactSpace (finiteSAdeleRing R K S) :=
+  (Homeomorph.locallyCompactSpace_iff (homeomorph_piSubtypeProd R K S)).2 inferInstance
+
 variable {R K S}
 
 /-- A finite S-adele is a finite adele. -/
@@ -259,12 +264,6 @@ def toFiniteAdeleRing : finiteSAdeleRing R K S →+* finiteAdeleRing R K where
 
 local notation "e" => toFiniteAdeleRing R K
 
-/-- The S-adeles are given the subspace topology viewed as a subspace of the finite adele ring. -/
-instance topologicalSpace : TopologicalSpace (finiteSAdeleRing R K S)
-  := TopologicalSpace.induced (e S) (TopologicalSpace.generateFrom (FiniteAdeleRing.generatingSet R K))
-
-theorem toFiniteAdeleRing_inducing : Inducing (e S) := by rw [inducing_iff]; rfl
-
 theorem toFiniteAdeleRing_injective : Function.Injective (e S) := by
   intro x y hxy
   simp only [toFiniteAdeleRing, Subtype.mk.injEq, RingHom.coe_mk, MonoidHom.coe_mk,
@@ -307,21 +306,20 @@ theorem toFiniteAdeleRing_range_mem_generatingSet : Set.range (e S) ∈ FiniteAd
   · simp only [Set.mem_setOf_eq, ite_eq_right_iff, not_forall, exists_prop] at hv
     exact hv.1
 
-/-- The map sending finite S-adeles to finite adeles is open and injective. -/
-theorem toFiniteAdeleRing_openEmbedding : OpenEmbedding (e S) := by
-  use ⟨toFiniteAdeleRing_inducing R K S, toFiniteAdeleRing_injective R K S⟩
-  exact TopologicalSpace.isOpen_generateFrom_of_mem (toFiniteAdeleRing_range_mem_generatingSet R K S)
+/-- The S-adeles are given a second subspace topology, viewed as a subspace of the finite adele ring. -/
+def adelicTopologicalSpace : TopologicalSpace (finiteSAdeleRing R K S)
+  := TopologicalSpace.induced (e S) (TopologicalSpace.generateFrom (FiniteAdeleRing.generatingSet R K))
 
-/-- The generating set of the topology of the finite S-adele ring. -/
-def generatingSet : Set (Set (finiteSAdeleRing R K S))
+/-- The generating set of the adelic topology of the finite S-adele ring. -/
+def adelicGeneratingSet : Set (Set (finiteSAdeleRing R K S))
   := Set.preimage (e S) '' (FiniteAdeleRing.generatingSet R K)
 
-theorem generateFrom :
-  topologicalSpace R K S = TopologicalSpace.generateFrom (FiniteSAdeleRing.generatingSet R K S) := by
-  rw [generatingSet, ← induced_generateFrom_eq]; rfl
+theorem adelicGenerateFrom :
+  adelicTopologicalSpace R K S = TopologicalSpace.generateFrom (FiniteSAdeleRing.adelicGeneratingSet R K S) := by
+  rw [adelicGeneratingSet, ← induced_generateFrom_eq]; rfl
 
-theorem set_univ_mem_generatingSet : Set.univ ∈ generatingSet R K S := by
-  simp only [generatingSet, Set.mem_image, Set.preimage_eq_univ_iff]
+theorem set_univ_mem_generatingSet : Set.univ ∈ adelicGeneratingSet R K S := by
+  simp only [adelicGeneratingSet, Set.mem_image, Set.preimage_eq_univ_iff]
   use (Set.range (e S)), toFiniteAdeleRing_range_mem_generatingSet R K S
 
 /-- Subtype val of the finite S-adele ring factors through the embedding into the finite adele ring. -/
@@ -336,7 +334,7 @@ theorem subtype_val_range_eq_pi :
 /-- The generating set of the subspace topology of the finite S-adele ring viewed as a subspace of the finite
 adele ring coincides with the generating set of the subspace topology obtained as a subspace of
 `ProdAdicCompletions`. -/
-theorem generatingSet_eq : generatingSet R K S =
+theorem adelicGeneratingSet_eq : adelicGeneratingSet R K S =
   Set.preimage Subtype.val '' (
     setOf (
       λ U =>
@@ -345,7 +343,7 @@ theorem generatingSet_eq : generatingSet R K S =
     )
   ) := by
   ext x
-  simp only [generatingSet, FiniteAdeleRing.generatingSet, Filter.eventually_cofinite, Set.mem_image,
+  simp only [adelicGeneratingSet, FiniteAdeleRing.generatingSet, Filter.eventually_cofinite, Set.mem_image,
       Set.mem_setOf_eq, exists_exists_and_eq_and]
   refine ⟨λ ⟨V, ⟨hV_open, hV_fin⟩, hV_pi⟩ => ?_, λ ⟨y, ⟨V, I, hV_open, hV_pi⟩, hy⟩ => ?_⟩
   · set I := Set.Finite.toFinset hV_fin with IDef
@@ -394,20 +392,17 @@ theorem generatingSet_eq : generatingSet R K S =
 
 /-- The subspace topology of the finite S-adele ring viewed as a subspace of the finite adele ring coincides
 with the subspace topology when viewed as a subspace of `ProdAdicCompletions`. -/
-theorem topologicalSpace_eq_piTopologicalSpace : topologicalSpace R K S = instTopologicalSpaceSubtype := by
-  rw [generateFrom, instTopologicalSpaceSubtype, instTopologicalSpaceProdAdicCompletions, pi_eq_generateFrom,
-    induced_generateFrom_eq, generatingSet_eq]
+theorem topologicalSpace_eq_adelicTopologicalSpace : adelicTopologicalSpace R K S = instTopologicalSpaceSubtype := by
+  rw [adelicGenerateFrom, instTopologicalSpaceSubtype, instTopologicalSpaceProdAdicCompletions, pi_eq_generateFrom,
+    induced_generateFrom_eq, adelicGeneratingSet_eq]
 
-/-- the finite S-adele ring is homeomorphic to `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
-theorem homeomorph_piSubtypeProd : finiteSAdeleRing R K S ≃ₜ SProdAdicCompletionIntegers_subtype R K S := by
-  rw [topologicalSpace_eq_piTopologicalSpace]
-  refine Homeomorph.subtype (SProdAdicCompletions.homeomorph_piSubtypeProd R K S) (λ x => ?_)
-  unfold SProdAdicCompletions.homeomorph_piSubtypeProd
-  exact ⟨λ hx v => hx v.1 v.2, λ hx v hv => hx ⟨v, hv⟩⟩
+theorem toFiniteAdeleRing_inducing : Inducing (e S) := by
+  rw [inducing_iff, ← topologicalSpace_eq_adelicTopologicalSpace]; rfl
 
-/-- The finite S-adele ring is locally compact. -/
-theorem locallyCompactSpace : LocallyCompactSpace (finiteSAdeleRing R K S) :=
-  (Homeomorph.locallyCompactSpace_iff (homeomorph_piSubtypeProd R K S)).2 inferInstance
+/-- The map sending finite S-adeles to finite adeles is open and injective. -/
+theorem toFiniteAdeleRing_openEmbedding : OpenEmbedding (e S) := by
+  use ⟨toFiniteAdeleRing_inducing R K S, toFiniteAdeleRing_injective R K S⟩
+  exact TopologicalSpace.isOpen_generateFrom_of_mem (toFiniteAdeleRing_range_mem_generatingSet R K S)
 
 end FiniteSAdeleRing
 
@@ -430,7 +425,7 @@ theorem locallyCompactSpace : LocallyCompactSpace (finiteAdeleRing R K) := by
   have hU_S : U_S ∈ nhds ⟨x, hx⟩ := by
     rw [mem_nhds_iff]
     exact ⟨U_S, subset_rfl,
-      (OpenEmbedding.continuous (toFiniteAdeleRing_openEmbedding R K S)).isOpen_preimage U hUOpen, hxU⟩
+      (toFiniteAdeleRing_openEmbedding R K S).continuous.isOpen_preimage U hUOpen, hxU⟩
   obtain ⟨N_S, hN_S, hNU_S, hN_S_compact⟩ :=
     (FiniteSAdeleRing.locallyCompactSpace R K S).local_compact_nhds ⟨x, hx⟩ U_S hU_S
   obtain ⟨V, hV, hVOpen, hxV⟩ := mem_nhds_iff.1 hN_S
