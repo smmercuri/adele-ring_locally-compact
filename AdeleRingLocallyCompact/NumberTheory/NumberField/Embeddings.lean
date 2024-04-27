@@ -92,9 +92,10 @@ instance : Field (v.completion K) := UniformSpace.Completion.instField
 instance : Inhabited (v.completion K) :=
   ⟨0⟩
 
-instance : TopologicalRing (v.completion K) := UniformSpace.Completion.topologicalRing
+instance : TopologicalRing (v.completion K) :=
+  UniformSpace.Completion.topologicalRing
 
-instance Dist : Dist (v.completion K) :=
+instance : Dist (v.completion K) :=
   UniformSpace.Completion.instDistCompletionToUniformSpace
 
 instance : T0Space (v.completion K) :=
@@ -124,7 +125,7 @@ theorem extensionEmbedding_dist_eq (x y : v.completion K) :
     dist (extensionEmbedding K v x) (extensionEmbedding K v y) =
       dist x y := by
   set p : v.completion K → v.completion K → Prop :=
-    λ x y => dist (extensionEmbedding K v x) (extensionEmbedding K v y) = (Dist K v).dist x y
+    λ x y => dist (extensionEmbedding K v x) (extensionEmbedding K v y) = dist x y
   refine @UniformSpace.Completion.induction_on₂ (subfield K v) _ (subfield K v) _ p x y ?_ (λ x y => ?_)
   · apply isClosed_eq
     · exact continuous_iff_continuous_dist.1 UniformSpace.Completion.continuous_extension
@@ -141,7 +142,7 @@ variable (K v)
 
 /-- The embedding `Kᵥ → ℂ` is an isometry. -/
 theorem embedding_isometry : Isometry (extensionEmbedding K v) :=
-  Isometry.of_dist_eq (extensionEmbedding_dist_eq)
+  Isometry.of_dist_eq extensionEmbedding_dist_eq
 
 /-- The embedding `Kᵥ → ℂ` is uniform inducing. -/
 theorem embedding_uniformInducing :
