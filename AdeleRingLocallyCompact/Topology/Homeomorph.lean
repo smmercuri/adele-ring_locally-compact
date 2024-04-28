@@ -19,7 +19,10 @@ namespace Homeomorph
 variable {X : Type*} {Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]
 
 /-- The codomain of a homeomorphism is a locally compact space if and only if
-the domain is a locally compact space. -/
+the domain is a locally compact space. 
+
+Now part of [mathlib](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Topology/Homeomorph.html#Homeomorph.locallyCompactSpace_iff).
+-/
 theorem locallyCompactSpace_iff (h : X ≃ₜ Y) :
     LocallyCompactSpace X ↔ LocallyCompactSpace Y := by
   exact ⟨fun _ => h.symm.openEmbedding.locallyCompactSpace,
