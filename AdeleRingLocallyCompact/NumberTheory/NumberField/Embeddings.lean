@@ -39,6 +39,10 @@ This file defines the completion of a number field with respect to an infinite p
 number field, embeddings, places, infinite places
 -/
 
+/-
+TODO: for the direct approach, I think it makes more sense to use the uniform space coming from the metric space on K, but
+this needs to be defined. Then UniformAddGroup probably needs to be shown directly.
+-/
 noncomputable section
 
 namespace NumberField.InfinitePlace
@@ -74,7 +78,6 @@ def subfieldEquiv : K ≃+* v.subfield K :=
 instance subfield_uniformSpace : UniformSpace (v.subfield K) := inferInstance
 
 /-- The completion of a number field at an Archimedean place. -/
---def completion := @UniformSpace.Completion K v.val.uniformSpace
 instance : NormedDivisionRing (subfield K v) :=
   NormedDivisionRing.induced _ _ (Subfield.subtype (subfield K v)) Subtype.val_injective
 
@@ -83,40 +86,62 @@ instance : NormedDivisionRing K :=
 
 instance : PseudoMetricSpace K := (instNormedDivisionRing K v).toPseudoMetricSpace
 
-theorem uniformInducing : @UniformInducing _ _ (instPseudoMetricSpace K v).toUniformSpace _ v.embedding := sorry
+instance topologicalSpace : TopologicalSpace K := (instPseudoMetricSpace K v).toUniformSpace.toTopologicalSpace
 
-def completion := @UniformSpace.Completion K (instPseudoMetricSpace K v).toUniformSpace
+instance topologicalDivisionRing : @TopologicalDivisionRing K _ (topologicalSpace K v) :=
+  (instNormedDivisionRing K v).to_topologicalDivisionRing
+
+instance topologicalRing : @TopologicalRing K (topologicalSpace K v) _ :=
+  @TopologicalDivisionRing.toTopologicalRing _ _ (topologicalSpace K v) _
+
+instance topologicalAddGroup : @TopologicalAddGroup K (topologicalSpace K v) _ :=
+  @TopologicalRing.to_topologicalAddGroup _ _ (topologicalSpace K v) _
+
+instance uniformSpace : UniformSpace K := @TopologicalAddGroup.toUniformSpace _ _ (topologicalSpace K v) _
+  -- (instPseudoMetricSpace K v).toUniformSpace
+
+-- May need to show this directly
+instance uniformAddGroup : @UniformAddGroup K (uniformSpace K v) _ :=
+  @comm_topologicalAddGroup_is_uniform _ _ (topologicalSpace K v) _
+
+theorem uniformInducing : @UniformInducing _ _ (v.uniformSpace K) _ v.embedding := sorry
+
+instance : @CompletableTopField K _ (v.uniformSpace K) := sorry
+  /-{(v.uniformSpace K) with
+  nice := by
+    let i : K →+* L := K.subtype
+    have hi : UniformInducing i := uniformEmbedding_subtype_val.toUniformInducing
+    rw [← hi.cauchy_map_iff] at F_cau ⊢
+    rw [map_comm (show (i ∘ fun x => x⁻¹) = (fun x => x⁻¹) ∘ i by ext; rfl)]
+    apply CompletableTopField.nice _ F_cau
+    rw [← Filter.push_pull', ← map_zero i, ← hi.inducing.nhds_eq_comap, inf_F, Filter.map_bot]
+}-/
+
+def completion := @UniformSpace.Completion K (v.uniformSpace K)
 
 namespace Completion
 
 instance : UniformSpace (v.completion K) :=
-  @UniformSpace.Completion.uniformSpace _ (instPseudoMetricSpace K v).toUniformSpace
+  @UniformSpace.Completion.uniformSpace _ (v.uniformSpace K)
 
 instance : CompleteSpace (v.completion K) :=
-  @UniformSpace.Completion.completeSpace _ (instPseudoMetricSpace K v).toUniformSpace
-
-instance instUniformAddGroup : @UniformAddGroup K ((instPseudoMetricSpace K v).toUniformSpace) _ :=
-  sorry
-
-instance : @CompletableTopField K _ (instPseudoMetricSpace K v).toUniformSpace := sorry
+  @UniformSpace.Completion.completeSpace _ (v.uniformSpace K)
 
 instance : Field (v.completion K) :=
-  @UniformSpace.Completion.instField _ _ (instPseudoMetricSpace K v).toUniformSpace (instNormedDivisionRing K v).to_topologicalDivisionRing _ _
+  @UniformSpace.Completion.instField _ _ (v.uniformSpace K) (v.topologicalDivisionRing K) _ _
 
 instance : Inhabited (v.completion K) :=
   ⟨0⟩
 
-instance : TopologicalSpace K := (instPseudoMetricSpace K v).toUniformSpace.toTopologicalSpace
-instance : @TopologicalDivisionRing K _ (instTopologicalSpace K v) := (instNormedDivisionRing K v).to_topologicalDivisionRing
-
 instance : TopologicalRing (v.completion K) :=
-  @UniformSpace.Completion.topologicalRing K _ (instPseudoMetricSpace K v).toUniformSpace _ (instUniformAddGroup K v)
+  @UniformSpace.Completion.topologicalRing K _ (v.uniformSpace K) _ (v.uniformAddGroup K)
 
 instance : Dist (v.completion K) :=
-  @UniformSpace.Completion.instDistCompletionToUniformSpace _ (instPseudoMetricSpace K v)
+  ⟨@UniformSpace.Completion.extension₂ _ (v.uniformSpace K) _ (v.uniformSpace K) _ _ (v.instPseudoMetricSpace K).dist⟩
+  --@UniformSpace.Completion.instDistCompletionToUniformSpace _ (instPseudoMetricSpace K v)
 
 instance : T0Space (v.completion K) :=
-  @UniformSpace.Completion.t0Space _ (instPseudoMetricSpace K v).toUniformSpace
+  @UniformSpace.Completion.t0Space _ (v.uniformSpace K)
 
 /-instance : Coe (subfield K v) (v.completion K) :=
   (inferInstance : Coe (subfield K v) (@UniformSpace.Completion (subfield K v) (subfield_uniformSpace K v)))
@@ -130,10 +155,10 @@ def coeRingHom : K →+* v.completion K :=
 /-- The embedding `Kᵥ → ℂ` of a completion of a number field at an Archimedean
 place into `ℂ`. -/
 def extensionEmbedding :=
-  @UniformSpace.Completion.extension _ (instPseudoMetricSpace K v).toUniformSpace _ _ v.embedding
+  @UniformSpace.Completion.extension _ (v.uniformSpace K) _ _ v.embedding
 
 theorem extensionEmbedding_injective : Function.Injective (extensionEmbedding K v) :=
-  sorry --(extensionEmbedding K v).injective
+  sorry
 
 variable {K v}
 
@@ -170,8 +195,9 @@ theorem extensionEmbedding_dist_eq (x y : v.completion K) :
     rfl-/
 
 variable (K v)
+instance metricSpace : MetricSpace (v.completion K) := sorry
 
-theorem embedding_isometry : Isometry (extensionEmbedding K v) :=
+theorem embedding_isometry : @Isometry _ _ (metricSpace K v).toPseudoEMetricSpace _ (extensionEmbedding K v) :=
   Isometry.of_dist_eq extensionEmbedding_dist_eq
 
 /-- The embedding `Kᵥ → ℂ` is uniform inducing. -/
