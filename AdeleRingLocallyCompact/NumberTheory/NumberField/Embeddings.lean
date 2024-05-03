@@ -71,7 +71,14 @@ theorem toSubfield_surjective : Function.Surjective (v.toSubfield K) := by
 def subfieldEquiv : K ≃+* v.subfield K :=
   RingEquiv.ofBijective _ ⟨toSubfield_injective K v, toSubfield_surjective K v⟩
 
-instance subfield_uniformSpace : UniformSpace (v.subfield K) := inferInstance
+instance : NormedDivisionRing (subfield K v) :=
+  NormedDivisionRing.induced _ _ (Subfield.subtype (subfield K v)) Subtype.val_injective
+
+instance subfield_uniformSpace : UniformSpace (v.subfield K) :=
+  instUniformSpaceSubtype
+
+instance subfield_uniformAddGroup : UniformAddGroup (v.subfield K) :=
+  (v.subfield K).toAddSubgroup.uniformAddGroup
 
 /-- The completion of a number field at an Archimedean place. -/
 def completion := (subfield_uniformSpace K v).Completion
@@ -83,9 +90,6 @@ instance : UniformSpace (v.completion K) :=
 
 instance : CompleteSpace (v.completion K) :=
   @UniformSpace.Completion.completeSpace _ (subfield_uniformSpace K v)
-
-instance : NormedDivisionRing (subfield K v) :=
-  NormedDivisionRing.induced _ _ (Subfield.subtype (subfield K v)) Subtype.val_injective
 
 instance : Field (v.completion K) := UniformSpace.Completion.instField
 
