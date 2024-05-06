@@ -5,8 +5,6 @@ Authors: Salvatore Mercuri
 -/
 import Mathlib
 
-set_option maxHeartbeats 50000000000
-
 /-!
 # Embeddings of number fields
 
@@ -74,7 +72,8 @@ def subfieldEquiv : K ≃+* v.subfield K :=
 
 instance subfield_uniformSpace : UniformSpace (v.subfield K) := inferInstance
 
-/-- The completion of a number field at an Archimedean place. -/
+section DerivedInstances
+
 instance : NormedDivisionRing (subfield K v) :=
   NormedDivisionRing.induced _ _ (Subfield.subtype (subfield K v)) Subtype.val_injective
 
@@ -107,9 +106,7 @@ instance uniformSpace : UniformSpace K := (instPseudoMetricSpace K v).toUniformS
 instance uniformAddGroup : @UniformAddGroup K (uniformSpace K v) _ :=
   (instSeminormedAddCommGroup K v).to_uniformAddGroup
 
-theorem uniformInducing : @UniformInducing _ _ (v.uniformSpace K) _ (toSubfield K v) := sorry
-
--- TODO: Why do I have to re-establish this instance for ℂ? Getting timeouts otherwise
+-- TODO: Why do I have to re-establish these instances for ℂ and ℝ? Getting timeouts otherwise
 instance : MetricSpace ℂ := inferInstance
 
 instance : T0Space ℂ := instMetricSpaceComplex.instT0Space
@@ -118,7 +115,44 @@ instance : NormedDivisionRing ℂ := Complex.instNormedFieldComplex.toNormedDivi
 
 instance : TopologicalDivisionRing ℂ := instNormedDivisionRingComplex.to_topologicalDivisionRing
 
+instance : TopologicalRing ℂ := instTopologicalDivisionRingComplexToDivisionRingInstNormedDivisionRingComplexToTopologicalSpaceToUniformSpaceToPseudoMetricSpaceToSeminormedRingToSeminormedCommRingToNormedCommRingInstNormedFieldComplex.toTopologicalRing
+
+instance : NormedRing ℂ := instNormedDivisionRingComplex.toNormedRing
+
+instance : NonUnitalNormedRing ℂ := instNormedRingComplex.toNonUnitalNormedRing
+
+instance : NormedAddCommGroup ℂ  := instNonUnitalNormedRingComplex.toNormedAddCommGroup
+
+instance : SeminormedAddCommGroup ℂ := instNormedAddCommGroupComplex.toSeminormedAddCommGroup
+
+instance : UniformAddGroup ℂ := instSeminormedAddCommGroupComplex.to_uniformAddGroup
+
 instance : CompletableTopField ℂ := completableTopField_of_complete ℂ
+
+instance : TopologicalSpace ℝ := Real.pseudoMetricSpace.toUniformSpace.toTopologicalSpace
+
+instance : UniformSpace ℝ := Real.pseudoMetricSpace.toUniformSpace
+
+instance : TopologicalSpace.MetrizableSpace ℝ := Real.metricSpace.toMetrizableSpace
+
+instance : T2Space ℝ := TopologicalSpace.t2Space_of_metrizableSpace
+
+end DerivedInstances
+
+theorem embedding' : @Embedding _ _ (v.topologicalSpace K) _ (v.toSubfield K) := by
+  rw [@embedding_iff]
+  refine ⟨?_, v.toSubfield_injective⟩
+  rw [@inducing_iff]
+  rfl
+
+theorem toSubfield_isometry : @Isometry _ _ (instPseudoMetricSpace K v).toPseudoEMetricSpace _ (toSubfield K v) :=
+  @Embedding.to_isometry _ _ (v.topologicalSpace K) _ _ v.embedding'
+
+theorem uniformInducing : @UniformInducing _ _ (v.uniformSpace K) _ (toSubfield K v).toFun :=
+  @Isometry.uniformInducing _ _ (instPseudoMetricSpace K v).toPseudoEMetricSpace _ _ (v.toSubfield_isometry K)
+
+theorem uniformContinuous : @UniformContinuous _ _ (v.uniformSpace K) _ (toSubfield K v).toFun :=
+  @UniformInducing.uniformContinuous _ _ (v.uniformSpace K) _ _ (v.uniformInducing K)
 
 instance : @CompletableTopField K _ (v.uniformSpace K) := by
   apply @CompletableTopField.mk _ _ (v.uniformSpace K)
@@ -140,7 +174,6 @@ instance : @CompletableTopField K _ (v.uniformSpace K) := by
   have h' := @Inducing.nhds_eq_comap _ _ _ (v.topologicalSpace K) _ h
   rw [← h', inf_F, Filter.map_bot]
 
-
 def completion := @UniformSpace.Completion K (v.uniformSpace K)
 
 namespace Completion
@@ -161,28 +194,29 @@ instance : TopologicalRing (v.completion K) :=
   @UniformSpace.Completion.topologicalRing K _ (v.uniformSpace K) _ (v.uniformAddGroup K)
 
 instance : Dist (v.completion K) :=
-  --⟨@UniformSpace.Completion.extension₂ _ (v.uniformSpace K) _ (v.uniformSpace K) _ _ (v.instPseudoMetricSpace K).dist⟩
   @UniformSpace.Completion.instDistCompletionToUniformSpace _ (instPseudoMetricSpace K v)
 
 instance : T0Space (v.completion K) :=
   @UniformSpace.Completion.t0Space _ (v.uniformSpace K)
 
-/-instance : Coe (subfield K v) (v.completion K) :=
-  (inferInstance : Coe (subfield K v) (@UniformSpace.Completion (subfield K v) (subfield_uniformSpace K v)))
+theorem embedding_uniformContinuous : @UniformContinuous _ _ (v.uniformSpace K) _ v.embedding := by
+  convert v.uniformContinuous K; simp [embedding, toSubfield];
+  constructor
+  · intro h
+    apply @UniformContinuous.subtype_mk _ _ _ _ (v.uniformSpace K)
+    exact h
+  · intro h
+    have h' := @UniformContinuous.comp _ _ _ (v.uniformSpace K) _ _ _ _ uniformContinuous_subtype_val h
+    exact h'
 
-instance : Coe K (v.completion K) where
-  coe := (↑) ∘ v.toSubfield K
+theorem embedding_continuous : @Continuous _ _ (v.topologicalSpace K) _ v.embedding :=
+  @UniformContinuous.continuous _ _ (v.uniformSpace K) _ _ (embedding_uniformContinuous K v)
 
-def coeRingHom : K →+* v.completion K :=
-  RingHom.comp UniformSpace.Completion.coeRingHom (v.toSubfield K)-/
-
-/-- The embedding `Kᵥ → ℂ` of a completion of a number field at an Archimedean
-place into `ℂ`. -/
 def extensionEmbedding :=
-  @UniformSpace.Completion.extension _ (v.uniformSpace K) _ _ v.embedding
+  @UniformSpace.Completion.extensionHom K _ (v.uniformSpace K) (v.topologicalRing K) (v.uniformAddGroup K) ℂ _ _ _ _ v.embedding (embedding_continuous K v) _ _
 
-theorem extensionEmbedding_injective : Function.Injective (extensionEmbedding K v) :=
-  sorry
+theorem extensionEmbedding_injective : Function.Injective (extensionEmbedding K v) := (extensionEmbedding K v).injective
+
 
 variable {K v}
 
@@ -193,33 +227,16 @@ theorem extensionEmbedding_dist_eq (x y : v.completion K) :
   set p : v.completion K → v.completion K → Prop :=
     λ x y => dist (extensionEmbedding K v x) (extensionEmbedding K v y) = dist x y
   refine @UniformSpace.Completion.induction_on₂ _ (instPseudoMetricSpace K v).toUniformSpace _ (instPseudoMetricSpace K v).toUniformSpace p x y ?_ (λ x y => ?_)
-  · sorry
-  · sorry
-  /-
-  · simp only [extensionEmbedding, UniformSpace.Completion.extensionHom, Subfield.coe_subtype,
-      RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, p, @UniformSpace.Completion.dist_eq (v.subfield K) _]
-    have h_val : UniformContinuous (subfield K v).subtype := uniformContinuous_subtype_val
-    have h_val_ext := UniformSpace.Completion.extension_coe h_val
-    simp only [Subfield.coe_subtype] at h_val_ext
-    rw [h_val_ext x, h_val_ext y]
-  sorry
-
-  set p : v.completion K → v.completion K → Prop :=
-    λ x y => dist (extensionEmbedding K v x) (extensionEmbedding K v y) = (Dist K v).dist x y
-  refine @UniformSpace.Completion.induction_on₂ (subfield K v) _ (subfield K v) _ p x y ?_ (λ x y => ?_)
   · apply isClosed_eq
-    · exact continuous_iff_continuous_dist.1 UniformSpace.Completion.continuous_extension
-    · exact continuous_dist
-  · simp only [extensionEmbedding, UniformSpace.Completion.extensionHom, Subfield.coe_subtype,
-      RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, p, @UniformSpace.Completion.dist_eq (v.subfield K) _]
-    have h_val : UniformContinuous (subfield K v).subtype := uniformContinuous_subtype_val
-    have h_val_ext := UniformSpace.Completion.extension_coe h_val
-    simp only [Subfield.coe_subtype] at h_val_ext
-    rw [h_val_ext x, h_val_ext y]
-    rfl-/
+    · refine continuous_iff_continuous_dist.1 (@UniformSpace.Completion.continuous_extension _ (v.uniformSpace K) _ _ _ _)
+    · convert continuous_dist
+  · simp [p, extensionEmbedding, UniformSpace.Completion.extensionHom]
+    rw [@UniformSpace.Completion.extension_coe _ (v.uniformSpace K) _ _ _ _ (embedding_uniformContinuous K v)]
+    rw [@UniformSpace.Completion.extension_coe _ (v.uniformSpace K) _ _ _ _ (embedding_uniformContinuous K v)]
+    rw [@UniformSpace.Completion.dist_eq _ (v.instPseudoMetricSpace K)]
+    exact @Isometry.dist_eq _ _ (v.instPseudoMetricSpace K) _ _ (v.toSubfield_isometry K) _ _
 
 variable (K v)
---instance metricSpace : MetricSpace (v.completion K) := sorry
 
 theorem embedding_isometry : Isometry (extensionEmbedding K v) :=
   Isometry.of_dist_eq extensionEmbedding_dist_eq
