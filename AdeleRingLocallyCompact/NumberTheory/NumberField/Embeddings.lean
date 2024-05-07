@@ -49,10 +49,8 @@ instance : Inhabited (InfinitePlace K) :=
 
 section DerivedInstances
 
---class NormedSubdivisionRing (α : Type u) (β : Type v) [Ring α] [Ring β] (σ : α →+* β) extends NormedDivisionRing β where
-
 variable {K}
-
+/--/
 def normedDivisionRing : NormedDivisionRing K :=
   NormedDivisionRing.induced _ _ v.embedding v.embedding.injective
 
@@ -68,14 +66,23 @@ instance topologicalRing : @TopologicalRing K v.topologicalSpace _ :=
 
 instance topologicalAddGroup : @TopologicalAddGroup K v.topologicalSpace _ :=
   @TopologicalRing.to_topologicalAddGroup _ _ v.topologicalSpace  _
-
-instance uniformSpace : UniformSpace K :=  v.pseudoMetricSpace.toUniformSpace
+-/
+instance uniformSpace : UniformSpace K := UniformSpace.comap v.embedding inferInstance
 
 instance uniformAddGroup : @UniformAddGroup K v.uniformSpace _ :=
-  @SeminormedAddCommGroup.to_uniformAddGroup _
+  UniformAddGroup.comap v.embedding
+
+instance topologicalSpace : TopologicalSpace K := v.uniformSpace.toTopologicalSpace
+
+instance topologicalRing : @TopologicalRing K v.topologicalSpace _ := sorry
+
+instance topologicalDivisionRing : @TopologicalDivisionRing K _ v.topologicalSpace := sorry
+
+instance t0Space : @T0Space K v.topologicalSpace := sorry
+  /-@SeminormedAddCommGroup.to_uniformAddGroup _
     (@NormedAddCommGroup.toSeminormedAddCommGroup _
       (@NonUnitalNormedRing.toNormedAddCommGroup _
-        (@NormedDivisionRing.toNormedRing _ v.normedDivisionRing).toNonUnitalNormedRing))
+        (@NormedDivisionRing.toNormedRing _ v.normedDivisionRing).toNonUnitalNormedRing))-/
 
 -- TODO: Why do I have to re-establish these instances for ℂ? Getting timeouts otherwise
 instance : MetricSpace ℂ := inferInstance
@@ -99,16 +106,16 @@ instance : SeminormedAddCommGroup ℂ := instNormedAddCommGroupComplex.toSeminor
 instance : UniformAddGroup ℂ := instSeminormedAddCommGroupComplex.to_uniformAddGroup
 
 end DerivedInstances
-
+/--/
 theorem topEmbedding : @Embedding _ _ v.topologicalSpace _ (v.embedding) := by
   rw [@embedding_iff, @inducing_iff]
   exact ⟨rfl, v.embedding.injective⟩
 
 theorem isometry : @Isometry _ _ v.pseudoMetricSpace.toPseudoEMetricSpace _ (v.embedding) :=
   @Embedding.to_isometry _ _ v.topologicalSpace _ _ v.topEmbedding
-
-theorem embedding_uniformInducing : @UniformInducing _ _ v.uniformSpace _ v.embedding :=
-  @Isometry.uniformInducing _ _ v.pseudoMetricSpace.toPseudoEMetricSpace _ _ (v.isometry K)
+-/
+theorem embedding_uniformInducing : @UniformInducing _ _ v.uniformSpace _ v.embedding := by
+  rw [@uniformInducing_iff_uniformSpace]; rfl
 
 theorem embedding_uniformContinuous : @UniformContinuous _ _ v.uniformSpace _ v.embedding :=
   @UniformInducing.uniformContinuous _ _ v.uniformSpace _ _ (v.embedding_uniformInducing K)
