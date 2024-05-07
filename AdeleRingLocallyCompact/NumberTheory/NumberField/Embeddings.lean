@@ -137,9 +137,12 @@ instance : T0Space (v.completion K) :=
 instance metricSpace : MetricSpace (v.completion K) :=
   @UniformSpace.Completion.instMetricSpace _ v.pseudoMetricSpace
 
+def coeRingHom : K →+* v.completion K :=
+  @UniformSpace.Completion.coeRingHom _ _ v.uniformSpace _ v.uniformAddGroup
+
 def extensionEmbedding :=
   @UniformSpace.Completion.extensionHom K _ v.uniformSpace v.topologicalRing v.uniformAddGroup
-    ℂ _ _ _ _ v.embedding v.embedding_continuous _ _
+    _ _ _ _ _ v.embedding v.embedding_continuous _ _
 
 theorem extensionEmbedding_injective : Function.Injective (extensionEmbedding K v) :=
   (extensionEmbedding K v).injective
