@@ -47,66 +47,37 @@ variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
 instance : Inhabited (InfinitePlace K) :=
   ⟨Classical.choice (instNonemptyInfinitePlace K)⟩
 
-/-- The embedding of K as a subfield in ℂ using the embedding associated to the infinite place
-`v`. -/
-def subfield (v : InfinitePlace K) : Subfield ℂ where
-  toSubring := v.embedding.range
-  inv_mem' _ := by intro ⟨y, hy⟩; exact ⟨y⁻¹, by simp only [map_inv₀, hy]⟩
-
-/-- The embedding sending a number field to its subfield in ℂ.-/
-def toSubfield : K →+* v.subfield K where
-  toFun := fun x => ⟨v.embedding x, Set.mem_range_self x⟩
-  map_one' := by simp only [map_one, Submonoid.mk_eq_one]
-  map_mul' x y := by simp only [v.embedding.map_mul' x y, map_mul]; rfl
-  map_zero' := by simp only [map_zero]; rfl
-  map_add' x y := by simp only [v.embedding.map_add' x y, map_add]; rfl
-
-theorem toSubfield_injective : Function.Injective (v.toSubfield K) := (v.toSubfield K).injective
-
-theorem toSubfield_surjective : Function.Surjective (v.toSubfield K) := by
-  rw [← RingHom.range_top_iff_surjective, Subring.eq_top_iff']
-  exact λ ⟨_, ⟨y, hy⟩⟩ => ⟨y, Subtype.val_inj.1 hy⟩
-
-def subfieldEquiv : K ≃+* v.subfield K :=
-  RingEquiv.ofBijective _ ⟨toSubfield_injective K v, toSubfield_surjective K v⟩
-
-instance subfield_uniformSpace : UniformSpace (v.subfield K) := inferInstance
-
 section DerivedInstances
 
-instance : NormedDivisionRing (subfield K v) :=
-  NormedDivisionRing.induced _ _ (Subfield.subtype (subfield K v)) Subtype.val_injective
+--class NormedSubdivisionRing (α : Type u) (β : Type v) [Ring α] [Ring β] (σ : α →+* β) extends NormedDivisionRing β where
 
-instance : NormedDivisionRing K :=
-  NormedDivisionRing.induced _ _ (toSubfield K v) (toSubfield_injective K v)
+variable {K}
 
-instance : NormedRing K := (instNormedDivisionRing K v).toNormedRing
+def normedDivisionRing : NormedDivisionRing K :=
+  NormedDivisionRing.induced _ _ v.embedding v.embedding.injective
 
-instance : NonUnitalNormedRing K := (instNormedRing K v).toNonUnitalNormedRing
+instance pseudoMetricSpace : PseudoMetricSpace K := v.normedDivisionRing.toPseudoMetricSpace
 
-instance : NormedAddCommGroup K := (instNonUnitalNormedRing K v).toNormedAddCommGroup
+instance topologicalSpace : TopologicalSpace K := v.pseudoMetricSpace.toUniformSpace.toTopologicalSpace
 
-instance : SeminormedAddCommGroup K := (instNormedAddCommGroup K v).toSeminormedAddCommGroup
+instance topologicalDivisionRing : @TopologicalDivisionRing K _ v.topologicalSpace :=
+  v.normedDivisionRing.to_topologicalDivisionRing
 
-instance : PseudoMetricSpace K := (instNormedDivisionRing K v).toPseudoMetricSpace
+instance topologicalRing : @TopologicalRing K v.topologicalSpace _ :=
+  @TopologicalDivisionRing.toTopologicalRing _ _ v.topologicalSpace _
 
-instance topologicalSpace : TopologicalSpace K := (instPseudoMetricSpace K v).toUniformSpace.toTopologicalSpace
+instance topologicalAddGroup : @TopologicalAddGroup K v.topologicalSpace _ :=
+  @TopologicalRing.to_topologicalAddGroup _ _ v.topologicalSpace  _
 
-instance topologicalDivisionRing : @TopologicalDivisionRing K _ (topologicalSpace K v) :=
-  (instNormedDivisionRing K v).to_topologicalDivisionRing
+instance uniformSpace : UniformSpace K :=  v.pseudoMetricSpace.toUniformSpace
 
-instance topologicalRing : @TopologicalRing K (topologicalSpace K v) _ :=
-  @TopologicalDivisionRing.toTopologicalRing _ _ (topologicalSpace K v) _
+instance uniformAddGroup : @UniformAddGroup K v.uniformSpace _ :=
+  @SeminormedAddCommGroup.to_uniformAddGroup _
+    (@NormedAddCommGroup.toSeminormedAddCommGroup _
+      (@NonUnitalNormedRing.toNormedAddCommGroup _
+        (@NormedDivisionRing.toNormedRing _ v.normedDivisionRing).toNonUnitalNormedRing))
 
-instance topologicalAddGroup : @TopologicalAddGroup K (topologicalSpace K v) _ :=
-  @TopologicalRing.to_topologicalAddGroup _ _ (topologicalSpace K v) _
-
-instance uniformSpace : UniformSpace K := (instPseudoMetricSpace K v).toUniformSpace
-
-instance uniformAddGroup : @UniformAddGroup K (uniformSpace K v) _ :=
-  (instSeminormedAddCommGroup K v).to_uniformAddGroup
-
--- TODO: Why do I have to re-establish these instances for ℂ and ℝ? Getting timeouts otherwise
+-- TODO: Why do I have to re-establish these instances for ℂ? Getting timeouts otherwise
 instance : MetricSpace ℂ := inferInstance
 
 instance : T0Space ℂ := instMetricSpaceComplex.instT0Space
@@ -127,96 +98,69 @@ instance : SeminormedAddCommGroup ℂ := instNormedAddCommGroupComplex.toSeminor
 
 instance : UniformAddGroup ℂ := instSeminormedAddCommGroupComplex.to_uniformAddGroup
 
-instance : CompletableTopField ℂ := completableTopField_of_complete ℂ
-
-instance : TopologicalSpace ℝ := Real.pseudoMetricSpace.toUniformSpace.toTopologicalSpace
-
-instance : UniformSpace ℝ := Real.pseudoMetricSpace.toUniformSpace
-
-instance : TopologicalSpace.MetrizableSpace ℝ := Real.metricSpace.toMetrizableSpace
-
-instance : T2Space ℝ := TopologicalSpace.t2Space_of_metrizableSpace
-
 end DerivedInstances
 
-theorem embedding' : @Embedding _ _ (v.topologicalSpace K) _ (v.toSubfield K) := by
-  rw [@embedding_iff]
-  refine ⟨?_, v.toSubfield_injective⟩
-  rw [@inducing_iff]
-  rfl
+theorem topEmbedding : @Embedding _ _ v.topologicalSpace _ (v.embedding) := by
+  rw [@embedding_iff, @inducing_iff]
+  exact ⟨rfl, v.embedding.injective⟩
 
-theorem toSubfield_isometry : @Isometry _ _ (instPseudoMetricSpace K v).toPseudoEMetricSpace _ (toSubfield K v) :=
-  @Embedding.to_isometry _ _ (v.topologicalSpace K) _ _ v.embedding'
+theorem isometry : @Isometry _ _ v.pseudoMetricSpace.toPseudoEMetricSpace _ (v.embedding) :=
+  @Embedding.to_isometry _ _ v.topologicalSpace _ _ v.topEmbedding
 
-theorem uniformInducing : @UniformInducing _ _ (v.uniformSpace K) _ (toSubfield K v).toFun :=
-  @Isometry.uniformInducing _ _ (instPseudoMetricSpace K v).toPseudoEMetricSpace _ _ (v.toSubfield_isometry K)
+theorem embedding_uniformInducing : @UniformInducing _ _ v.uniformSpace _ v.embedding :=
+  @Isometry.uniformInducing _ _ v.pseudoMetricSpace.toPseudoEMetricSpace _ _ (v.isometry K)
 
-theorem uniformContinuous : @UniformContinuous _ _ (v.uniformSpace K) _ (toSubfield K v).toFun :=
-  @UniformInducing.uniformContinuous _ _ (v.uniformSpace K) _ _ (v.uniformInducing K)
+theorem embedding_uniformContinuous : @UniformContinuous _ _ v.uniformSpace _ v.embedding :=
+  @UniformInducing.uniformContinuous _ _ v.uniformSpace _ _ (v.embedding_uniformInducing K)
 
-instance : @CompletableTopField K _ (v.uniformSpace K) := by
-  apply @CompletableTopField.mk _ _ (v.uniformSpace K)
+theorem embedding_continuous : @Continuous _ _ v.topologicalSpace _ v.embedding :=
+  @UniformContinuous.continuous _ _ v.uniformSpace _ _ (embedding_uniformContinuous K v)
+
+instance completableTopField : @CompletableTopField K _ v.uniformSpace := by
+  apply @CompletableTopField.mk _ _ v.uniformSpace
   intro F F_cau inf_F
-  let σ := toSubfield K v
-  let i : K →+* ℂ := RingHom.comp (subfield K v).subtype σ
-  have hi : @UniformInducing _ _ (v.uniformSpace K) _ i :=
-    @UniformInducing.comp _ _ _ (v.uniformSpace K) _ _ _ uniformEmbedding_subtype_val.toUniformInducing _ (v.uniformInducing K)
-  have h_cau_i := @UniformInducing.cauchy_map_iff _ _ (v.uniformSpace K) _ _ hi
+  have h_cau_i := @UniformInducing.cauchy_map_iff _ _ v.uniformSpace _ _ (v.embedding_uniformInducing K)
   rw [← h_cau_i] at F_cau ⊢
-  have h_comm : (i ∘ fun x => x⁻¹) = (fun x => x⁻¹) ∘ i := by
-    ext
-    simp only [Function.comp_apply, map_inv₀, Subfield.coe_inv]
-
+  have h_comm : (v.embedding ∘ fun x => x⁻¹) = (fun x => x⁻¹) ∘ v.embedding := by
+    ext; simp only [Function.comp_apply, map_inv₀, Subfield.coe_inv]
   rw [Filter.map_comm h_comm]
-  apply CompletableTopField.nice _ F_cau
-  rw [← Filter.push_pull', ← map_zero i]
-  have h := (@UniformInducing.inducing _ _ (v.uniformSpace K) _ _ hi)
-  have h' := @Inducing.nhds_eq_comap _ _ _ (v.topologicalSpace K) _ h
-  rw [← h', inf_F, Filter.map_bot]
+  apply @CompletableTopField.nice ℂ _ _ _ _ F_cau
+  rw [← Filter.push_pull', ← map_zero v.embedding]
+  have h_inducing := (@UniformInducing.inducing _ _ v.uniformSpace _ _ (v.embedding_uniformInducing K))
+  have h_nhds := @Inducing.nhds_eq_comap _ _ _ v.topologicalSpace _ h_inducing
+  rw [← h_nhds, inf_F, Filter.map_bot]
 
-def completion := @UniformSpace.Completion K (v.uniformSpace K)
+def completion := @UniformSpace.Completion K v.uniformSpace
 
 namespace Completion
 
 instance : UniformSpace (v.completion K) :=
-  @UniformSpace.Completion.uniformSpace _ (v.uniformSpace K)
+  @UniformSpace.Completion.uniformSpace _ v.uniformSpace
 
 instance : CompleteSpace (v.completion K) :=
-  @UniformSpace.Completion.completeSpace _ (v.uniformSpace K)
+  @UniformSpace.Completion.completeSpace _ v.uniformSpace
 
 instance : Field (v.completion K) :=
-  @UniformSpace.Completion.instField _ _ (v.uniformSpace K) (v.topologicalDivisionRing K) _ _
+  @UniformSpace.Completion.instField _ _ v.uniformSpace v.topologicalDivisionRing _ _
 
 instance : Inhabited (v.completion K) :=
   ⟨0⟩
 
 instance : TopologicalRing (v.completion K) :=
-  @UniformSpace.Completion.topologicalRing K _ (v.uniformSpace K) _ (v.uniformAddGroup K)
+  @UniformSpace.Completion.topologicalRing K _ v.uniformSpace _ v.uniformAddGroup
 
 instance : Dist (v.completion K) :=
-  @UniformSpace.Completion.instDistCompletionToUniformSpace _ (instPseudoMetricSpace K v)
+  @UniformSpace.Completion.instDistCompletionToUniformSpace _ v.pseudoMetricSpace
 
 instance : T0Space (v.completion K) :=
-  @UniformSpace.Completion.t0Space _ (v.uniformSpace K)
-
-theorem embedding_uniformContinuous : @UniformContinuous _ _ (v.uniformSpace K) _ v.embedding := by
-  convert v.uniformContinuous K; simp [embedding, toSubfield];
-  constructor
-  · intro h
-    apply @UniformContinuous.subtype_mk _ _ _ _ (v.uniformSpace K)
-    exact h
-  · intro h
-    have h' := @UniformContinuous.comp _ _ _ (v.uniformSpace K) _ _ _ _ uniformContinuous_subtype_val h
-    exact h'
-
-theorem embedding_continuous : @Continuous _ _ (v.topologicalSpace K) _ v.embedding :=
-  @UniformContinuous.continuous _ _ (v.uniformSpace K) _ _ (embedding_uniformContinuous K v)
+  @UniformSpace.Completion.t0Space _ v.uniformSpace
 
 def extensionEmbedding :=
-  @UniformSpace.Completion.extensionHom K _ (v.uniformSpace K) (v.topologicalRing K) (v.uniformAddGroup K) ℂ _ _ _ _ v.embedding (embedding_continuous K v) _ _
+  @UniformSpace.Completion.extensionHom K _ v.uniformSpace v.topologicalRing v.uniformAddGroup
+    ℂ _ _ _ _ v.embedding v.embedding_continuous _ _
 
-theorem extensionEmbedding_injective : Function.Injective (extensionEmbedding K v) := (extensionEmbedding K v).injective
-
+theorem extensionEmbedding_injective : Function.Injective (extensionEmbedding K v) :=
+  (extensionEmbedding K v).injective
 
 variable {K v}
 
@@ -226,15 +170,15 @@ theorem extensionEmbedding_dist_eq (x y : v.completion K) :
       dist x y := by
   set p : v.completion K → v.completion K → Prop :=
     λ x y => dist (extensionEmbedding K v x) (extensionEmbedding K v y) = dist x y
-  refine @UniformSpace.Completion.induction_on₂ _ (instPseudoMetricSpace K v).toUniformSpace _ (instPseudoMetricSpace K v).toUniformSpace p x y ?_ (λ x y => ?_)
+  refine @UniformSpace.Completion.induction_on₂ _ v.uniformSpace _ v.uniformSpace p x y ?_ (λ x y => ?_)
   · apply isClosed_eq
-    · refine continuous_iff_continuous_dist.1 (@UniformSpace.Completion.continuous_extension _ (v.uniformSpace K) _ _ _ _)
+    · refine continuous_iff_continuous_dist.1 (@UniformSpace.Completion.continuous_extension _ v.uniformSpace _ _ _ _)
     · convert continuous_dist
   · simp [p, extensionEmbedding, UniformSpace.Completion.extensionHom]
-    rw [@UniformSpace.Completion.extension_coe _ (v.uniformSpace K) _ _ _ _ (embedding_uniformContinuous K v)]
-    rw [@UniformSpace.Completion.extension_coe _ (v.uniformSpace K) _ _ _ _ (embedding_uniformContinuous K v)]
-    rw [@UniformSpace.Completion.dist_eq _ (v.instPseudoMetricSpace K)]
-    exact @Isometry.dist_eq _ _ (v.instPseudoMetricSpace K) _ _ (v.toSubfield_isometry K) _ _
+    rw [@UniformSpace.Completion.extension_coe _ v.uniformSpace _ _ _ _ v.embedding_uniformContinuous]
+    rw [@UniformSpace.Completion.extension_coe _ v.uniformSpace _ _ _ _ v.embedding_uniformContinuous]
+    rw [@UniformSpace.Completion.dist_eq _ v.pseudoMetricSpace]
+    exact @Isometry.dist_eq _ _ v.pseudoMetricSpace _ _ (v.isometry K) _ _
 
 variable (K v)
 
