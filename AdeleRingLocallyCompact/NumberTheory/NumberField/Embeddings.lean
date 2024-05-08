@@ -9,32 +9,37 @@ import AdeleRingLocallyCompact.Topology.UniformSpace.UniformEmbedding
 /-!
 # Embeddings of number fields
 
-This file defines the completion of a number field with respect to an infinite place.
+This file defines the main approach to the completion of a number field with respect to an infinite place.
 
 ## Main definitions
  - `NumberField.InfinitePlace.completion` is the Archimedean completion of a number field as
-   an infinite place, obtained by embedding as a subfield of ℂ and completing this subfield.
+   an infinite place, obtained by defining a uniform space structure inherited from ℂ via the
+   embedding associated to an infinite place.
 
 ## Main results
  - `NumberField.InfinitePlace.Completion.locallyCompactSpace` : the Archimedean completion
    of a number field is locally compact.
 
 ## Implementation notes
- - There are two main choices for formalising the completion of a number field `K` at
-  an infinite place `v`. One is to complete `K` directly using `UniformSpace.Completion`
-  and the uniform space induced by the absolute value associated to `v`. To show that
-  the resultant completion is a field requires one to prove that `K` has a
-  `completableTopField` instance. Alternatively, and the approach taken here, is to
-  note that the absolute values associated to infinite places are given by composing
-  the various embeddings of `K →+* ℂ` with the usual complex absolute value. So we
-  can first embed `K` into a `Subfield ℂ` type, and then complete the embedding
-  using `UniformSpace.Completion` with respect to the usual complex absolute value.
-  `Subfield ℂ` already has instances such as `completableTopField`.
- - By splitting out the embedding from the completion, the consequence of this approach
-  is that the inferred absolute value on `v.completion K` is just the complex absolute value.
-  In the literature, the absolute value is the composition of the embedding with the complex
-  absolute value. Therefore, we define the coercion from `K → v.completion K` using the
-  embedding associated to `v` to align the two approaches.
+ - We have identified two approaches for formalising the completion of a number field `K` at
+   an infinite place `v`. One is to define an appropriate uniform structure on `K` directly,
+   and apply the `UniformSpace.Completion` functor to this. To show that
+   the resultant completion is a field requires one to prove that `K` has a
+   `completableTopField` instance with this uniform space. This approach is taken
+   in this file, namely we pullback the uniform structure on `ℂ` via the embedding
+   associated to an infinite place, through `UniformSpace.comap`. We show that
+   the embedding is uniform inducing. In such a scenario, the completable topological
+   field instance from `ℂ` transfers to `K`, which we show in
+   [Topology/UniformSpace/UniformEmbedding.lean](AdeleRingLocallyCompact/Topology/UniformSpace/UniformEmbedding.lean)
+ - The alternative approach is to use the embedding associated to an infinite place to embed
+   `K` to a `Subfield ℂ` term, which already has a `CompletableTopField` instance. We complete
+   `K` indirectly by applying the `UniformSpace.Completion` functor to the `Subfield ℂ` term.
+   This is the approach taken in [EmbeddingsAlt.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/EmbeddingsAlt.lean).
+   It leads to an isomorphic field completion to the direct approach, since both define abstract
+   completions. However, the API for the alternative approach is deficient, because we lose any
+   `UniformSpace.Completion` constructions which transfer properties of the base field `K` to its completion;
+   for example, `UniformSpace.Completion.extension` which extends a uniform continuous map on `K` to one
+   on its completion. These would have to be re-established.
 
 ## Tags
 number field, embeddings, places, infinite places
