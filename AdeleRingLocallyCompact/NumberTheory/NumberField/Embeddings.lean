@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
 import Mathlib
+import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 
 /-!
 # Embeddings of number fields
@@ -12,33 +13,16 @@ This file defines the completion of a number field with respect to an infinite p
 
 ## Main definitions
  - `NumberField.InfinitePlace.completion` is the Archimedean completion of a number field as
-   an infinite place, obtained by embedding as a subfield of ℂ and completing this subfield.
+   an infinite place, obtained by defining a uniform space structure inherited from ℂ via the
+   embedding associated to an infinite place.
 
 ## Main results
  - `NumberField.InfinitePlace.Completion.locallyCompactSpace` : the Archimedean completion
    of a number field is locally compact.
 
-## Implementation notes
- - There are two main choices for formalising the completion of a number field `K` at
-  an infinite place `v`. One is to complete `K` directly using `UniformSpace.Completion`
-  and the uniform space induced by the absolute value associated to `v`. To show that
-  the resultant completion is a field requires one to prove that `K` has a
-  `completableTopField` instance. Alternatively, and the approach taken here, is to
-  note that the absolute values associated to infinite places are given by composing
-  the various embeddings of `K →+* ℂ` with the usual complex absolute value. So we
-  can first embed `K` into a `Subfield ℂ` type, and then complete the embedding
-  using `UniformSpace.Completion` with respect to the usual complex absolute value.
-  `Subfield ℂ` already has instances such as `completableTopField`.
- - By splitting out the embedding from the completion, the consequence of this approach
-  is that the inferred absolute value on `v.completion K` is just the complex absolute value.
-  In the literature, the absolute value is the composition of the embedding with the complex
-  absolute value. Therefore, we define the coercion from `K → v.completion K` using the
-  embedding associated to `v` to align the two approaches.
-
 ## Tags
 number field, embeddings, places, infinite places
 -/
-
 noncomputable section
 
 namespace NumberField.InfinitePlace
@@ -48,107 +32,123 @@ variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
 instance : Inhabited (InfinitePlace K) :=
   ⟨Classical.choice (instNonemptyInfinitePlace K)⟩
 
-/-- The embedding of K as a subfield in ℂ using the embedding associated to the infinite place
-`v`. -/
-def subfield (v : InfinitePlace K) : Subfield ℂ where
-  toSubring := v.embedding.range
-  inv_mem' _ := by intro ⟨y, hy⟩; exact ⟨y⁻¹, by simp only [map_inv₀, hy]⟩
+section DerivedInstances
 
-/-- The embedding sending a number field to its subfield in ℂ.-/
-def toSubfield : K →+* v.subfield K where
-  toFun := fun x => ⟨v.embedding x, Set.mem_range_self x⟩
-  map_one' := by simp only [map_one, Submonoid.mk_eq_one]
-  map_mul' x y := by simp only [v.embedding.map_mul' x y, map_mul]; rfl
-  map_zero' := by simp only [map_zero]; rfl
-  map_add' x y := by simp only [v.embedding.map_add' x y, map_add]; rfl
+variable {K}
 
-theorem toSubfield_injective : Function.Injective (v.toSubfield K) := (v.toSubfield K).injective
+def normedDivisionRing : NormedDivisionRing K :=
+  NormedDivisionRing.induced _ _ v.embedding v.embedding.injective
 
-theorem toSubfield_surjective : Function.Surjective (v.toSubfield K) := by
-  rw [← RingHom.range_top_iff_surjective, Subring.eq_top_iff']
-  exact λ ⟨_, ⟨y, hy⟩⟩ => ⟨y, Subtype.val_inj.1 hy⟩
+instance uniformSpace : UniformSpace K := UniformSpace.comap v.embedding inferInstance
 
-def subfieldEquiv : K ≃+* v.subfield K :=
-  RingEquiv.ofBijective _ ⟨toSubfield_injective K v, toSubfield_surjective K v⟩
+instance uniformAddGroup : @UniformAddGroup K v.uniformSpace _ :=
+  UniformAddGroup.comap v.embedding
 
-instance : NormedDivisionRing (subfield K v) :=
-  NormedDivisionRing.induced _ _ (Subfield.subtype (subfield K v)) Subtype.val_injective
+instance topologicalSpace : TopologicalSpace K := v.uniformSpace.toTopologicalSpace
 
-instance subfield_uniformSpace : UniformSpace (v.subfield K) :=
-  instUniformSpaceSubtype
+instance topologicalDivisionRing : @TopologicalDivisionRing K _ v.topologicalSpace :=
+  v.normedDivisionRing.to_topologicalDivisionRing
 
-instance subfield_uniformAddGroup : UniformAddGroup (v.subfield K) :=
-  (v.subfield K).toAddSubgroup.uniformAddGroup
+instance topologicalRing : @TopologicalRing K v.topologicalSpace _ :=
+  @TopologicalDivisionRing.toTopologicalRing _ _ v.topologicalSpace _
 
-/-- The completion of a number field at an Archimedean place. -/
-def completion := (subfield_uniformSpace K v).Completion
+end DerivedInstances
+
+variable {K}
+
+theorem embedding_uniformInducing : @UniformInducing _ _ v.uniformSpace _ v.embedding := by
+  rw [@uniformInducing_iff_uniformSpace]; rfl
+
+instance pseudoMetricSpace : PseudoMetricSpace K :=
+  @UniformInducing.comapPseudoMetricSpace _ _ v.uniformSpace _ _ v.embedding_uniformInducing
+
+theorem topEmbedding : @Embedding _ _ v.topologicalSpace _ (v.embedding) := by
+  rw [@embedding_iff, @inducing_iff]
+  exact ⟨rfl, v.embedding.injective⟩
+
+theorem isometry : @Isometry _ _ v.pseudoMetricSpace.toPseudoEMetricSpace _ (v.embedding) :=
+  @Embedding.to_isometry _ _ v.topologicalSpace _ _ v.topEmbedding
+
+theorem embedding_uniformContinuous : @UniformContinuous _ _ v.uniformSpace _ v.embedding :=
+  @UniformInducing.uniformContinuous _ _ v.uniformSpace _ _ v.embedding_uniformInducing
+
+theorem embedding_continuous : @Continuous _ _ v.topologicalSpace _ v.embedding :=
+  @UniformContinuous.continuous _ _ v.uniformSpace _ _ v.embedding_uniformContinuous
+
+instance t0Space : @T0Space K v.topologicalSpace :=
+  @t0Space_of_injective_of_continuous _ _ v.topologicalSpace _ _ v.embedding.injective v.embedding_continuous _
+
+instance completableTopField : @CompletableTopField K _ v.uniformSpace :=
+  UniformSpace.comap_completableTopField
+
+variable (K)
+
+def completion := @UniformSpace.Completion K v.uniformSpace
 
 namespace Completion
 
+section DerivedInstances
+
 instance : UniformSpace (v.completion K) :=
-  @UniformSpace.Completion.uniformSpace _ (subfield_uniformSpace K v)
+  @UniformSpace.Completion.uniformSpace _ v.uniformSpace
 
 instance : CompleteSpace (v.completion K) :=
-  @UniformSpace.Completion.completeSpace _ (subfield_uniformSpace K v)
+  @UniformSpace.Completion.completeSpace _ v.uniformSpace
 
-instance : Field (v.completion K) := UniformSpace.Completion.instField
+instance : Field (v.completion K) :=
+  @UniformSpace.Completion.instField _ _ v.uniformSpace v.topologicalDivisionRing _ _
 
 instance : Inhabited (v.completion K) :=
   ⟨0⟩
 
 instance : TopologicalRing (v.completion K) :=
-  UniformSpace.Completion.topologicalRing
+  @UniformSpace.Completion.topologicalRing K _ v.uniformSpace _ v.uniformAddGroup
 
 instance : Dist (v.completion K) :=
-  UniformSpace.Completion.instDistCompletionToUniformSpace
+  @UniformSpace.Completion.instDistCompletionToUniformSpace _ v.pseudoMetricSpace
 
 instance : T0Space (v.completion K) :=
-  @UniformSpace.Completion.t0Space _ (subfield_uniformSpace K v)
+  @UniformSpace.Completion.t0Space _ v.uniformSpace
 
-instance : Coe (subfield K v) (v.completion K) :=
-  (inferInstance : Coe (subfield K v) (@UniformSpace.Completion (subfield K v) (subfield_uniformSpace K v)))
+instance metricSpace : MetricSpace (v.completion K) :=
+  @UniformSpace.Completion.instMetricSpace _ v.pseudoMetricSpace
 
-instance : Coe K (v.completion K) where
-  coe := (↑) ∘ v.toSubfield K
+end DerivedInstances
 
 def coeRingHom : K →+* v.completion K :=
-  RingHom.comp UniformSpace.Completion.coeRingHom (v.toSubfield K)
+  @UniformSpace.Completion.coeRingHom _ _ v.uniformSpace _ v.uniformAddGroup
 
-/-- The embedding `Kᵥ → ℂ` of a completion of a number field at an Archimedean
-place into `ℂ`. -/
 def extensionEmbedding :=
-  UniformSpace.Completion.extensionHom (Subfield.subtype (subfield K v)) continuous_subtype_val
+  @UniformSpace.Completion.extensionHom K _ v.uniformSpace v.topologicalRing v.uniformAddGroup
+    _ _ _ _ _ v.embedding v.embedding_continuous _ _
 
 theorem extensionEmbedding_injective : Function.Injective (extensionEmbedding K v) :=
   (extensionEmbedding K v).injective
 
 variable {K v}
 
-/-- The embedding `Kᵥ → ℂ` preserves distances. -/
+/- The embedding `Kᵥ → ℂ` preserves distances. -/
 theorem extensionEmbedding_dist_eq (x y : v.completion K) :
     dist (extensionEmbedding K v x) (extensionEmbedding K v y) =
       dist x y := by
   set p : v.completion K → v.completion K → Prop :=
     λ x y => dist (extensionEmbedding K v x) (extensionEmbedding K v y) = dist x y
-  refine @UniformSpace.Completion.induction_on₂ (subfield K v) _ (subfield K v) _ p x y ?_ (λ x y => ?_)
+  refine @UniformSpace.Completion.induction_on₂ _ v.uniformSpace _ v.uniformSpace p x y ?_ (λ x y => ?_)
   · apply isClosed_eq
-    · exact continuous_iff_continuous_dist.1 UniformSpace.Completion.continuous_extension
-    · exact continuous_dist
-  · simp only [extensionEmbedding, UniformSpace.Completion.extensionHom, Subfield.coe_subtype,
-      RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, p, @UniformSpace.Completion.dist_eq (v.subfield K) _]
-    have h_val : UniformContinuous (subfield K v).subtype := uniformContinuous_subtype_val
-    have h_val_ext := UniformSpace.Completion.extension_coe h_val
-    simp only [Subfield.coe_subtype] at h_val_ext
-    rw [h_val_ext x, h_val_ext y]
-    rfl
+    · exact continuous_iff_continuous_dist.1 (@UniformSpace.Completion.continuous_extension _ v.uniformSpace _ _ _ _)
+    · exact @continuous_dist _ (metricSpace K v).toPseudoMetricSpace
+  · simp only [extensionEmbedding, UniformSpace.Completion.extensionHom, RingHom.coe_mk, MonoidHom.coe_mk,
+      OneHom.coe_mk, p]
+    simp only [@UniformSpace.Completion.extension_coe _ v.uniformSpace _ _ _ _ v.embedding_uniformContinuous]
+    rw [@UniformSpace.Completion.dist_eq _ v.pseudoMetricSpace]
+    rw [@Isometry.dist_eq _ _ v.pseudoMetricSpace _ _ (v.isometry) _ _]
 
 variable (K v)
 
-/-- The embedding `Kᵥ → ℂ` is an isometry. -/
-theorem embedding_isometry : Isometry (extensionEmbedding K v) :=
+theorem embedding_isometry : @Isometry _ _ (metricSpace K v).toPseudoEMetricSpace _ (extensionEmbedding K v) :=
   Isometry.of_dist_eq extensionEmbedding_dist_eq
 
-/-- The embedding `Kᵥ → ℂ` is uniform inducing. -/
+/- The embedding `Kᵥ → ℂ` is uniform inducing. -/
 theorem embedding_uniformInducing :
     UniformInducing (extensionEmbedding K v) :=
   (embedding_isometry K v).uniformInducing
