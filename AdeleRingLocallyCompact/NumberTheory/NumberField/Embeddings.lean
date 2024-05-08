@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
 import Mathlib
-import AdeleRingLocallyCompact.Topology.UniformSpace.UniformEmbedding
+import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 
 /-!
 # Embeddings of number fields
@@ -79,7 +79,7 @@ instance t0Space : @T0Space K v.topologicalSpace :=
   @t0Space_of_injective_of_continuous _ _ v.topologicalSpace _ _ v.embedding.injective v.embedding_continuous _
 
 instance completableTopField : @CompletableTopField K _ v.uniformSpace :=
-  v.embedding_uniformInducing.comap_completableTopField
+  UniformSpace.comap_completableTopField
 
 variable (K)
 
