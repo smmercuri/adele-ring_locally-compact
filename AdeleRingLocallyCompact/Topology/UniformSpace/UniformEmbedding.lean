@@ -1,5 +1,21 @@
+/-
+Copyright (c) 2024 Salvatore Mercuri. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Salvatore Mercuri
+-/
 import Mathlib
 
+/-!
+# Uniform embeddings of uniform spaces.
+
+In this file we prove that a `UniformSpace.comap f b` uniform structure defines a completable
+topological field if the map `f` is uniform inducing and if the codomain uniform space `b` is
+a completable topological field.
+
+## Main results
+ - `UniformInducing.comap_completableTopField` : if the codomain of a uniform inducing map is a
+   completable topological field, then the domain is also a completable topological field.
+-/
 universe u v
 variable {α : Type u} {β : Type v}
 
