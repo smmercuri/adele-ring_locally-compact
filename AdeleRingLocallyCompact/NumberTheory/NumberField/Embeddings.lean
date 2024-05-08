@@ -151,11 +151,11 @@ theorem extensionEmbedding_dist_eq (x y : v.completion K) :
     λ x y => dist (extensionEmbedding K v x) (extensionEmbedding K v y) = dist x y
   refine @UniformSpace.Completion.induction_on₂ _ v.uniformSpace _ v.uniformSpace p x y ?_ (λ x y => ?_)
   · apply isClosed_eq
-    · refine continuous_iff_continuous_dist.1 (@UniformSpace.Completion.continuous_extension _ v.uniformSpace _ _ _ _)
+    · exact continuous_iff_continuous_dist.1 (@UniformSpace.Completion.continuous_extension _ v.uniformSpace _ _ _ _)
     · exact @continuous_dist _ (metricSpace K v).toPseudoMetricSpace
-  · simp [p, extensionEmbedding, UniformSpace.Completion.extensionHom]
-    rw [@UniformSpace.Completion.extension_coe _ v.uniformSpace _ _ _ _ v.embedding_uniformContinuous]
-    rw [@UniformSpace.Completion.extension_coe _ v.uniformSpace _ _ _ _ v.embedding_uniformContinuous]
+  · simp only [extensionEmbedding, UniformSpace.Completion.extensionHom, RingHom.coe_mk, MonoidHom.coe_mk,
+      OneHom.coe_mk, p]
+    simp only [@UniformSpace.Completion.extension_coe _ v.uniformSpace _ _ _ _ v.embedding_uniformContinuous]
     rw [@UniformSpace.Completion.dist_eq _ v.pseudoMetricSpace]
     rw [@Isometry.dist_eq _ _ v.pseudoMetricSpace _ _ (v.isometry) _ _]
 
