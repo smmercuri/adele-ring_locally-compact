@@ -13,28 +13,12 @@ This file defines the completion of a number field with respect to an infinite p
 
 ## Main definitions
  - `NumberField.InfinitePlace.completion` is the Archimedean completion of a number field as
-   an infinite place, obtained by embedding as a subfield of ℂ and completing this subfield.
+   an infinite place, obtained by defining a uniform space structure inherited from ℂ via the
+   embedding associated to an infinite place.
 
 ## Main results
  - `NumberField.InfinitePlace.Completion.locallyCompactSpace` : the Archimedean completion
    of a number field is locally compact.
-
-## Implementation notes
- - There are two main choices for formalising the completion of a number field `K` at
-  an infinite place `v`. One is to complete `K` directly using `UniformSpace.Completion`
-  and the uniform space induced by the absolute value associated to `v`. To show that
-  the resultant completion is a field requires one to prove that `K` has a
-  `completableTopField` instance. Alternatively, and the approach taken here, is to
-  note that the absolute values associated to infinite places are given by composing
-  the various embeddings of `K →+* ℂ` with the usual complex absolute value. So we
-  can first embed `K` into a `Subfield ℂ` type, and then complete the embedding
-  using `UniformSpace.Completion` with respect to the usual complex absolute value.
-  `Subfield ℂ` already has instances such as `completableTopField`.
- - By splitting out the embedding from the completion, the consequence of this approach
-  is that the inferred absolute value on `v.completion K` is just the complex absolute value.
-  In the literature, the absolute value is the composition of the embedding with the complex
-  absolute value. Therefore, we define the coercion from `K → v.completion K` using the
-  embedding associated to `v` to align the two approaches.
 
 ## Tags
 number field, embeddings, places, infinite places
