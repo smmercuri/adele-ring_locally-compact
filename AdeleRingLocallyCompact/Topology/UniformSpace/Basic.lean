@@ -9,12 +9,12 @@ import Mathlib
 # Uniform spaces
 
 In this file we prove that a `UniformSpace.comap f b` uniform structure defines a completable
-topological field if the map `f` is uniform inducing and if the codomain uniform space `b` is
+topological field if the map `f` is a ring homomorphism between fields and if the codomain uniform space `b` is
 a completable topological field.
 
 ## Main results
- - `UniformInducing.comap_completableTopField` : if the codomain of a uniform inducing map is a
-   completable topological field, then the domain is also a completable topological field.
+ - `UniformInducing.comap_completableTopField` : if the codomain of a ring homomorphism between fields
+   is a completable topological field, then the domain is also a completable topological field.
 -/
 universe u v
 variable {α : Type u} {β : Type v}
