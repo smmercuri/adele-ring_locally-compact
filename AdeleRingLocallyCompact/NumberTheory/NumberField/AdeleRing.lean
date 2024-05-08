@@ -50,8 +50,8 @@ instance : Inhabited (adeleRing K) := ⟨0⟩
 instance topologicalSpace : TopologicalSpace (adeleRing K) :=
   instTopologicalSpaceProd
 
-instance topologicalRing : TopologicalRing (adeleRing K) := by
-  exact instTopologicalRingProdInstTopologicalSpaceProdInstNonUnitalNonAssocRing
+instance topologicalRing : TopologicalRing (adeleRing K) :=
+  instTopologicalRingProdInstTopologicalSpaceProdInstNonUnitalNonAssocRing
 
 end DerivedInstances
 
