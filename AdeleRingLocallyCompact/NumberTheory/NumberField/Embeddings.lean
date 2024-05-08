@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
 import Mathlib
-import AdeleRingLocallyCompact.Topology.UniformSpace.UniformEmbedding
+import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 
 /-!
 # Embeddings of number fields
@@ -27,10 +27,9 @@ This file defines the main approach to the completion of a number field with res
    the resultant completion is a field requires one to prove that `K` has a
    `completableTopField` instance with this uniform space. This approach is taken
    in this file, namely we pullback the uniform structure on `ℂ` via the embedding
-   associated to an infinite place, through `UniformSpace.comap`. We show that
-   the embedding is uniform inducing. In such a scenario, the completable topological
-   field instance from `ℂ` transfers to `K`, which we show in
-   [Topology/UniformSpace/UniformEmbedding.lean](AdeleRingLocallyCompact/Topology/UniformSpace/UniformEmbedding.lean)
+   associated to an infinite place, through `UniformSpace.comap`. In such a scenario,
+   the completable topological field instance from `ℂ` transfers to `K`, which we show in
+   [Topology/UniformSpace/UniformEmbedding.lean](AdeleRingLocallyCompact/Topology/UniformSpace/Basic.lean)
  - The alternative approach is to use the embedding associated to an infinite place to embed
    `K` to a `Subfield ℂ` term, which already has a `CompletableTopField` instance. We complete
    `K` indirectly by applying the `UniformSpace.Completion` functor to the `Subfield ℂ` term.
@@ -100,7 +99,7 @@ instance t0Space : @T0Space K v.topologicalSpace :=
   @t0Space_of_injective_of_continuous _ _ v.topologicalSpace _ _ v.embedding.injective v.embedding_continuous _
 
 instance completableTopField : @CompletableTopField K _ v.uniformSpace :=
-  v.embedding_uniformInducing.comap_completableTopField
+  UniformSpace.comap_completableTopField
 
 variable (K)
 

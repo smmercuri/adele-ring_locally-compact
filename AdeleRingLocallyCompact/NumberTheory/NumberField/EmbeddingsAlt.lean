@@ -28,10 +28,9 @@ with this approach, detailed in the implementation notes below. We keep this app
    `completableTopField` instance with this uniform space. This approach is the principal approach taken
    in [Embeddings.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean),
    namely we pullback the uniform structure on `ℂ` via the embedding
-   associated to an infinite place, through `UniformSpace.comap`. We show that
-   the embedding is uniform inducing. In such a scenario, the completable topological
-   field instance from `ℂ` transfers to `K`, which we show in
-   [Topology/UniformSpace/UniformEmbedding.lean](AdeleRingLocallyCompact/Topology/UniformSpace/UniformEmbedding.lean)
+   associated to an infinite place, through `UniformSpace.comap`. In such a scenario,
+   the completable topological field instance from `ℂ` transfers to `K`, which we show in
+   [Topology/UniformSpace/UniformEmbedding.lean](AdeleRingLocallyCompact/Topology/UniformSpace/Basic.lean)
  - The alternative approach is to use the embedding associated to an infinite place to embed
    `K` to a `Subfield ℂ` term, which already has a `CompletableTopField` instance. We complete
    `K` indirectly by applying the `UniformSpace.Completion` functor to the `Subfield ℂ` term.
