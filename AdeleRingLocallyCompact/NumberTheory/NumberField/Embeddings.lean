@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
 import Mathlib
+import AdeleRingLocallyCompact.Topology.UniformSpace.UniformEmbedding
 
 /-!
 # Embeddings of number fields
@@ -93,25 +94,16 @@ theorem embedding_continuous : @Continuous _ _ v.topologicalSpace _ v.embedding 
 instance t0Space : @T0Space K v.topologicalSpace :=
   @t0Space_of_injective_of_continuous _ _ v.topologicalSpace _ _ v.embedding.injective v.embedding_continuous _
 
-instance completableTopField : @CompletableTopField K _ v.uniformSpace := by
-  apply @CompletableTopField.mk _ _ v.uniformSpace
-  intro F F_cau inf_F
-  have h_cau_i := @UniformInducing.cauchy_map_iff _ _ v.uniformSpace _ _ v.embedding_uniformInducing
-  rw [← h_cau_i] at F_cau ⊢
-  have h_comm : (v.embedding ∘ fun x => x⁻¹) = (fun x => x⁻¹) ∘ v.embedding := by
-    ext; simp only [Function.comp_apply, map_inv₀, Subfield.coe_inv]
-  rw [Filter.map_comm h_comm]
-  apply CompletableTopField.nice _ F_cau
-  rw [← Filter.push_pull', ← map_zero v.embedding]
-  have h_inducing := (@UniformInducing.inducing _ _ v.uniformSpace _ _ v.embedding_uniformInducing)
-  have h_nhds := @Inducing.nhds_eq_comap _ _ _ v.topologicalSpace _ h_inducing
-  rw [← h_nhds, inf_F, Filter.map_bot]
+instance completableTopField : @CompletableTopField K _ v.uniformSpace :=
+  v.embedding_uniformInducing.comap_completableTopField
 
 variable (K)
 
 def completion := @UniformSpace.Completion K v.uniformSpace
 
 namespace Completion
+
+section DerivedInstances
 
 instance : UniformSpace (v.completion K) :=
   @UniformSpace.Completion.uniformSpace _ v.uniformSpace
@@ -136,6 +128,8 @@ instance : T0Space (v.completion K) :=
 
 instance metricSpace : MetricSpace (v.completion K) :=
   @UniformSpace.Completion.instMetricSpace _ v.pseudoMetricSpace
+
+end DerivedInstances
 
 def coeRingHom : K →+* v.completion K :=
   @UniformSpace.Completion.coeRingHom _ _ v.uniformSpace _ v.uniformAddGroup
