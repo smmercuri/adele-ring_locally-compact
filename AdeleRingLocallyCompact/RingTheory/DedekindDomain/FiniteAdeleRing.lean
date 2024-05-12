@@ -131,8 +131,8 @@ def generatingSet : Set (Set (finiteAdeleRing R K)) :=
     )
   ))
 
-instance topologicalSpace : TopologicalSpace (finiteAdeleRing R K)
-  := TopologicalSpace.generateFrom (generatingSet R K)
+instance topologicalSpace : TopologicalSpace (finiteAdeleRing R K) :=
+  TopologicalSpace.generateFrom (generatingSet R K)
 
 variable {R K}
 
@@ -328,7 +328,7 @@ theorem globalEmbedding_isFiniteAdele (x : K) :
     simp only [h_val, Valued.valuedCompletion_apply, adicValued_apply, HeightOneSpectrum.valuation_def] at hv
     simp only [← hx, map_div₀, Valuation.extendToLocalization_apply_map_apply] at hv
     have h_val_d : intValuation v d = 1 :=
-      by rw [←le_antisymm (v.int_valuation_le_one d) h_one_le]; rfl
+      by rw [← le_antisymm (v.int_valuation_le_one d) h_one_le]; rfl
     rw [h_val_d, div_one] at hv
     exact not_lt.2 (v.int_valuation_le_one r) hv
   exact Set.Finite.subset (Ideal.finite_factors hd_ne_zero) hsubset
