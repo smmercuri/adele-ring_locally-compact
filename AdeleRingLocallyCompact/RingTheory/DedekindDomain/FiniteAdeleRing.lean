@@ -46,19 +46,19 @@ variable (R : Type*) [CommRing R] [IsDomain R] [IsDedekindDomain R] (K : Type*)
 namespace ProdAdicCompletions
 
 def globalEmbedding : K →+* ProdAdicCompletions R K :=
-  Pi.ringHom (λ v => AdicCompletion.coeRingHom K v)
+  Pi.ringHom (fun v => AdicCompletion.coeRingHom K v)
 
 variable {R}
 
 /-- Sends an element of the product of all `adicCompletions` to a local place. -/
 def projection (v : HeightOneSpectrum R) :
-  ProdAdicCompletions R K →+* v.adicCompletion K :=
+    ProdAdicCompletions R K →+* v.adicCompletion K :=
   Pi.evalRingHom _ v
 
 /-- Sends a local element to the product of all `adicCompletions` filled with `1`s elsewhere. -/
 def localInclusion (v : HeightOneSpectrum R) :
-  v.adicCompletion K → ProdAdicCompletions R K :=
-  λ x =>
+    v.adicCompletion K → ProdAdicCompletions R K :=
+  fun x =>
     (λ w =>
       if hw : w = v then
         congrArg (λ v => v.adicCompletion K) hw ▸ x else
@@ -69,9 +69,9 @@ variable {K}
 
 /-- The local inclusion of any element is a finite adele. -/
 theorem isFiniteAdele_localInclusion (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-  (localInclusion K v x).IsFiniteAdele := by
+    (localInclusion K v x).IsFiniteAdele := by
   rw [ProdAdicCompletions.IsFiniteAdele, Filter.eventually_cofinite]
-  have h : setOf (λ w => localInclusion K v x w ∉ w.adicCompletionIntegers K) ⊆ {v} := by
+  have h : setOf (fun w => localInclusion K v x w ∉ w.adicCompletionIntegers K) ⊆ {v} := by
     intro w hw
     simp only [Set.mem_setOf_eq, Set.mem_singleton_iff] at hw ⊢
     contrapose! hw
@@ -81,11 +81,11 @@ theorem isFiniteAdele_localInclusion (v : HeightOneSpectrum R) (x : v.adicComple
 
 /-- The `v`th place of the local inclusion is the original element. -/
 theorem localInclusion_rfl (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-  localInclusion K v x v = x := by simp only [localInclusion, dif_pos]
+    localInclusion K v x v = x := by simp only [localInclusion, dif_pos]
 
 /-- The projection and local inclusions are inverses on `ProdAdicCompletions`. -/
 theorem projection_localInclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-  projection K v (localInclusion K v x) = x := by convert localInclusion_rfl v x
+    projection K v (localInclusion K v x) = x := by convert localInclusion_rfl v x
 
 end ProdAdicCompletions
 
@@ -99,7 +99,7 @@ def projection (v : HeightOneSpectrum R) : finiteAdeleRing R K →+* v.adicCompl
 
 /-- Sends a local element to a finite adele filled with `1`s elsewhere. -/
 def localInclusion (v : HeightOneSpectrum R) : v.adicCompletion K → finiteAdeleRing R K :=
-  λ x => ⟨ProdAdicCompletions.localInclusion K v x,
+  fun x => ⟨ProdAdicCompletions.localInclusion K v x,
           ProdAdicCompletions.isFiniteAdele_localInclusion v x⟩
 
 local notation "π" => projection K
@@ -108,11 +108,13 @@ local notation "ι" => localInclusion K
 variable {K}
 
 /-- The `v`th place of the local inclusion is the original element. -/
-theorem localInclusion_rfl (v : HeightOneSpectrum R) (x : v.adicCompletion K) : (ι v x).val v = x := by
+theorem localInclusion_rfl (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
+    (ι v x).val v = x := by
   simp only [localInclusion, ProdAdicCompletions.localInclusion_rfl]
 
 /-- The projection and local inclusions are inverses on the finite adele ring. -/
-theorem projection_localInclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion K) : π v (ι v x) = x := by
+theorem projection_localInclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
+    π v (ι v x) = x := by
   apply localInclusion_rfl v x
 
 variable (R K)
@@ -123,7 +125,7 @@ ring of integers. -/
 def generatingSet : Set (Set (finiteAdeleRing R K)) :=
   Set.preimage (Subtype.val) '' (Set.pi Set.univ '' (
     setOf (
-      λ V =>
+      fun V =>
         (∀ v, IsOpen (V v)) ∧
         (∀ᶠ v in Filter.cofinite, V v = v.adicCompletionIntegers K)
     )
@@ -144,22 +146,22 @@ preimage of `U` under `f`.
 Abstracted version of
 [https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L469](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L469)-/
 theorem comap_of_generateFrom_nhd₂
-  {x y : finiteAdeleRing R K}
-  {U : Set (finiteAdeleRing R K)}
-  (f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing R K)
-  (hf : ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
-      ∀ v,
-        (g v ∘ (RingHom.prodMap (π v) (π v)) = (π v) ∘ f
-        ∧ Continuous (g v)
-        ∧ ∀ (x y : v.adicCompletion K),
-          x ∈ v.adicCompletionIntegers K
-            → y ∈ v.adicCompletionIntegers K
-            → g v (x, y) ∈ v.adicCompletionIntegers K
+    {x y : finiteAdeleRing R K}
+    {U : Set (finiteAdeleRing R K)}
+    (f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing R K)
+    (hf : ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
+        ∀ v,
+          (g v ∘ (RingHom.prodMap (π v) (π v)) = (π v) ∘ f
+          ∧ Continuous (g v)
+          ∧ ∀ (x y : v.adicCompletion K),
+            x ∈ v.adicCompletionIntegers K
+              → y ∈ v.adicCompletionIntegers K
+              → g v (x, y) ∈ v.adicCompletionIntegers K
+      )
     )
-  )
-  (hU : U ∈ generatingSet R K)
-  (hxy : (x, y) ∈ f⁻¹' U) :
-    ∃ X Y : Set (finiteAdeleRing R K), IsOpen X ∧ IsOpen Y ∧ x ∈ X ∧ y ∈ Y ∧ X ×ˢ Y ⊆ f ⁻¹' U := by
+    (hU : U ∈ generatingSet R K)
+    (hxy : (x, y) ∈ f⁻¹' U) :
+      ∃ X Y : Set (finiteAdeleRing R K), IsOpen X ∧ IsOpen Y ∧ x ∈ X ∧ y ∈ Y ∧ X ×ˢ Y ⊆ f ⁻¹' U := by
   obtain ⟨V, ⟨W, hW, hWV⟩, hVU⟩ := hU
   obtain ⟨g, hg⟩ := hf
   rw [← hVU, ← hWV] at hxy
@@ -179,25 +181,25 @@ theorem comap_of_generateFrom_nhd₂
   set Sxy := Sx.toFinset ∪ Sy.toFinset
   set SW := hW.2.toFinset
   set S := Sxy ∪ SW
-  set Vx := λ v => ite (v ∈ S)
+  set Vx := fun v => ite (v ∈ S)
     (Classical.choose (isOpen_prod_iff.1 (hW' v) _ _ (hxy_g v)))
     (v.adicCompletionIntegers K)
-  set Vy := λ v => ite (v ∈ S)
+  set Vy := fun v => ite (v ∈ S)
     (Classical.choose (Classical.choose_spec (isOpen_prod_iff.1 (hW' v) _ _ (hxy_g v))))
     (v.adicCompletionIntegers K)
   use Subtype.val ⁻¹' Set.pi Set.univ Vx, Subtype.val ⁻¹' Set.pi Set.univ Vy
-  refine ⟨?_, ?_, λ v _ => ?_, λ v _ => ?_, λ p ⟨hp₁, hp₂⟩ => ?_⟩ <;>
+  refine ⟨?_, ?_, fun v _ => ?_, fun v _ => ?_, fun p ⟨hp₁, hp₂⟩ => ?_⟩ <;>
     try apply TopologicalSpace.isOpen_generateFrom_of_mem <;>
     simp only [generatingSet, Set.mem_image, exists_exists_and_eq_and]
-  · refine ⟨Vx, ⟨λ v => ?_, ?_⟩, rfl⟩
+  · refine ⟨Vx, ⟨fun v => ?_, ?_⟩, rfl⟩
     · simp only [Vx]
       split_ifs
       · exact (h v).1
       · exact Valued.valuationSubring_isOpen (v.adicCompletion K)
     · apply Set.Finite.subset S.finite_toSet
       rw [Set.compl_subset_comm]; simp only [Vx, ite_eq_right_iff]
-      exact λ _ hv_compl hv => (hv_compl hv).elim
-  · refine ⟨Vy, ⟨λ v => ?_, ?_⟩, rfl⟩
+      exact fun _ hv_compl hv => (hv_compl hv).elim
+  · refine ⟨Vy, ⟨fun v => ?_, ?_⟩, rfl⟩
     · simp only [Vy]
       split_ifs
       · exact (h v).2.1
@@ -233,17 +235,17 @@ theorem comap_of_generateFrom_nhd₂
 of continuous maps `g v` defined at each place, which each preserve the respective ring of integers, then
 `f` is continuous. -/
 theorem continuous_if_factors₂
-  (f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing R K)
-  (hf : ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
-    ∀ v,
-      (g v ∘ (RingHom.prodMap (π v) (π v)) = (π v) ∘ f
-      ∧ Continuous (g v)
-      ∧ ∀ (x y : v.adicCompletion K),
-        x ∈ v.adicCompletionIntegers K
-          → y ∈ v.adicCompletionIntegers K
-          → g v (x, y) ∈ v.adicCompletionIntegers K
-    )
-  ) :
+    (f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing R K)
+    (hf : ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
+      ∀ v,
+        (g v ∘ (RingHom.prodMap (π v) (π v)) = (π v) ∘ f
+        ∧ Continuous (g v)
+        ∧ ∀ (x y : v.adicCompletion K),
+          x ∈ v.adicCompletionIntegers K
+            → y ∈ v.adicCompletionIntegers K
+            → g v (x, y) ∈ v.adicCompletionIntegers K
+      )
+    ) :
     Continuous f := by
   rw [continuous_generateFrom_iff]
   exact λ _ hU => isOpen_prod_iff.2 (λ _ _ hxy => comap_of_generateFrom_nhd₂ f hf hU hxy)
@@ -253,32 +255,32 @@ variable (R K)
 /-- Addition on the finite adele ring factors through continuous maps `g v` defined at each place,
 which preserve the ring of integers. -/
 theorem add_factors :
-  ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
-    ∀ v,
-      (g v ∘ (RingHom.prodMap (π v) (π v))
-        = (π v) ∘ ((λ x : finiteAdeleRing R K × finiteAdeleRing R K => x.1 + x.2))
-      ∧ Continuous (g v)
-      ∧ ∀ (x y : v.adicCompletion K),
-        x ∈ v.adicCompletionIntegers K
-          → y ∈ v.adicCompletionIntegers K
-          → g v (x, y) ∈ v.adicCompletionIntegers K
-      ) :=
+    ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
+      ∀ v,
+        (g v ∘ (RingHom.prodMap (π v) (π v))
+          = (π v) ∘ ((λ x : finiteAdeleRing R K × finiteAdeleRing R K => x.1 + x.2))
+        ∧ Continuous (g v)
+        ∧ ∀ (x y : v.adicCompletion K),
+          x ∈ v.adicCompletionIntegers K
+            → y ∈ v.adicCompletionIntegers K
+            → g v (x, y) ∈ v.adicCompletionIntegers K
+        ) :=
   ⟨λ v => (λ p : v.adicCompletion K × v.adicCompletion K => p.1 + p.2),
     λ v => ⟨rfl, continuous_add, (v.adicCompletionIntegers K).add_mem⟩⟩
 
 /-- Multiplication on the finite adele ring factors through continuous maps `g v` defined at each place,
 which preserve the ring of integers. -/
 theorem mul_factors :
-  ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
-    ∀ v,
-      (g v ∘ (RingHom.prodMap (π v) (π v))
-        = (π v) ∘ ((λ x : finiteAdeleRing R K × finiteAdeleRing R K => x.1 * x.2))
-      ∧ Continuous (g v)
-      ∧ ∀ (x y : v.adicCompletion K),
-        x ∈ v.adicCompletionIntegers K
-          → y ∈ v.adicCompletionIntegers K
-          → g v (x, y) ∈ v.adicCompletionIntegers K
-      ) :=
+    ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
+      ∀ v,
+        (g v ∘ (RingHom.prodMap (π v) (π v))
+          = (π v) ∘ ((λ x : finiteAdeleRing R K × finiteAdeleRing R K => x.1 * x.2))
+        ∧ Continuous (g v)
+        ∧ ∀ (x y : v.adicCompletion K),
+          x ∈ v.adicCompletionIntegers K
+            → y ∈ v.adicCompletionIntegers K
+            → g v (x, y) ∈ v.adicCompletionIntegers K
+        ) :=
   ⟨λ v => (λ p : v.adicCompletion K × v.adicCompletion K => p.1 * p.2),
     λ v => ⟨rfl, continuous_mul, (v.adicCompletionIntegers K).mul_mem⟩⟩
 

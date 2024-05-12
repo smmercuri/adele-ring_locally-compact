@@ -12,35 +12,40 @@ import AdeleRingLocallyCompact.Algebra.Group.WithOne.Defs
 /-!
 # Adic valuations on Dedekind domains
 
-Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions and `v` a maximal ideal of `R`.
-In this file we prove compactness results for the `v`-adic completion of `K` and its ring of integers.
+Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions and `v`
+a maximal ideal of `R`. In this file we prove compactness results for the `v`-adic
+completion of `K` and its ring of integers.
 
-We import required Lean 3 results from the work of María Inés de Frutos-Fernández and Filippo A. E. Nuccio
-concerning the uniformizers of the ring of integers and the finiteness of its residue field, which are
+We import required Lean 3 results from the work of María Inés de Frutos-Fernández
+and Filippo A. E. Nuccio concerning the uniformizers of the ring of integers and
+the finiteness of its residue field, which are
 referenced appropriately in the docstrings.
 
-Note that one of the main results is not proved here, since the proof is already given elsewhere in Lean 3
-by María Inés de Frutos-Fernández, Filippo A. E. Nuccio in [https://github.com/mariainesdff/local_fields_journal/](https://github.com/mariainesdff/local_fields_journal/).
+Note that one of the main results is not proved here, since the proof is already
+given elsewhere in Lean 3 by María Inés de Frutos-Fernández, Filippo A. E. Nuccio
+in [https://github.com/mariainesdff/local_fields_journal/](https://github.com/mariainesdff/local_fields_journal/).
 
 ## Main definitions
- - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.maximalIdeal K v` is the maximal ideal of the
-   ring of integers in the `v`-adic completion of `K`.
- - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField K v` is the residue field of the
-   ring of integers in the `v`-adic completion of `K`.
- - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.ofFiniteCoeffs π n` constructs a `v`-adic integer
-   from an `n`-tuple of `v`-adic integers by using them as coefficients in a finite `v`-adic expansionin the
-   uniformizer `π`.
- - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.toFiniteCoeffs π n` gives the first `n` coefficients
-   in the `v`-adic expansion in `π` of a `v`-adic integer modulo the `n`th power of the maximal ideal.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.maximalIdeal K v` is
+   the maximal ideal of the ring of integers in the `v`-adic completion of `K`.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField K v` is
+   the residue field of the ring of integers in the `v`-adic completion of `K`.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.ofFiniteCoeffs π n`
+   constructs a `v`-adic integer from an `n`-tuple of `v`-adic integers by using
+   them as coefficients in a finite `v`-adic expansionin the uniformizer `π`.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.toFiniteCoeffs π n`
+   gives the first `n` coefficients in the `v`-adic expansion in `π` of a `v`-adic
+   integer modulo the `n`th power of the maximal ideal.
 
 ## Main results
- - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField_finite` : the residue field of
-   the `v`-adic ring of integers is finite.
- - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.quotient_maximalIdeal_pow_fintype` : the quotient of
-   the `v`-adic ring of integers by a power of the maximal ideal is finite.
- - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.isCompact` : the `v`-adic ring of integers is
-   compact.
- - `IsDedekindDomain.HeightOneSpectrum.locallyCompactSpace` : the `v`-adic Completion of `K` is locally compact.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField_finite` : the
+   residue field of the `v`-adic ring of integers is finite.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.quotient_maximalIdeal_pow_fintype` :
+   the quotient of the `v`-adic ring of integers by a power of the maximal ideal is finite.
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.isCompact` : the `v`-adic ring
+   of integers is compact.
+ - `IsDedekindDomain.HeightOneSpectrum.locallyCompactSpace` : the `v`-adic Completion of `K`
+   is locally compact.
 
 ## References
  * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
@@ -76,7 +81,7 @@ def coeRingHom : K →+* v.adicCompletion K :=
 
 /-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L95](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L95) -/
 theorem exists_uniformizer :
-  ∃ (π : v.adicCompletion K), IsUniformizer π := by
+    ∃ (π : v.adicCompletion K), IsUniformizer π := by
   obtain ⟨x, hx⟩ := valuation_exists_uniformizer K v
   use ↑x
   simp only [IsUniformizer, valuedAdicCompletion_def, ← hx, Valued.extension_extends]
@@ -110,16 +115,17 @@ theorem openBall_isClosed (γ : (WithZero (Multiplicative ℤ))ˣ) : IsClosed (o
   exact (not_le_of_lt hy') hx
 
 /-- Small open balls are contained in the `v`-adic integers. -/
-theorem openBall_of_le_one_subset_adicCompletionIntegers (γ : (WithZero (Multiplicative ℤ))ˣ) (hγ : γ ≤ 1) :
-  openBall K v γ ⊆ v.adicCompletionIntegers K := by
+theorem openBall_of_le_one_subset_adicCompletionIntegers (γ : (WithZero (Multiplicative ℤ))ˣ)
+    (hγ : γ ≤ 1) :
+    openBall K v γ ⊆ v.adicCompletionIntegers K := by
   intro x hx
   rw [openBall, Set.mem_setOf_eq] at hx
   exact le_of_lt (lt_of_lt_of_le hx hγ)
 
 /-- Open balls can be shrunk by multiplying by an appropriate power of a uniformizer. -/
 theorem mem_openBall_mul_uniformizer_pow (x π : v.adicCompletion K) (hx : x ∈ openBall K v γ)
-  (hπ : IsUniformizer π) :
-  Valued.v (π^(Multiplicative.toAdd (μ_v γ)) * x) < 1 := by
+    (hπ : IsUniformizer π) :
+    Valued.v (π^(Multiplicative.toAdd (μ_v γ)) * x) < 1 := by
   rw [Valued.v.map_mul, map_zpow₀, hπ]
   rw [openBall, Set.mem_setOf_eq] at hx
   have h_ne_zero : γ.val⁻¹ ≠ 0 := by simp_all only [ne_eq, inv_eq_zero, Units.ne_zero, not_false_eq_true]
@@ -134,7 +140,7 @@ theorem mem_openBall_mul_uniformizer_pow (x π : v.adicCompletion K) (hx : x ∈
 variable {K v}
 
 theorem ne_zero_iff_valuation_ne_zero (x : v.adicCompletion K) :
-  x ≠ 0 ↔ Valued.v x ≠ 0 := by simp only [ne_eq, map_eq_zero]
+    x ≠ 0 ↔ Valued.v x ≠ 0 := by simp only [ne_eq, map_eq_zero]
 
 end AdicCompletion
 
@@ -146,7 +152,7 @@ variable (K v)
 
 /-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L79](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L79)-/
 theorem exists_uniformizer :
-  ∃ (π : v.adicCompletionIntegers K), IsUniformizer π.val := by
+    ∃ (π : v.adicCompletionIntegers K), IsUniformizer π.val := by
   obtain ⟨π, hπ⟩ := valuation_exists_uniformizer K v
   refine ⟨⟨π, ?_⟩, ?_⟩
   · rw [mem_adicCompletionIntegers, valuedAdicCompletion_def]
@@ -168,7 +174,7 @@ variable {K v}
 
 /-- The valuation of a unit is `1`. -/
 theorem valuation_eq_one_of_isUnit {x : v.adicCompletionIntegers K} (hx : IsUnit x) :
-  Valued.v x.val = 1 := by
+    Valued.v x.val = 1 := by
   obtain ⟨u, hu⟩ := hx
   apply le_antisymm ((v.mem_adicCompletionIntegers K).1 x.property)
   rw [← @Valuation.map_one (v.adicCompletion K) (WithZero (Multiplicative ℤ)) _ _ Valued.v]
@@ -180,8 +186,9 @@ theorem valuation_eq_one_of_isUnit {x : v.adicCompletionIntegers K} (hx : IsUnit
   exact mul_le_mul_left' ((v.mem_adicCompletionIntegers K).1 (u⁻¹.val.property)) _
 
 /-- A `v`-adic integer with valuation `1` is a unit. -/
-theorem isUnit_of_valuation_eq_one {x : v.adicCompletionIntegers K} (hx : Valued.v (x : v.adicCompletion K) = 1) :
-  IsUnit x := by
+theorem isUnit_of_valuation_eq_one {x : v.adicCompletionIntegers K}
+    (hx : Valued.v (x : v.adicCompletion K) = 1) :
+    IsUnit x := by
   have hx_unit : IsUnit (x : v.adicCompletion K) := by
     simp only [isUnit_iff_ne_zero, ne_zero_iff_valuation_ne_zero, hx, ne_eq, one_ne_zero, not_false_eq_true]
   obtain ⟨u, hu⟩ := hx_unit
@@ -198,31 +205,33 @@ theorem isUnit_of_valuation_eq_one {x : v.adicCompletionIntegers K} (hx : Valued
   exact ⟨by simp only [h₂, h₁]; rfl, by simp only [h₂, h₁, mul_comm]; rfl⟩
 
 /-- A `v`-adic integer is a unit if and only if it has valuation `1`. -/
-theorem isUnit_iff_valuation_eq_one (x : v.adicCompletionIntegers K) : IsUnit x ↔ Valued.v x.val = 1 :=
+theorem isUnit_iff_valuation_eq_one (x : v.adicCompletionIntegers K) :
+    IsUnit x ↔ Valued.v x.val = 1 :=
   ⟨valuation_eq_one_of_isUnit, isUnit_of_valuation_eq_one⟩
 
 /-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L116](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L116)-/
 theorem not_isUnit_iff_valuation_lt_one (x : v.adicCompletionIntegers K) :
-  ¬IsUnit x ↔ Valued.v x.val < 1 := by
+    ¬IsUnit x ↔ Valued.v x.val < 1 := by
   rw [← not_le, not_iff_not, isUnit_iff_valuation_eq_one, le_antisymm_iff]
   exact and_iff_right x.2
 
 /-- A uniformizer is non-zero. -/
 theorem isUniformizer_ne_zero {π : v.adicCompletionIntegers K} (h : IsUniformizer π.val) : π ≠ 0 := by
   contrapose! h
-  simp only [h, IsUniformizer, ZeroMemClass.coe_zero, map_zero, Int.reduceNeg, ofAdd_neg, WithZero.coe_inv,
-    zero_eq_inv, WithZero.zero_ne_coe, not_false_eq_true]
+  simp only [h, IsUniformizer, ZeroMemClass.coe_zero, map_zero, Int.reduceNeg, ofAdd_neg,
+    WithZero.coe_inv, zero_eq_inv, WithZero.zero_ne_coe, not_false_eq_true]
 
 /-- A uniformizer is not a unit in the `v`-adic integers. -/
 theorem isUniformizer_not_isUnit {π : v.adicCompletionIntegers K} (h : IsUniformizer π.val) :
-  ¬IsUnit π := by
+    ¬IsUnit π := by
   rw [IsUniformizer] at h
-  simp only [not_isUnit_iff_valuation_lt_one, h, ← WithZero.coe_one, ← ofAdd_zero, WithZero.coe_lt_coe,
-    Multiplicative.ofAdd_lt, Left.neg_neg_iff, zero_lt_one]
+  simp only [not_isUnit_iff_valuation_lt_one, h, ← WithZero.coe_one, ← ofAdd_zero,
+    WithZero.coe_lt_coe, Multiplicative.ofAdd_lt, Left.neg_neg_iff, zero_lt_one]
 
 /- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L259](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L259)-/
-theorem eq_pow_uniformizer_mul_unit {x π : v.adicCompletionIntegers K} (hx : x.val ≠ 0) (hπ : IsUniformizer π.val) :
-  ∃ (n : ℕ) (u : (v.adicCompletionIntegers K)ˣ), x = π^n * u := by
+theorem eq_pow_uniformizer_mul_unit {x π : v.adicCompletionIntegers K} (hx : x.val ≠ 0)
+    (hπ : IsUniformizer π.val) :
+    ∃ (n : ℕ) (u : (v.adicCompletionIntegers K)ˣ), x = π^n * u := by
   have hx₀ : Valued.v x.val ≠ 0 := (ne_zero_iff_valuation_ne_zero x.val).1 hx
   set m := - Multiplicative.toAdd (WithZero.unzero hx₀)
   have hm₀ : 0 ≤ m := by
@@ -245,7 +254,7 @@ theorem eq_pow_uniformizer_mul_unit {x π : v.adicCompletionIntegers K} (hx : x.
 
 /- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L295](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L295)-/
 theorem isUniformizer_is_generator {π : v.adicCompletionIntegers K} (hπ : IsUniformizer π.val) :
-  maximalIdeal K v = Ideal.span {π} := by
+    maximalIdeal K v = Ideal.span {π} := by
   apply (LocalRing.maximalIdeal.isMaximal _).eq_of_le (Ideal.span_singleton_ne_top (isUniformizer_not_isUnit hπ))
   intro x hx
   by_cases hx₀ : x.val = 0
@@ -265,8 +274,9 @@ theorem valuation_lt_one_of_maximalIdeal {x : v.adicCompletionIntegers K} (hx : 
 
 /-- An element of a positive power `n` of the maximal ideal of the `v`-adic integers has valuation less than
 or equal to `-n`. -/
-theorem valuation_le_pow_of_maximalIdeal {x : v.adicCompletionIntegers K} (n : ℕ) (hx : x ∈ (maximalIdeal K v)^n) :
-  Valued.v (x : v.adicCompletion K) ≤ Multiplicative.ofAdd (-n : ℤ) := by
+theorem valuation_le_pow_of_maximalIdeal {x : v.adicCompletionIntegers K} (n : ℕ)
+    (hx : x ∈ (maximalIdeal K v)^n) :
+    Valued.v (x : v.adicCompletion K) ≤ Multiplicative.ofAdd (-n : ℤ) := by
   by_cases hn : n = 0
   · simp only [hn, pow_zero, Ideal.one_eq_top, Submodule.mem_top, CharP.cast_eq_zero, neg_zero,
       ofAdd_zero, WithZero.coe_one, forall_true_left];
@@ -295,16 +305,16 @@ instance : CommRing (Fin n → LocalRing.ResidueField (v.adicCompletionIntegers 
 a finite `v`-adic expansion in some fixed `v`-adic integer `π` as `a₁ + a₂π + a₃π² + ...`.
 Note the definition does not require `π` to be a uniformizer. -/
 def ofFiniteCoeffs (π : v.adicCompletionIntegers K) (n : ℕ) :
-  (Fin n → v.adicCompletionIntegers K) → v.adicCompletionIntegers K :=
-  λ x => ((List.ofFn x).mapIdx (λ i j => j * π^i)).sum
+    (Fin n → v.adicCompletionIntegers K) → v.adicCompletionIntegers K :=
+  fun x => ((List.ofFn x).mapIdx (λ i j => j * π^i)).sum
 
 /-- Given a uniformizer `π` of the `v`-adic integers and a `v`-adic integer `x`, there exists an `n`-tuple of
 representatives in the residue field of the `v`-adic integers such that `x` can be written as a finite `v`-adic
 expansion in `π` with coefficients given by the `n`-tuple. -/
 theorem finiteExpansion {π : v.adicCompletionIntegers K} (n : ℕ) (x : v.adicCompletionIntegers K)
-  (hπ : IsUniformizer π.val) :
-  ∃ (a : Fin n → LocalRing.ResidueField (v.adicCompletionIntegers K)),
-    x - ((List.ofFn a).mapIdx (λ i j => (Quotient.out' j) * π^i)).sum ∈ (maximalIdeal K v)^n := by
+    (hπ : IsUniformizer π.val) :
+    ∃ (a : Fin n → LocalRing.ResidueField (v.adicCompletionIntegers K)),
+      x - ((List.ofFn a).mapIdx (λ i j => (Quotient.out' j) * π^i)).sum ∈ (maximalIdeal K v)^n := by
   induction' n with d hd;
   · simp only [Nat.zero_eq, List.ofFn_zero, List.mapIdx_nil, List.sum_nil, sub_zero, pow_zero,
         Ideal.one_eq_top, Submodule.mem_top, exists_const]
@@ -328,12 +338,12 @@ the maximal ideal, gives the coefficients of `x` in the finite `v`-adic expansio
 representatives in the residue field.
 -/
 def toFiniteCoeffs {π : v.adicCompletionIntegers K} (n : ℕ) (hπ : IsUniformizer π.val) :
-  v.adicCompletionIntegers K ⧸ (maximalIdeal K v)^n
-    → (Fin n → LocalRing.ResidueField (v.adicCompletionIntegers K)) :=
-  λ x => (Classical.choose (finiteExpansion n (Quotient.out' x) hπ))
+    v.adicCompletionIntegers K ⧸ (maximalIdeal K v)^n
+      → (Fin n → LocalRing.ResidueField (v.adicCompletionIntegers K)) :=
+  fun x => (Classical.choose (finiteExpansion n (Quotient.out' x) hπ))
 
 theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K} (n : ℕ) (hπ : IsUniformizer π.val) :
-  (toFiniteCoeffs n hπ).Injective := by
+    (toFiniteCoeffs n hπ).Injective := by
   intro x y hxy
   unfold toFiniteCoeffs at hxy
   set a := Classical.choose (finiteExpansion n (Quotient.out' x) hπ) with a_def
@@ -347,8 +357,9 @@ theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K} (n : ℕ) (h�
   exact Ideal.sub_mem _ hx hy
 
 /-- The quotient of the `v`-adic integers with a power of the maximal ideal is finite. -/
-theorem quotient_maximalIdeal_pow_fintype {π : v.adicCompletionIntegers K} (n : ℕ) (hπ : IsUniformizer π.val) :
-  Fintype (v.adicCompletionIntegers K ⧸ (maximalIdeal K v)^n) := by
+theorem quotient_maximalIdeal_pow_fintype {π : v.adicCompletionIntegers K} (n : ℕ)
+    (hπ : IsUniformizer π.val) :
+    Fintype (v.adicCompletionIntegers K ⧸ (maximalIdeal K v)^n) := by
   haveI : Fintype (Fin n → residueField K v) := Pi.fintype
   unfold residueField at this
   exact Fintype.ofInjective _ (toFiniteCoeffs_injective n hπ)
@@ -370,9 +381,9 @@ theorem isClosed : IsClosed (v.adicCompletionIntegers K : Set (v.adicCompletion 
 /-- There is a finite covering of the `v`-adic integers of open balls of radius larger than one, namely
 the single open ball centred at `0`. -/
 theorem hasFiniteSubcover_of_openBall_one_lt {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ.val > 1) :
-  ∃ t : Set (v.adicCompletion K),
-    Set.Finite t ∧
-    ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t, {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
+    ∃ t : Set (v.adicCompletion K),
+      Set.Finite t ∧
+      ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t, {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
   use {0}
   simp only [Set.finite_singleton, Set.mem_singleton_iff, Set.mem_setOf_eq,
     Set.iUnion_iUnion_eq_left, zero_sub, Valuation.map_neg, true_and]
@@ -383,9 +394,9 @@ theorem hasFiniteSubcover_of_openBall_one_lt {γ : (WithZero (Multiplicative ℤ
 /-- There is a finite covering of the `v`-adic integers of open balls of radius equal to one, obtained
 by using the finite representatives in the residue field. -/
 theorem hasFiniteSubcover_of_openBall_eq_one {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ.val = 1) :
- ∃ t : Set (v.adicCompletion K),
-    Set.Finite t ∧
-    ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t, {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
+    ∃ t : Set (v.adicCompletion K),
+      Set.Finite t ∧
+      ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t, {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
   set quotientMap : v.adicCompletionIntegers K → residueField K v := Submodule.Quotient.mk
   obtain ⟨π, hπ⟩ := exists_uniformizer K v
   have h := quotient_maximalIdeal_pow_fintype 1 hπ
@@ -408,7 +419,7 @@ theorem hasFiniteSubcover_of_openBall_eq_one {γ : (WithZero (Multiplicative ℤ
 by using the finite representatives in the quotient of the `v`-adic integers by a power of the maximal
 ideal. -/
 theorem hasFiniteSubcover_of_openBall_lt_one {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ.val < 1) :
-  ∃ t : Set (v.adicCompletion K),
+    ∃ t : Set (v.adicCompletion K),
       Set.Finite t ∧
       ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t, {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
   have ho : ∃ μ : Multiplicative ℤ, γ.val = (μ : WithZero (Multiplicative ℤ)) := by
@@ -459,7 +470,7 @@ theorem isCompact : IsCompact (v.adicCompletionIntegers K : Set (v.adicCompletio
   isCompact_iff_totallyBounded_isComplete.2 ⟨isTotallyBounded K v, IsClosed.isComplete (isClosed K v)⟩
 
 instance compactSpace :  CompactSpace (v.adicCompletionIntegers K) :=
-  by apply CompactSpace.mk (isCompact_iff_isCompact_univ.1 (isCompact K v))
+  CompactSpace.mk (isCompact_iff_isCompact_univ.1 (isCompact K v))
 
 instance : LocallyCompactSpace (v.adicCompletionIntegers K) := inferInstance
 

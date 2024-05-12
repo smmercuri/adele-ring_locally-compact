@@ -22,7 +22,7 @@ variable {α : Type u} {β : Type v}
 namespace UniformSpace
 
 theorem comap_completableTopField [Field β] [Field α] {f : α →+* β} [b : UniformSpace β]
-  [@T0Space α (UniformSpace.comap f b).toTopologicalSpace] [CompletableTopField β] :
+    [@T0Space α (UniformSpace.comap f b).toTopologicalSpace] [CompletableTopField β] :
     @CompletableTopField _ _ (UniformSpace.comap f b) := by
   have h_ui : @UniformInducing _ _ (UniformSpace.comap f b) _ f := by
     rw [@uniformInducing_iff_uniformSpace]

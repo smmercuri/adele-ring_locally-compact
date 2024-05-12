@@ -14,7 +14,8 @@ In this file we provide a basic inequality result when adding a zero to the mult
 namespace Multiplicative
 
 /-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/for_mathlib/with_zero.lean#L129](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/for_mathlib/with_zero.lean#L129)-/
-theorem ofAdd_neg_one_lt_one : Multiplicative.ofAdd (-1 : ℤ) < (1 : WithZero (Multiplicative ℤ)) := by
+theorem ofAdd_neg_one_lt_one :
+    Multiplicative.ofAdd (-1 : ℤ) < (1 : WithZero (Multiplicative ℤ)) := by
   rw [← WithZero.coe_one, WithZero.coe_lt_coe, ← ofAdd_zero, Multiplicative.ofAdd_lt]
   exact neg_one_lt_zero
 
