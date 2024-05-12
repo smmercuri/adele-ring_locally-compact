@@ -59,8 +59,7 @@ instance : Nontrivial (infiniteAdeleRing K) := Pi.nontrivial
 
 end DerivedInstances
 
-instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K)
-  := Pi.topologicalSpace
+instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K) := Pi.topologicalSpace
 
 instance topologicalRing : TopologicalRing (infiniteAdeleRing K) := Pi.instTopologicalRing
 

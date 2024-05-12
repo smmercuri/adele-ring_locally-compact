@@ -89,7 +89,8 @@ namespace SProdAdicCompletions
 instance : Coe (SProdAdicCompletionIntegers R K S) (SProdAdicCompletions R K S) where
   coe := λ x => (λ (v : S) => x.1 v, λ (v : {v // v ∉ S}) => (x.2 v : v.val.adicCompletion K))
 
-theorem coe_injective : (Coe.coe : SProdAdicCompletionIntegers R K S → SProdAdicCompletions R K S).Injective := by
+theorem coe_injective :
+    (Coe.coe : SProdAdicCompletionIntegers R K S → SProdAdicCompletions R K S).Injective := by
   intro x y hxy
   refine Prod.ext (Prod.ext_iff.1 hxy).1 ?_
   funext v
@@ -181,7 +182,7 @@ theorem one : IsFiniteSAdele S (1 : ProdAdicCompletions R K) :=
   λ v _ => by rw [mem_adicCompletionIntegers]; exact le_of_eq (Valued.v.map_one')
 
 theorem add {x y : ProdAdicCompletions R K} (hx : IsFiniteSAdele S x) (hy : IsFiniteSAdele S y) :
-  IsFiniteSAdele S (x + y) := by
+    IsFiniteSAdele S (x + y) := by
   intro v hv
   rw [mem_adicCompletionIntegers, Pi.add_apply]
   exact le_trans (Valued.v.map_add_le_max' (x v) (y v)) (max_le (hx v hv) (hy v hv))
@@ -193,7 +194,7 @@ theorem zero : IsFiniteSAdele S (0 : ProdAdicCompletions R K) := by
   exact Valued.v.map_zero'
 
 theorem neg {x : ProdAdicCompletions R K} (hx : IsFiniteSAdele S x) :
-  IsFiniteSAdele S (-x) := by
+    IsFiniteSAdele S (-x) := by
   intro v hv
   rw [mem_adicCompletionIntegers, Pi.neg_apply, Valuation.map_neg]
   exact hx v hv
@@ -224,7 +225,7 @@ variable {R K S}
 
 /-- A finite S-adele is a finite adele. -/
 theorem mem_isFiniteAdele {x : ProdAdicCompletions R K} (hx : x ∈ finiteSAdeleRing R K S) :
-  x ∈ finiteAdeleRing R K := by
+    x ∈ finiteAdeleRing R K := by
   rw [mem_finiteAdeleRing_iff, ProdAdicCompletions.IsFiniteAdele, Filter.eventually_cofinite]
   refine Set.Finite.subset S.finite_toSet (λ v hv => ?_)
   contrapose hv
@@ -233,8 +234,8 @@ theorem mem_isFiniteAdele {x : ProdAdicCompletions R K} (hx : x ∈ finiteSAdele
 
 /-- If `x` is a `v`-adic integer, then the local inclusion of `x` at any place `v` is a finite S-adele. -/
 theorem isFiniteSAdele_localInclusion (v : HeightOneSpectrum R) {x : v.adicCompletion K}
-  (hx : x ∈ v.adicCompletionIntegers K) :
-  IsFiniteSAdele S (ι v x).val := by
+    (hx : x ∈ v.adicCompletionIntegers K) :
+    IsFiniteSAdele S (ι v x).val := by
   intros w _
   simp only [FiniteAdeleRing.localInclusion, ProdAdicCompletions.localInclusion]
   by_cases hw : w = v
@@ -246,7 +247,7 @@ theorem isFiniteSAdele_localInclusion (v : HeightOneSpectrum R) {x : v.adicCompl
 
 /-- If `v ∈ S` then the local inclusion of any `x` in the `v`-adic completion of `K` is a finite S-adele. -/
 theorem isFiniteSAdele_localInclusion_of_S {v : HeightOneSpectrum R} (x : v.adicCompletion K) (h : v ∈ S) :
-  IsFiniteSAdele S (ι v x).val := by
+    IsFiniteSAdele S (ι v x).val := by
   intros w hw
   simp only [FiniteAdeleRing.localInclusion, ProdAdicCompletions.localInclusion, Ne.symm (ne_of_mem_of_not_mem h hw),
     ↓reduceDite]
@@ -274,7 +275,7 @@ theorem toFiniteAdeleRing_range : Set.range (e S) = setOf (λ x : finiteAdeleRin
   (Set.range_eq_iff _ _).2 ⟨λ x => x.2, λ x hx => by {use ⟨x, hx⟩; rfl}⟩
 
 theorem toFiniteAdeleRing_range_eq_pi : Subtype.val '' Set.range (e S) =
-  Set.pi Set.univ (λ v => if (v ∈ S) then Set.univ else (v.adicCompletionIntegers K)) := by
+    Set.pi Set.univ (λ v => if (v ∈ S) then Set.univ else (v.adicCompletionIntegers K)) := by
   ext x
   rw [toFiniteAdeleRing_range R K]
   refine ⟨λ ⟨y, hy₀, hy₁⟩ v _ => ?_, ?_⟩
@@ -307,12 +308,12 @@ theorem toFiniteAdeleRing_range_mem_generatingSet : Set.range (e S) ∈ FiniteAd
     exact hv.1
 
 /-- The S-adeles are given a second subspace topology, viewed as a subspace of the finite adele ring. -/
-def adelicTopologicalSpace : TopologicalSpace (finiteSAdeleRing R K S)
-  := TopologicalSpace.induced (e S) (TopologicalSpace.generateFrom (FiniteAdeleRing.generatingSet R K))
+def adelicTopologicalSpace : TopologicalSpace (finiteSAdeleRing R K S) :=
+  TopologicalSpace.induced (e S) (TopologicalSpace.generateFrom (FiniteAdeleRing.generatingSet R K))
 
 /-- The generating set of the adelic topology of the finite S-adele ring. -/
-def adelicGeneratingSet : Set (Set (finiteSAdeleRing R K S))
-  := Set.preimage (e S) '' (FiniteAdeleRing.generatingSet R K)
+def adelicGeneratingSet : Set (Set (finiteSAdeleRing R K S)) :=
+  Set.preimage (e S) '' (FiniteAdeleRing.generatingSet R K)
 
 theorem adelicGenerateFrom :
   adelicTopologicalSpace R K S = TopologicalSpace.generateFrom (FiniteSAdeleRing.adelicGeneratingSet R K S) := by
@@ -324,24 +325,24 @@ theorem set_univ_mem_generatingSet : Set.univ ∈ adelicGeneratingSet R K S := b
 
 /-- Subtype val of the finite S-adele ring factors through the embedding into the finite adele ring. -/
 theorem subtype_val_embedding :
-  (Subtype.val : finiteSAdeleRing R K S → ProdAdicCompletions R K) = Subtype.val ∘ e S := rfl
+    (Subtype.val : finiteSAdeleRing R K S → ProdAdicCompletions R K) = Subtype.val ∘ e S := rfl
 
 theorem subtype_val_range_eq_pi :
-  Set.range (Subtype.val : finiteSAdeleRing R K S → ProdAdicCompletions R K)
-    = Set.pi Set.univ (λ v => ite (v ∈ S) Set.univ (v.adicCompletionIntegers K)) := by
+    Set.range (Subtype.val : finiteSAdeleRing R K S → ProdAdicCompletions R K)
+      = Set.pi Set.univ (λ v => ite (v ∈ S) Set.univ (v.adicCompletionIntegers K)) := by
   rw [subtype_val_embedding, Set.range_comp, toFiniteAdeleRing_range_eq_pi]
 
 /-- The generating set of the subspace topology of the finite S-adele ring viewed as a subspace of the finite
 adele ring coincides with the generating set of the subspace topology obtained as a subspace of
 `ProdAdicCompletions`. -/
 theorem adelicGeneratingSet_eq : adelicGeneratingSet R K S =
-  Set.preimage Subtype.val '' (
-    setOf (
-      λ U =>
-        ∃ (V : (v: HeightOneSpectrum R) → Set (v.adicCompletion K)) (I : Finset (HeightOneSpectrum R)),
-          (∀ v ∈ I, IsOpen (V v)) ∧ U = Set.pi (I.toSet) V
-    )
-  ) := by
+    Set.preimage Subtype.val '' (
+      setOf (
+        λ U =>
+          ∃ (V : (v: HeightOneSpectrum R) → Set (v.adicCompletion K)) (I : Finset (HeightOneSpectrum R)),
+            (∀ v ∈ I, IsOpen (V v)) ∧ U = Set.pi (I.toSet) V
+      )
+    ) := by
   ext x
   simp only [adelicGeneratingSet, FiniteAdeleRing.generatingSet, Filter.eventually_cofinite, Set.mem_image,
       Set.mem_setOf_eq, exists_exists_and_eq_and]

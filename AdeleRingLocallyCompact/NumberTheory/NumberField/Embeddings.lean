@@ -96,7 +96,8 @@ theorem continuous : @Continuous _ _ v.topologicalSpace _ v.embedding :=
   @UniformContinuous.continuous _ _ v.uniformSpace _ _ v.uniformContinuous
 
 instance t0Space : @T0Space K v.topologicalSpace :=
-  @t0Space_of_injective_of_continuous _ _ v.topologicalSpace _ _ v.embedding.injective v.continuous _
+  @t0Space_of_injective_of_continuous _ _ v.topologicalSpace _ _
+    v.embedding.injective v.continuous _
 
 instance completableTopField : @CompletableTopField K _ v.uniformSpace :=
   UniformSpace.comap_completableTopField
@@ -153,19 +154,22 @@ theorem extensionEmbedding_dist_eq (x y : v.completion K) :
       dist x y := by
   set p : v.completion K → v.completion K → Prop :=
     λ x y => dist (extensionEmbedding K v x) (extensionEmbedding K v y) = dist x y
-  refine @UniformSpace.Completion.induction_on₂ _ v.uniformSpace _ v.uniformSpace p x y ?_ (λ x y => ?_)
+  refine (@UniformSpace.Completion.induction_on₂ _
+    v.uniformSpace _ v.uniformSpace p x y ?_ (λ x y => ?_))
   · apply isClosed_eq
-    · exact continuous_iff_continuous_dist.1 (@UniformSpace.Completion.continuous_extension _ v.uniformSpace _ _ _ _)
+    · exact (continuous_iff_continuous_dist.1
+        (@UniformSpace.Completion.continuous_extension _ v.uniformSpace _ _ _ _))
     · exact @continuous_dist _ (metricSpace K v).toPseudoMetricSpace
-  · simp only [extensionEmbedding, UniformSpace.Completion.extensionHom, RingHom.coe_mk, MonoidHom.coe_mk,
-      OneHom.coe_mk, p]
+  · simp only [extensionEmbedding, UniformSpace.Completion.extensionHom, RingHom.coe_mk,
+      MonoidHom.coe_mk, OneHom.coe_mk, p]
     simp only [@UniformSpace.Completion.extension_coe _ v.uniformSpace _ _ _ _ v.uniformContinuous]
     rw [@UniformSpace.Completion.dist_eq _ v.pseudoMetricSpace]
     rw [@Isometry.dist_eq _ _ v.pseudoMetricSpace _ _ (v.isometry) _ _]
 
 variable (K v)
 
-theorem extensionEmbedding_isometry : @Isometry _ _ (metricSpace K v).toPseudoEMetricSpace _ (extensionEmbedding K v) :=
+theorem extensionEmbedding_isometry :
+    @Isometry _ _ (metricSpace K v).toPseudoEMetricSpace _ (extensionEmbedding K v) :=
   Isometry.of_dist_eq extensionEmbedding_dist_eq
 
 /- The embedding `Kᵥ → ℂ` is uniform inducing. -/
