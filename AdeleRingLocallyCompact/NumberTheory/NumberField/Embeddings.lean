@@ -56,27 +56,27 @@ end DerivedInstances
 
 variable {K}
 
-theorem embedding_uniformInducing : @UniformInducing _ _ v.uniformSpace _ v.embedding := by
-  rw [@uniformInducing_iff_uniformSpace]; rfl
-
-instance pseudoMetricSpace : PseudoMetricSpace K :=
-  @UniformInducing.comapPseudoMetricSpace _ _ v.uniformSpace _ _ v.embedding_uniformInducing
-
-theorem topEmbedding : @Embedding _ _ v.topologicalSpace _ (v.embedding) := by
-  rw [@embedding_iff, @inducing_iff]
+theorem uniformEmbedding : @UniformEmbedding _ _ v.uniformSpace _ v.embedding := by
+  rw [@uniformEmbedding_iff, @uniformInducing_iff_uniformSpace]
   exact ⟨rfl, v.embedding.injective⟩
 
+theorem uniformInducing : @UniformInducing _ _ v.uniformSpace _ v.embedding :=
+  @UniformEmbedding.toUniformInducing _ _ v.uniformSpace _ _ v.uniformEmbedding
+
+instance pseudoMetricSpace : PseudoMetricSpace K :=
+  @UniformInducing.comapPseudoMetricSpace _ _ v.uniformSpace _ _ v.uniformInducing
+
 theorem isometry : @Isometry _ _ v.pseudoMetricSpace.toPseudoEMetricSpace _ (v.embedding) :=
-  @Embedding.to_isometry _ _ v.topologicalSpace _ _ v.topEmbedding
+  @UniformEmbedding.to_isometry _ _ v.uniformSpace _ _ v.uniformEmbedding
 
-theorem embedding_uniformContinuous : @UniformContinuous _ _ v.uniformSpace _ v.embedding :=
-  @UniformInducing.uniformContinuous _ _ v.uniformSpace _ _ v.embedding_uniformInducing
+theorem uniformContinuous : @UniformContinuous _ _ v.uniformSpace _ v.embedding :=
+  @UniformInducing.uniformContinuous _ _ v.uniformSpace _ _ v.uniformInducing
 
-theorem embedding_continuous : @Continuous _ _ v.topologicalSpace _ v.embedding :=
-  @UniformContinuous.continuous _ _ v.uniformSpace _ _ v.embedding_uniformContinuous
+theorem continuous : @Continuous _ _ v.topologicalSpace _ v.embedding :=
+  @UniformContinuous.continuous _ _ v.uniformSpace _ _ v.uniformContinuous
 
 instance t0Space : @T0Space K v.topologicalSpace :=
-  @t0Space_of_injective_of_continuous _ _ v.topologicalSpace _ _ v.embedding.injective v.embedding_continuous _
+  @t0Space_of_injective_of_continuous _ _ v.topologicalSpace _ _ v.embedding.injective v.continuous _
 
 instance completableTopField : @CompletableTopField K _ v.uniformSpace :=
   UniformSpace.comap_completableTopField
@@ -120,7 +120,7 @@ def coeRingHom : K →+* v.completion K :=
 
 def extensionEmbedding :=
   @UniformSpace.Completion.extensionHom K _ v.uniformSpace v.topologicalRing v.uniformAddGroup
-    _ _ _ _ _ v.embedding v.embedding_continuous _ _
+    _ _ _ _ _ v.embedding v.continuous _ _
 
 theorem extensionEmbedding_injective : Function.Injective (extensionEmbedding K v) :=
   (extensionEmbedding K v).injective
@@ -139,23 +139,23 @@ theorem extensionEmbedding_dist_eq (x y : v.completion K) :
     · exact @continuous_dist _ (metricSpace K v).toPseudoMetricSpace
   · simp only [extensionEmbedding, UniformSpace.Completion.extensionHom, RingHom.coe_mk, MonoidHom.coe_mk,
       OneHom.coe_mk, p]
-    simp only [@UniformSpace.Completion.extension_coe _ v.uniformSpace _ _ _ _ v.embedding_uniformContinuous]
+    simp only [@UniformSpace.Completion.extension_coe _ v.uniformSpace _ _ _ _ v.uniformContinuous]
     rw [@UniformSpace.Completion.dist_eq _ v.pseudoMetricSpace]
     rw [@Isometry.dist_eq _ _ v.pseudoMetricSpace _ _ (v.isometry) _ _]
 
 variable (K v)
 
-theorem embedding_isometry : @Isometry _ _ (metricSpace K v).toPseudoEMetricSpace _ (extensionEmbedding K v) :=
+theorem extensionEmbedding_isometry : @Isometry _ _ (metricSpace K v).toPseudoEMetricSpace _ (extensionEmbedding K v) :=
   Isometry.of_dist_eq extensionEmbedding_dist_eq
 
 /- The embedding `Kᵥ → ℂ` is uniform inducing. -/
-theorem embedding_uniformInducing :
+theorem extensionEmbedding_uniformInducing :
     UniformInducing (extensionEmbedding K v) :=
-  (embedding_isometry K v).uniformInducing
+  (extensionEmbedding_isometry K v).uniformInducing
 
 /-- The embedding `Kᵥ → ℂ` is a closed embedding. -/
 theorem closedEmbedding : ClosedEmbedding (extensionEmbedding K v) :=
-  (embedding_isometry K v).closedEmbedding
+  (extensionEmbedding_isometry K v).closedEmbedding
 
 /-- The completion of a number field at an Archimedean place is locally compact. -/
 instance locallyCompactSpace : LocallyCompactSpace (v.completion K) :=
