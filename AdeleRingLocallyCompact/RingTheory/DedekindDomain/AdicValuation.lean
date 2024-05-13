@@ -128,7 +128,8 @@ theorem mem_openBall_mul_uniformizer_pow (x π : v.adicCompletion K) (hx : x ∈
     Valued.v (π^(Multiplicative.toAdd (μ_v γ)) * x) < 1 := by
   rw [Valued.v.map_mul, map_zpow₀, hπ]
   rw [openBall, Set.mem_setOf_eq] at hx
-  have h_ne_zero : γ.val⁻¹ ≠ 0 := by simp_all only [ne_eq, inv_eq_zero, Units.ne_zero, not_false_eq_true]
+  have h_ne_zero : γ.val⁻¹ ≠ 0 := by simp only [ne_eq, inv_eq_zero, Units.ne_zero,
+    not_false_eq_true]
   rw [(Units.inv_mul' γ).symm]
   apply mul_lt_mul_of_lt_of_le₀ _ h_ne_zero hx
   rw [ofAdd_neg, WithZero.coe_inv, inv_zpow', zpow_neg]
@@ -190,7 +191,8 @@ theorem isUnit_of_valuation_eq_one {x : v.adicCompletionIntegers K}
     (hx : Valued.v (x : v.adicCompletion K) = 1) :
     IsUnit x := by
   have hx_unit : IsUnit (x : v.adicCompletion K) := by
-    simp only [isUnit_iff_ne_zero, ne_zero_iff_valuation_ne_zero, hx, ne_eq, one_ne_zero, not_false_eq_true]
+    simp only [isUnit_iff_ne_zero, ne_zero_iff_valuation_ne_zero, hx, ne_eq, one_ne_zero,
+      not_false_eq_true]
   obtain ⟨u, hu⟩ := hx_unit
   have hu_le : Valued.v u.val ≤ 1 := by rw [hu]; exact x.property
   have hu_inv_le : Valued.v u⁻¹.val ≤ 1 := by
@@ -201,7 +203,8 @@ theorem isUnit_of_valuation_eq_one {x : v.adicCompletionIntegers K}
   use ⟨u⁻¹.val, hu_inv_le⟩
   have h₁ : (1 : v.adicCompletion K) = u * u⁻¹ := by simp only [Units.val_inv_eq_inv_val,
     ne_eq, Units.ne_zero, not_false_eq_true, mul_inv_cancel]
-  have h₂ : (1 : v.adicCompletionIntegers K) = ⟨(1 : v.adicCompletion K), (v.adicCompletionIntegers K).one_mem⟩ := rfl
+  have h₂ : (1 : v.adicCompletionIntegers K) =
+    ⟨(1 : v.adicCompletion K), (v.adicCompletionIntegers K).one_mem⟩ := rfl
   exact ⟨by simp only [h₂, h₁]; rfl, by simp only [h₂, h₁, mul_comm]; rfl⟩
 
 /-- A `v`-adic integer is a unit if and only if it has valuation `1`. -/
@@ -216,7 +219,8 @@ theorem not_isUnit_iff_valuation_lt_one (x : v.adicCompletionIntegers K) :
   exact and_iff_right x.2
 
 /-- A uniformizer is non-zero. -/
-theorem isUniformizer_ne_zero {π : v.adicCompletionIntegers K} (h : IsUniformizer π.val) : π ≠ 0 := by
+theorem isUniformizer_ne_zero {π : v.adicCompletionIntegers K} (h : IsUniformizer π.val) :
+    π ≠ 0 := by
   contrapose! h
   simp only [h, IsUniformizer, ZeroMemClass.coe_zero, map_zero, Int.reduceNeg, ofAdd_neg,
     WithZero.coe_inv, zero_eq_inv, WithZero.zero_ne_coe, not_false_eq_true]
@@ -235,12 +239,14 @@ theorem eq_pow_uniformizer_mul_unit {x π : v.adicCompletionIntegers K} (hx : x.
   have hx₀ : Valued.v x.val ≠ 0 := (ne_zero_iff_valuation_ne_zero x.val).1 hx
   set m := - Multiplicative.toAdd (WithZero.unzero hx₀)
   have hm₀ : 0 ≤ m := by
-    rw [Right.nonneg_neg_iff, ← toAdd_one, Multiplicative.toAdd_le, ← WithZero.coe_le_coe, WithZero.coe_unzero]
+    rw [Right.nonneg_neg_iff, ← toAdd_one, Multiplicative.toAdd_le, ← WithZero.coe_le_coe,
+      WithZero.coe_unzero]
     exact x.property
   use Int.toNat m
   have hpow : Valued.v (π ^ (-m) * x.val) = 1 := by
-    rw [Valued.v.map_mul, map_zpow₀, hπ, ofAdd_neg, WithZero.coe_inv, inv_zpow', neg_neg, ← WithZero.coe_zpow,
-    ← Int.ofAdd_mul, one_mul, ofAdd_neg, ofAdd_toAdd, WithZero.coe_inv, WithZero.coe_unzero, inv_mul_cancel hx₀]
+    rw [Valued.v.map_mul, map_zpow₀, hπ, ofAdd_neg, WithZero.coe_inv, inv_zpow', neg_neg,
+      ← WithZero.coe_zpow, ← Int.ofAdd_mul, one_mul, ofAdd_neg, ofAdd_toAdd, WithZero.coe_inv,
+      WithZero.coe_unzero, inv_mul_cancel hx₀]
   set a : v.adicCompletionIntegers K := ⟨π^(-m) * x.val, le_of_eq hpow⟩
   have h_isUnit_a : IsUnit a := isUnit_of_valuation_eq_one hpow
   use h_isUnit_a.unit
@@ -255,25 +261,28 @@ theorem eq_pow_uniformizer_mul_unit {x π : v.adicCompletionIntegers K} (hx : x.
 /- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L295](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L295)-/
 theorem isUniformizer_is_generator {π : v.adicCompletionIntegers K} (hπ : IsUniformizer π.val) :
     maximalIdeal K v = Ideal.span {π} := by
-  apply (LocalRing.maximalIdeal.isMaximal _).eq_of_le (Ideal.span_singleton_ne_top (isUniformizer_not_isUnit hπ))
+  apply (LocalRing.maximalIdeal.isMaximal _).eq_of_le
+    (Ideal.span_singleton_ne_top (isUniformizer_not_isUnit hπ))
   intro x hx
   by_cases hx₀ : x.val = 0
   · simp only [ZeroMemClass.coe_eq_zero] at hx₀
     simp only [hx₀, Ideal.zero_mem]
   · obtain ⟨n, ⟨u, hu⟩⟩ := eq_pow_uniformizer_mul_unit hx₀ hπ
-    have hn : ¬(IsUnit x) := λ h => (LocalRing.maximalIdeal.isMaximal _).ne_top (Ideal.eq_top_of_isUnit_mem _ hx h)
+    have hn : ¬(IsUnit x) := λ h =>
+      (LocalRing.maximalIdeal.isMaximal _).ne_top (Ideal.eq_top_of_isUnit_mem _ hx h)
     replace hn : n ≠ 0 := λ h => by {rw [hu, h, pow_zero, one_mul] at hn; exact hn u.isUnit}
     simpa [Ideal.mem_span_singleton, hu, IsUnit.dvd_mul_right, Units.isUnit] using dvd_pow_self _ hn
 
 /-- An element of the maximal ideal of the `v`-adic integers has valuation less than `1`. -/
-theorem valuation_lt_one_of_maximalIdeal {x : v.adicCompletionIntegers K} (hx : x ∈ maximalIdeal K v) :
-  Valued.v (x : v.adicCompletion K) < 1 := by
+theorem valuation_lt_one_of_maximalIdeal {x : v.adicCompletionIntegers K}
+    (hx : x ∈ maximalIdeal K v) :
+    Valued.v (x : v.adicCompletion K) < 1 := by
   rw [AdicCompletionIntegers.maximalIdeal, LocalRing.mem_maximalIdeal, mem_nonunits_iff] at hx
   contrapose! hx
   exact isUnit_of_valuation_eq_one (le_antisymm x.property hx)
 
-/-- An element of a positive power `n` of the maximal ideal of the `v`-adic integers has valuation less than
-or equal to `-n`. -/
+/-- An element of a positive power `n` of the maximal ideal of the `v`-adic integers has
+valuation less than or equal to `-n`. -/
 theorem valuation_le_pow_of_maximalIdeal {x : v.adicCompletionIntegers K} (n : ℕ)
     (hx : x ∈ (maximalIdeal K v)^n) :
     Valued.v (x : v.adicCompletion K) ≤ Multiplicative.ofAdd (-n : ℤ) := by
@@ -292,8 +301,8 @@ theorem valuation_le_pow_of_maximalIdeal {x : v.adicCompletionIntegers K} (n : �
       simp only [pow_ne_zero_iff hn, Valuation.ne_zero_iff, ne_eq, ZeroMemClass.coe_eq_zero]
       exact isUniformizer_ne_zero hπ
     apply le_trans h_mul_le_mul
-    rw [mul_one, hπ, ← WithZero.coe_pow, WithZero.coe_le_coe, ofAdd_neg, ofAdd_neg, inv_pow, inv_le_inv_iff,
-      ← one_mul (n : ℤ), Int.ofAdd_mul, zpow_natCast]
+    rw [mul_one, hπ, ← WithZero.coe_pow, WithZero.coe_le_coe, ofAdd_neg, ofAdd_neg, inv_pow,
+      inv_le_inv_iff, ← one_mul (n : ℤ), Int.ofAdd_mul, zpow_natCast]
 
 /-- The residue field of the `v`-adic integers is finite. -/
 instance residueField_finite : Fintype (residueField K v) :=
@@ -301,16 +310,16 @@ instance residueField_finite : Fintype (residueField K v) :=
 
 instance : CommRing (Fin n → LocalRing.ResidueField (v.adicCompletionIntegers K)) := inferInstance
 
-/-- Takes an `n`-tuple `(a₁, ..., aₙ)` and creates a `v`-adic integer using the `n`-tuple as coefficients in
-a finite `v`-adic expansion in some fixed `v`-adic integer `π` as `a₁ + a₂π + a₃π² + ...`.
-Note the definition does not require `π` to be a uniformizer. -/
+/-- Takes an `n`-tuple `(a₁, ..., aₙ)` and creates a `v`-adic integer using the `n`-tuple as
+coefficients in a finite `v`-adic expansion in some fixed `v`-adic integer `π` as
+`a₁ + a₂π + a₃π² + ...`. Note the definition does not require `π` to be a uniformizer. -/
 def ofFiniteCoeffs (π : v.adicCompletionIntegers K) (n : ℕ) :
     (Fin n → v.adicCompletionIntegers K) → v.adicCompletionIntegers K :=
   fun x => ((List.ofFn x).mapIdx (λ i j => j * π^i)).sum
 
-/-- Given a uniformizer `π` of the `v`-adic integers and a `v`-adic integer `x`, there exists an `n`-tuple of
-representatives in the residue field of the `v`-adic integers such that `x` can be written as a finite `v`-adic
-expansion in `π` with coefficients given by the `n`-tuple. -/
+/-- Given a uniformizer `π` of the `v`-adic integers and a `v`-adic integer `x`, there exists
+an `n`-tuple of representatives in the residue field of the `v`-adic integers such that `x` can
+be written as a finite `v`-adic expansion in `π` with coefficients given by the `n`-tuple. -/
 theorem finiteExpansion {π : v.adicCompletionIntegers K} (n : ℕ) (x : v.adicCompletionIntegers K)
     (hπ : IsUniformizer π.val) :
     ∃ (a : Fin n → LocalRing.ResidueField (v.adicCompletionIntegers K)),
@@ -323,26 +332,28 @@ theorem finiteExpansion {π : v.adicCompletionIntegers K} (n : ℕ) (x : v.adicC
     rw [Ideal.mem_span_singleton'] at hbx
     obtain ⟨z, hz⟩ := hbx
     use Fin.snoc b (Ideal.Quotient.mk _ z)
-    simp only [List.ofFn_succ', Fin.snoc_castSucc, Fin.snoc_last, List.concat_eq_append, List.mapIdx_append,
-      List.length_ofFn, List.mapIdx_cons, zero_add, List.mapIdx_nil, List.sum_append, List.sum_cons,
-      List.sum_nil, add_zero, ← sub_sub, ← hz, ← sub_mul, Ideal.mem_span_singleton, pow_succ]
+    simp only [List.ofFn_succ', Fin.snoc_castSucc, Fin.snoc_last, List.concat_eq_append,
+      List.mapIdx_append, List.length_ofFn, List.mapIdx_cons, zero_add, List.mapIdx_nil,
+      List.sum_append, List.sum_cons, List.sum_nil, add_zero, ← sub_sub, ← hz, ← sub_mul,
+      Ideal.mem_span_singleton, pow_succ]
     have h : π ∣ z - Quotient.out' (Ideal.Quotient.mk (maximalIdeal K v) z) := by
-      rw [isUniformizer_is_generator hπ, ← Ideal.mem_span_singleton, ← Submodule.Quotient.mk_eq_zero,
-        Submodule.Quotient.mk_sub, Submodule.Quotient.mk, Quotient.out_eq', Submodule.Quotient.mk''_eq_mk,
-        Ideal.Quotient.mk_eq_mk, sub_self]
+      rw [isUniformizer_is_generator hπ, ← Ideal.mem_span_singleton,
+        ← Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_sub, Submodule.Quotient.mk,
+        Quotient.out_eq', Submodule.Quotient.mk''_eq_mk, Ideal.Quotient.mk_eq_mk, sub_self]
     rw [mul_comm]
     exact mul_dvd_mul_right h (π^d)
 
 /-- Given a uniformizer `π` of the `v`-adic integers and a `v`-adic integer `x` modulo a power of
-the maximal ideal, gives the coefficients of `x` in the finite `v`-adic expansion in `π` as an `n`-tuple of
-representatives in the residue field.
+the maximal ideal, gives the coefficients of `x` in the finite `v`-adic expansion in `π` as an
+`n`-tuple of representatives in the residue field.
 -/
 def toFiniteCoeffs {π : v.adicCompletionIntegers K} (n : ℕ) (hπ : IsUniformizer π.val) :
     v.adicCompletionIntegers K ⧸ (maximalIdeal K v)^n
       → (Fin n → LocalRing.ResidueField (v.adicCompletionIntegers K)) :=
   fun x => (Classical.choose (finiteExpansion n (Quotient.out' x) hπ))
 
-theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K} (n : ℕ) (hπ : IsUniformizer π.val) :
+theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K}
+    (n : ℕ) (hπ : IsUniformizer π.val) :
     (toFiniteCoeffs n hπ).Injective := by
   intro x y hxy
   unfold toFiniteCoeffs at hxy
@@ -353,7 +364,8 @@ theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K} (n : ℕ) (h�
   rw [← a_def, hxy] at hx
   rw [← Quotient.out_eq' x, ← Quotient.out_eq' y, ← Submodule.Quotient.mk, ← sub_eq_zero,
     ← Submodule.Quotient.mk_sub, Submodule.Quotient.mk_eq_zero,
-    ← sub_sub_sub_cancel_right _ _ (List.sum (List.mapIdx (fun i j => Quotient.out' j * π ^ i) (List.ofFn b)))]
+    ← sub_sub_sub_cancel_right _ _
+      (List.sum (List.mapIdx (fun i j => Quotient.out' j * π ^ i) (List.ofFn b)))]
   exact Ideal.sub_mem _ hx hy
 
 /-- The quotient of the `v`-adic integers with a power of the maximal ideal is finite. -/
@@ -368,7 +380,8 @@ variable (K v)
 
 /-- The `v`-adic integers are closed in the `v`-adic completion of `K`. -/
 theorem isClosed : IsClosed (v.adicCompletionIntegers K : Set (v.adicCompletion K)) := by
-  simp only [isClosed_iff_nhds, SetLike.mem_coe, HeightOneSpectrum.mem_adicCompletionIntegers, not_le]
+  simp only [isClosed_iff_nhds, SetLike.mem_coe, HeightOneSpectrum.mem_adicCompletionIntegers,
+    not_le]
   intro x hx
   contrapose! hx
   use {y | Valued.v y = Valued.v x}, (Valued.loc_const (ne_zero_of_lt hx))
@@ -378,12 +391,13 @@ theorem isClosed : IsClosed (v.adicCompletionIntegers K : Set (v.adicCompletion 
   rw [← hy] at hx
   exact (not_lt_of_le hy_int) hx
 
-/-- There is a finite covering of the `v`-adic integers of open balls of radius larger than one, namely
-the single open ball centred at `0`. -/
+/-- There is a finite covering of the `v`-adic integers of open balls of radius larger than one,
+namely the single open ball centred at `0`. -/
 theorem hasFiniteSubcover_of_openBall_one_lt {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ.val > 1) :
     ∃ t : Set (v.adicCompletion K),
       Set.Finite t ∧
-      ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t, {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
+      ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t,
+        {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
   use {0}
   simp only [Set.finite_singleton, Set.mem_singleton_iff, Set.mem_setOf_eq,
     Set.iUnion_iUnion_eq_left, zero_sub, Valuation.map_neg, true_and]
@@ -391,37 +405,41 @@ theorem hasFiniteSubcover_of_openBall_one_lt {γ : (WithZero (Multiplicative ℤ
   rw [SetLike.mem_coe, mem_adicCompletionIntegers] at hx
   exact lt_of_le_of_lt hx hγ
 
-/-- There is a finite covering of the `v`-adic integers of open balls of radius equal to one, obtained
-by using the finite representatives in the residue field. -/
+/-- There is a finite covering of the `v`-adic integers of open balls of radius equal to one,
+obtained by using the finite representatives in the residue field. -/
 theorem hasFiniteSubcover_of_openBall_eq_one {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ.val = 1) :
     ∃ t : Set (v.adicCompletion K),
       Set.Finite t ∧
-      ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t, {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
+      ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t,
+        {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
   set quotientMap : v.adicCompletionIntegers K → residueField K v := Submodule.Quotient.mk
   obtain ⟨π, hπ⟩ := exists_uniformizer K v
   have h := quotient_maximalIdeal_pow_fintype 1 hπ
   rw [pow_one] at h
   set T := Quotient.out' '' (h.elems.toSet)
-  use T, (Set.Finite.image Subtype.val (Set.Finite.image Quotient.out' (Finset.finite_toSet h.elems)))
+  use T, (Set.Finite.image Subtype.val (Set.Finite.image Quotient.out'
+    (Finset.finite_toSet h.elems)))
   intro x hx
   simp only [Set.mem_iUnion]
   set y := (Quotient.out' (quotientMap ⟨x, hx⟩))
   use y
   have h_out_mk_mem : Subtype.val (Quotient.out' (quotientMap ⟨x, hx⟩)) ∈ Subtype.val '' T :=
-    ⟨y, Set.mem_image_of_mem Quotient.out' (Finset.mem_coe.2 (h.complete (quotientMap ⟨x, hx⟩))), rfl⟩
+    ⟨y, Set.mem_image_of_mem Quotient.out' (Finset.mem_coe.2 (h.complete (quotientMap ⟨x, hx⟩))),
+      rfl⟩
   use h_out_mk_mem
   have h_sub_zero : y - ⟨x, hx⟩ ∈ maximalIdeal K v := by
     rw [← Submodule.Quotient.eq, ← Submodule.Quotient.mk''_eq_mk, Quotient.out_eq']
   rw [hγ]
   exact valuation_lt_one_of_maximalIdeal h_sub_zero
 
-/-- There is a finite covering of the `v`-adic integers of open balls of radius less than one, obtained
-by using the finite representatives in the quotient of the `v`-adic integers by a power of the maximal
-ideal. -/
+/-- There is a finite covering of the `v`-adic integers of open balls of radius less than one,
+obtained by using the finite representatives in the quotient of the `v`-adic integers by a power
+of the maximal ideal. -/
 theorem hasFiniteSubcover_of_openBall_lt_one {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ.val < 1) :
     ∃ t : Set (v.adicCompletion K),
       Set.Finite t ∧
-      ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t, {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
+      ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t,
+        {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
   have ho : ∃ μ : Multiplicative ℤ, γ.val = (μ : WithZero (Multiplicative ℤ)) := by
       use μ_v γ
       simp only [WithZero.unitsWithZeroEquiv, MulEquiv.coe_mk, Equiv.coe_fn_mk, WithZero.coe_unzero]
@@ -432,7 +450,8 @@ theorem hasFiniteSubcover_of_openBall_lt_one {γ : (WithZero (Multiplicative ℤ
   obtain ⟨π, hπ⟩ := exists_uniformizer K v
   have h : Fintype S := quotient_maximalIdeal_pow_fintype (-Multiplicative.toAdd μ + 1).toNat hπ
   set T := Quotient.out' '' (h.elems.toSet)
-  use T, (Set.Finite.image Subtype.val (Set.Finite.image Quotient.out' (Finset.finite_toSet h.elems)))
+  use T, (Set.Finite.image Subtype.val (Set.Finite.image Quotient.out'
+    (Finset.finite_toSet h.elems)))
   intro x hx
   simp only [Set.mem_iUnion]
   set y := (Quotient.out' (quotientMap ⟨x, hx⟩))
@@ -446,28 +465,33 @@ theorem hasFiniteSubcover_of_openBall_lt_one {γ : (WithZero (Multiplicative ℤ
   apply lt_of_le_of_lt h_le
   rw [hμ, ← ofAdd_toAdd μ, WithZero.coe_lt_coe, Multiplicative.ofAdd_lt, ofAdd_toAdd]
   have h_nonneg : 0 ≤ - (Multiplicative.toAdd μ) + 1 := by
-    rw [le_neg_add_iff_add_le, add_zero, ← Multiplicative.ofAdd_le, ofAdd_toAdd, ← WithZero.coe_le_coe, ← hμ]
+    rw [le_neg_add_iff_add_le, add_zero, ← Multiplicative.ofAdd_le, ofAdd_toAdd,
+      ← WithZero.coe_le_coe, ← hμ]
     apply le_trans (le_of_lt hγ)
     rw [← WithZero.coe_one, WithZero.coe_le_coe, ← ofAdd_zero, Multiplicative.ofAdd_le]
     exact zero_le_one
   rw [Int.toNat_of_nonneg h_nonneg, neg_add, neg_neg, add_lt_iff_neg_left, Left.neg_neg_iff]
   exact zero_lt_one
 
-/-- The `v`-adic integers is a totally bounded set since they afford a finite subcover of open balls,
-obtained by using the finite representatives of the quotient of the `v`-adic integers by a power of the
-maximal ideal. -/
-theorem isTotallyBounded : TotallyBounded (v.adicCompletionIntegers K : Set (v.adicCompletion K)) := by
+/-- The `v`-adic integers is a totally bounded set since they afford a finite subcover of
+open balls, obtained by using the finite representatives of the quotient of the `v`-adic
+integers by a power of the maximal ideal. -/
+theorem isTotallyBounded :
+    TotallyBounded (v.adicCompletionIntegers K : Set (v.adicCompletion K)) := by
   simp only [Filter.HasBasis.totallyBounded_iff (Valued.hasBasis_uniformity _ _), forall_true_left]
   intro γ
-  by_cases hγ : (γ : WithZero (Multiplicative ℤ)) > 1; exact hasFiniteSubcover_of_openBall_one_lt K v hγ
-  by_cases hγ' : (γ : WithZero (Multiplicative ℤ)) = 1; exact hasFiniteSubcover_of_openBall_eq_one K v hγ'
+  by_cases hγ : (γ : WithZero (Multiplicative ℤ)) > 1
+  · exact hasFiniteSubcover_of_openBall_one_lt K v hγ
+  by_cases hγ' : (γ : WithZero (Multiplicative ℤ)) = 1
+  · exact hasFiniteSubcover_of_openBall_eq_one K v hγ'
   exact hasFiniteSubcover_of_openBall_lt_one K v (lt_of_le_of_ne (le_of_not_gt hγ) hγ')
 
 instance : CompleteSpace (v.adicCompletionIntegers K) := IsClosed.completeSpace_coe (isClosed K v)
 
 /-- The `v`-adic integers is compact. -/
 theorem isCompact : IsCompact (v.adicCompletionIntegers K : Set (v.adicCompletion K)) :=
-  isCompact_iff_totallyBounded_isComplete.2 ⟨isTotallyBounded K v, IsClosed.isComplete (isClosed K v)⟩
+  isCompact_iff_totallyBounded_isComplete.2
+    ⟨isTotallyBounded K v, IsClosed.isComplete (isClosed K v)⟩
 
 instance compactSpace :  CompactSpace (v.adicCompletionIntegers K) :=
   CompactSpace.mk (isCompact_iff_isCompact_univ.1 (isCompact K v))
@@ -514,7 +538,8 @@ theorem openBall_isCompact (γ : (WithZero (Multiplicative ℤ))ˣ) : IsCompact 
     rw [Set.image_preimage_eq_of_subset h_range] at h_image_preimage_f_compact
     exact h_image_preimage_f_compact
 
-  /-- The `v`-adic completion of `K` is locally compact since the open balls give compact neighbourhoods. -/
+  /-- The `v`-adic completion of `K` is locally compact since the open balls give
+  compact neighbourhoods. -/
   instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletion K) := by
     refine LocallyCompactSpace.mk (λ x N hN => ?_)
     rw [Valued.mem_nhds] at hN

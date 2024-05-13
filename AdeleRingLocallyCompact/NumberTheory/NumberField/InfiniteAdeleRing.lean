@@ -9,17 +9,18 @@ import AdeleRingLocallyCompact.NumberTheory.NumberField.Embeddings
 /-!
 # Infinite adele ring
 
-This file formalises the definition of the infinite adele ring of a number field `K` as the product of completions
-of `K` over its infinite places and we show that it is locally compact. The definition of the completions
-are formalised in `AdeleRingLocallyCompact.NumberTheory.NumberField.Embeddings`.
+This file formalises the definition of the infinite adele ring of a number field `K` as the
+product of completions of `K` over its infinite places and we show that it is locally compact.
+The definition of the completions are formalised in
+[AdeleRingLocallyCompact.NumberTheory.NumberField.Embeddings](Embeddings.lean).
 
 ## Main definitions
- - `DedekindDomain.infiniteAdeleRing` of a number field `K` is defined as the product of the completions
-  of `K` over its Archimedean places.
+ - `DedekindDomain.infiniteAdeleRing` of a number field `K` is defined as the product of
+   the completions of `K` over its Archimedean places.
 
 ## Main results
- - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` : the infinite adele ring is a locally compact space
-  since it's topology is induced from a finite product of locally compact spaces.
+ - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` : the infinite adele ring is a
+  locally compact space since it's a finite product of locally compact spaces.
 
 ## Implementation notes
  - In the literature, the global embedding is usually defined by `x ↦ (x, x, ..., x)`, where
