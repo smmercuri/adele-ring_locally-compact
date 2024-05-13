@@ -9,20 +9,24 @@ import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
 /-!
 # Finite adele ring
 
-Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions. The finite adele ring of
-`K` is defined in `Mathlib.RingTheory.DedekindDomain.finiteAdeleRing`
+Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions. The finite adele
+ring of `K` is defined in `Mathlib.RingTheory.DedekindDomain.finiteAdeleRing`
 [https://github.com/leanprover-community/mathlib4/blob/1c0ac885c9b8aa4daa1830acb56b755140a8059f/Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean#L274-L280](https://github.com/leanprover-community/mathlib4/blob/1c0ac885c9b8aa4daa1830acb56b755140a8059f/Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean#L274-L280).
-In this file we supplement the theory by defining some local maps and the topological space for the finite adele ring.
+In this file we supplement the theory by defining some local maps and the topological space for
+the finite adele ring.
 
 ## Main definitions
- - `DedekindDomain.FiniteAdeleRing.projection v` is the map sending a finite adele `x` to its `v`th place `x v` in
-   the `v`-adic completion of `K`.
- - `DedekindDomain.FiniteAdeleRing.localInclusion v` is the map sending an element `x` of the `v`-adic completion
-   of `K` to the finite adele which has `x` in its `v`th place and `1`s everywhere else.
- - `DedekindDomain.FiniteAdeleRing.generatingSet` is the generating set of the topology of the finite adele ring.
+ - `DedekindDomain.FiniteAdeleRing.projection v` is the map sending a finite adele `x` to its
+   `v`th place `x v` in the `v`-adic completion of `K`.
+ - `DedekindDomain.FiniteAdeleRing.localInclusion v` is the map sending an element `x` of the
+   `v`-adic completion of `K` to the finite adele which has `x` in its `v`th place and `1`s
+   everywhere else.
+ - `DedekindDomain.FiniteAdeleRing.generatingSet` is the generating set of the topology of
+   the finite adele ring.
 
 ## Main results
- - `DedekindDomain.FiniteAdeleRing.topologicalSpace` : the topological space on the finite adele ring.
+ - `DedekindDomain.FiniteAdeleRing.topologicalSpace` : the topological space on the finite
+   adele ring.
 
 ## References
  * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
@@ -136,12 +140,12 @@ instance topologicalSpace : TopologicalSpace (finiteAdeleRing R K) :=
 
 variable {R K}
 
-/-- Consider two finite adeles `x`, `y`, a generating open set `U` of the finite adele ring and a function
-`f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing K` such that `(x, y)` is in the preimage of
-`U` under `f`. If `f` factors through a collection of continuous maps `g v` defined at each place, which
-each preserve the respective ring of integers, then we can obtain two open sets `X` and `Y` of the finite
-adele ring, which contain `x` and `y` respectively, such that their product `X ×ˢ Y` is contained in the
-preimage of `U` under `f`.
+/-- Consider two finite adeles `x`, `y`, a generating open set `U` of the finite adele ring and
+a function`f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing K` such that `(x, y)`
+is in the preimage of `U` under `f`. If `f` factors through a collection of continuous maps `g v`
+defined at each place, which each preserve the respective ring of integers, then we can obtain
+two open sets `X` and `Y` of the finite adele ring, which contain `x` and `y` respectively, such
+that their product `X ×ˢ Y` is contained in the preimage of `U` under `f`.
 
 Abstracted version of
 [https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L469](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L469)-/
@@ -149,19 +153,23 @@ theorem comap_of_generateFrom_nhd₂
     {x y : finiteAdeleRing R K}
     {U : Set (finiteAdeleRing R K)}
     (f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing R K)
-    (hf : ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
-        ∀ v,
-          (g v ∘ (RingHom.prodMap (π v) (π v)) = (π v) ∘ f
-          ∧ Continuous (g v)
-          ∧ ∀ (x y : v.adicCompletion K),
-            x ∈ v.adicCompletionIntegers K
-              → y ∈ v.adicCompletionIntegers K
-              → g v (x, y) ∈ v.adicCompletionIntegers K
+    (hf :
+      ∃ g : (v : HeightOneSpectrum R)
+        → v.adicCompletion K × v.adicCompletion K
+        → v.adicCompletion K,
+          ∀ v,
+            (g v ∘ (RingHom.prodMap (π v) (π v)) = (π v) ∘ f
+            ∧ Continuous (g v)
+            ∧ ∀ (x y : v.adicCompletion K),
+              x ∈ v.adicCompletionIntegers K
+                → y ∈ v.adicCompletionIntegers K
+                → g v (x, y) ∈ v.adicCompletionIntegers K
       )
     )
     (hU : U ∈ generatingSet R K)
     (hxy : (x, y) ∈ f⁻¹' U) :
-      ∃ X Y : Set (finiteAdeleRing R K), IsOpen X ∧ IsOpen Y ∧ x ∈ X ∧ y ∈ Y ∧ X ×ˢ Y ⊆ f ⁻¹' U := by
+      ∃ X Y : Set (finiteAdeleRing R K),
+        IsOpen X ∧ IsOpen Y ∧ x ∈ X ∧ y ∈ Y ∧ X ×ˢ Y ⊆ f ⁻¹' U := by
   obtain ⟨V, ⟨W, hW, hWV⟩, hVU⟩ := hU
   obtain ⟨g, hg⟩ := hf
   rw [← hVU, ← hWV] at hxy
@@ -170,12 +178,14 @@ theorem comap_of_generateFrom_nhd₂
     have hxy_f : (x, y) ∈ (π v ∘ f)⁻¹' W v := by
       refine Set.mem_of_mem_of_subset hxy (λ z hz => ?_)
       simp only [Set.mem_preimage] at hz ⊢
-      exact Set.mem_of_mem_of_subset (Set.mem_image_of_mem (Function.eval v) hz) Set.eval_image_univ_pi_subset
+      exact Set.mem_of_mem_of_subset (Set.mem_image_of_mem (Function.eval v) hz)
+        Set.eval_image_univ_pi_subset
     rw [← (hg v).1] at hxy_f
     exact hxy_f
   have hW' := λ v => Continuous.isOpen_preimage (hg v).2.1 (W v) (hW.1 v)
   have h := λ v =>
-    (Classical.choose_spec (Classical.choose_spec (isOpen_prod_iff.1 (hW' v) (x.1 v) (y.1 v) (hxy_g v))))
+    (Classical.choose_spec
+      (Classical.choose_spec (isOpen_prod_iff.1 (hW' v) (x.1 v) (y.1 v) (hxy_g v))))
   set Sx := (mem_finiteAdeleRing_iff _).1 x.property
   set Sy := (mem_finiteAdeleRing_iff _).1 y.property
   set Sxy := Sx.toFinset ∪ Sy.toFinset
@@ -208,22 +218,26 @@ theorem comap_of_generateFrom_nhd₂
       rw [Set.compl_subset_comm]; simp only [Vy, ite_eq_right_iff]
       exact λ _ hv_compl hv => (hv_compl hv).elim
   · simp only [Vx, S, Sxy]
-    split_ifs with hv <;> simp only [Finset.not_mem_union, Set.Finite.mem_toFinset, Set.mem_compl_iff, not_not] at hv
+    split_ifs with hv <;>
+      simp only [Finset.not_mem_union, Set.Finite.mem_toFinset, Set.mem_compl_iff, not_not] at hv
     · exact (h v).2.2.1
     · exact hv.1.1
   · simp only [Vy, S, Sxy]
-    split_ifs with hv <;> simp only [Finset.not_mem_union, Set.Finite.mem_toFinset, Set.mem_compl_iff, not_not] at hv
+    split_ifs with hv <;>
+      simp only [Finset.not_mem_union, Set.Finite.mem_toFinset, Set.mem_compl_iff, not_not] at hv
     · exact (h v).2.2.2.1
     · exact hv.1.2
   · rw [Set.mem_preimage, Set.mem_univ_pi] at hp₁ hp₂
     simp only [Vx, Vy] at hp₁ hp₂
     rw [← hVU, ← hWV];
     intro v _
-    by_cases hv : v ∈ S <;> specialize hp₁ v <;> specialize hp₂ v <;> simp only [hv, if_true, if_false] at hp₁ hp₂
+    by_cases hv : v ∈ S <;> specialize hp₁ v <;> specialize hp₂ v <;>
+      simp only [hv, if_true, if_false] at hp₁ hp₂
     · apply Set.image_subset_iff.2 (h v).2.2.2.2
       simp only [Set.mem_image, Set.mem_prod, Prod.exists]
       exact ⟨_, _, ⟨hp₁, hp₂⟩, congrFun ((hg v).1) p⟩
-    · simp only [S, SW, Finset.not_mem_union, Set.Finite.mem_toFinset, Set.mem_compl_iff, not_not] at hv
+    · simp only [S, SW, Finset.not_mem_union, Set.Finite.mem_toFinset,
+        Set.mem_compl_iff, not_not] at hv
       rw [hv.2, SetLike.mem_coe]
       have h_comm := congrFun ((hg v).1) p
       convert (hg v).2.2 _ _ hp₁ hp₂
@@ -231,19 +245,22 @@ theorem comap_of_generateFrom_nhd₂
       rw [h_comm]
       rfl
 
-/-- If `f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing R K` factors through a collection
-of continuous maps `g v` defined at each place, which each preserve the respective ring of integers, then
-`f` is continuous. -/
+/-- If `f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing R K` factors through
+a collection of continuous maps `g v` defined at each place, which each preserve the respective
+ring of integers, then `f` is continuous. -/
 theorem continuous_if_factors₂
     (f : finiteAdeleRing R K × finiteAdeleRing R K → finiteAdeleRing R K)
-    (hf : ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
-      ∀ v,
-        (g v ∘ (RingHom.prodMap (π v) (π v)) = (π v) ∘ f
-        ∧ Continuous (g v)
-        ∧ ∀ (x y : v.adicCompletion K),
-          x ∈ v.adicCompletionIntegers K
-            → y ∈ v.adicCompletionIntegers K
-            → g v (x, y) ∈ v.adicCompletionIntegers K
+    (hf :
+      ∃ g : (v : HeightOneSpectrum R)
+        → v.adicCompletion K × v.adicCompletion K
+        → v.adicCompletion K,
+          ∀ v,
+            (g v ∘ (RingHom.prodMap (π v) (π v)) = (π v) ∘ f
+            ∧ Continuous (g v)
+            ∧ ∀ (x y : v.adicCompletion K),
+              x ∈ v.adicCompletionIntegers K
+                → y ∈ v.adicCompletionIntegers K
+                → g v (x, y) ∈ v.adicCompletionIntegers K
       )
     ) :
     Continuous f := by
@@ -268,8 +285,8 @@ theorem add_factors :
   ⟨λ v => (λ p : v.adicCompletion K × v.adicCompletion K => p.1 + p.2),
     λ v => ⟨rfl, continuous_add, (v.adicCompletionIntegers K).add_mem⟩⟩
 
-/-- Multiplication on the finite adele ring factors through continuous maps `g v` defined at each place,
-which preserve the ring of integers. -/
+/-- Multiplication on the finite adele ring factors through continuous maps `g v` defined at
+each place, which preserve the ring of integers. -/
 theorem mul_factors :
     ∃ g : (v : HeightOneSpectrum R) → v.adicCompletion K × v.adicCompletion K → v.adicCompletion K,
       ∀ v,
@@ -321,11 +338,13 @@ theorem globalEmbedding_isFiniteAdele (x : K) :
     simp only [IsFractionRing.mk'_eq_div] at hx
     have h_val : Valued.v ((ProdAdicCompletions.globalEmbedding R K x v)) =
       Valued.v (x : v.adicCompletion K) := by
-      have h : Pi.ringHom (λ v => AdicCompletion.coeRingHom K v) x v = (x : v.adicCompletion K) := by
+      have h : Pi.ringHom (λ v => AdicCompletion.coeRingHom K v) x v
+          = (x : v.adicCompletion K) := by
         simp only [Pi.ringHom_apply]; rfl
       rw [← h, Pi.ringHom_apply]
       rfl
-    simp only [h_val, Valued.valuedCompletion_apply, adicValued_apply, HeightOneSpectrum.valuation_def] at hv
+    simp only [h_val, Valued.valuedCompletion_apply, adicValued_apply,
+      HeightOneSpectrum.valuation_def, ] at hv
     simp only [← hx, map_div₀, Valuation.extendToLocalization_apply_map_apply] at hv
     have h_val_d : intValuation v d = 1 :=
       by rw [← le_antisymm (v.int_valuation_le_one d) h_one_le]; rfl

@@ -8,25 +8,27 @@ import Mathlib
 /-!
 # Embeddings of number fields
 
-This file defines an indirect approach to the completion of a number field with respect to an infinite place.
-While this suffices for the proof of the local compactness of the adele ring, we have identified deficiencies
-with this approach, detailed in the implementation notes below. We keep this approach here for reference.
+This file defines an indirect approach to the completion of a number field with respect to
+an infinite place. While this suffices for the proof of the local compactness of the adele ring,
+we have identified deficiencies with this approach, detailed in the implementation notes below.
+We keep this approach here for reference.
 
 ## Main definitions
- - `NumberField.InfinitePlace.completion'` is the (indirect) Archimedean completion of a number field as
-   an infinite place, obtained by embedding as a subfield of ℂ and completing this subfield.
+ - `NumberField.InfinitePlace.completion'` is the (indirect) Archimedean completion of a number
+   field as an infinite place, obtained by embedding as a subfield of ℂ and completing
+   this subfield.
 
 ## Main results
- - `NumberField.InfinitePlace.Completion.locallyCompactSpace'` : the (indirect) Archimedean completion
-   of a number field is locally compact.
+ - `NumberField.InfinitePlace.Completion.locallyCompactSpace'` : the (indirect) Archimedean
+   completion of a number field is locally compact.
 
 ## Implementation notes
  - We have identified two approaches for formalising the completion of a number field `K` at
    an infinite place `v`. One is to define an appropriate uniform structure on `K` directly,
    and apply the `UniformSpace.Completion` functor to this. To show that
    the resultant completion is a field requires one to prove that `K` has a
-   `completableTopField` instance with this uniform space. This approach is the principal approach taken
-   in [Embeddings.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean),
+   `completableTopField` instance with this uniform space. This approach is the principal
+   approach taken in [Embeddings.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean),
    namely we pullback the uniform structure on `ℂ` via the embedding
    associated to an infinite place, through `UniformSpace.comap`. In such a scenario,
    the completable topological field instance from `ℂ` transfers to `K`, which we show in
@@ -36,10 +38,10 @@ with this approach, detailed in the implementation notes below. We keep this app
    `K` indirectly by applying the `UniformSpace.Completion` functor to the `Subfield ℂ` term.
    This is the approach taken in this file.
    It leads to an isomorphic field completion to the direct approach, since both define abstract
-   completions. However, the API for the alternative approach in this file is deficient, because we lose any
-   `UniformSpace.Completion` constructions which transfer properties of the base field `K` to its completion;
-   for example, `UniformSpace.Completion.extension` which extends a uniform continuous map on `K` to one
-   on its completion. These would have to be re-established.
+   completions. However, the API for the alternative approach in this file is deficient, because
+   we lose any `UniformSpace.Completion` constructions which transfer properties of the base
+   field `K` to its completion; for example, `UniformSpace.Completion.extension` which extends
+   a uniform continuous map on `K` to one on its completion. These would have to be re-established.
 
 ## Tags
 number field, embeddings, places, infinite places
@@ -108,7 +110,8 @@ instance : T0Space (v.completion' K) :=
   @UniformSpace.Completion.t0Space _ (subfield_uniformSpace K v)
 
 instance : Coe (subfield K v) (v.completion' K) :=
-  (inferInstance : Coe (subfield K v) (@UniformSpace.Completion (subfield K v) (subfield_uniformSpace K v)))
+  (inferInstance : Coe (subfield K v)
+    (@UniformSpace.Completion (subfield K v) (subfield_uniformSpace K v)))
 
 instance : Coe K (v.completion' K) where
   coe := (↑) ∘ v.toSubfield K
@@ -132,12 +135,14 @@ theorem extensionEmbedding_dist_eq' (x y : v.completion' K) :
       dist x y := by
   set p : v.completion' K → v.completion' K → Prop :=
     λ x y => dist (extensionEmbedding' K v x) (extensionEmbedding' K v y) = dist x y
-  refine @UniformSpace.Completion.induction_on₂ (subfield K v) _ (subfield K v) _ p x y ?_ (λ x y => ?_)
+  refine @UniformSpace.Completion.induction_on₂ (subfield K v) _ (subfield K v) _ p x y ?_
+    (λ x y => ?_)
   · apply isClosed_eq
     · exact continuous_iff_continuous_dist.1 UniformSpace.Completion.continuous_extension
     · exact continuous_dist
   · simp only [extensionEmbedding', UniformSpace.Completion.extensionHom, Subfield.coe_subtype,
-      RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, p, @UniformSpace.Completion.dist_eq (v.subfield K) _]
+      RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, p,
+      @UniformSpace.Completion.dist_eq (v.subfield K) _]
     have h_val : UniformContinuous (subfield K v).subtype := uniformContinuous_subtype_val
     have h_val_ext := UniformSpace.Completion.extension_coe h_val
     simp only [Subfield.coe_subtype] at h_val_ext
