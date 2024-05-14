@@ -160,17 +160,9 @@ theorem homeomorph :
     refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
     exact Continuous.snd  ({ isOpen_preimage := fun s a => a })
 
-instance : LocallyCompactSpace ((v : S) → v.val.adicCompletion K) :=
-  Pi.locallyCompactSpace_of_finite
-
-instance : LocallyCompactSpace ((v : {v // v ∉ S}) → v.val.adicCompletionIntegers K) :=
-  Pi.locallyCompactSpace
-
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact. -/
 instance : LocallyCompactSpace (SProdAdicCompletionIntegers R K S) :=
-  Prod.locallyCompactSpace
-    ((v : S) → v.val.adicCompletion K)
-    ((v : {v // v ∉ S}) → v.val.adicCompletionIntegers K)
+  @Prod.locallyCompactSpace _ _ _ _ Pi.locallyCompactSpace_of_finite Pi.locallyCompactSpace
 
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact. -/
 instance : LocallyCompactSpace (SProdAdicCompletionIntegers_subtype R K S) :=
