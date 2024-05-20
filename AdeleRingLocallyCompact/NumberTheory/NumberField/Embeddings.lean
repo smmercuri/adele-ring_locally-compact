@@ -9,7 +9,7 @@ import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 /-!
 # Embeddings of number fields
 
-This file defines the completion of a number field with respect to an infinite place.
+This file defines the main approach to the completion of a number field with respect to an infinite place.
 
 ## Main definitions
  - `NumberField.InfinitePlace.completion` is the Archimedean completion of a number field as
@@ -19,6 +19,26 @@ This file defines the completion of a number field with respect to an infinite p
 ## Main results
  - `NumberField.InfinitePlace.Completion.locallyCompactSpace` : the Archimedean completion
    of a number field is locally compact.
+
+## Implementation notes
+ - We have identified two approaches for formalising the completion of a number field `K` at
+   an infinite place `v`. One is to define an appropriate uniform structure on `K` directly,
+   and apply the `UniformSpace.Completion` functor to this. To show that
+   the resultant completion is a field requires one to prove that `K` has a
+   `completableTopField` instance with this uniform space. This approach is taken
+   in this file, namely we pullback the uniform structure on `ℂ` via the embedding
+   associated to an infinite place, through `UniformSpace.comap`. In such a scenario,
+   the completable topological field instance from `ℂ` transfers to `K`, which we show in
+   [Topology/UniformSpace/UniformEmbedding.lean](AdeleRingLocallyCompact/Topology/UniformSpace/Basic.lean)
+ - The alternative approach is to use the embedding associated to an infinite place to embed
+   `K` to a `Subfield ℂ` term, which already has a `CompletableTopField` instance. We complete
+   `K` indirectly by applying the `UniformSpace.Completion` functor to the `Subfield ℂ` term.
+   This is the approach taken in [EmbeddingsAlt.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/EmbeddingsAlt.lean).
+   It leads to an isomorphic field completion to the direct approach, since both define abstract
+   completions. However, the API for the alternative approach is deficient, because we lose any
+   `UniformSpace.Completion` constructions which transfer properties of the base field `K` to its completion;
+   for example, `UniformSpace.Completion.extension` which extends a uniform continuous map on `K` to one
+   on its completion. These would have to be re-established.
 
 ## Tags
 number field, embeddings, places, infinite places
