@@ -53,9 +53,6 @@ namespace NumberField.InfinitePlace
 
 variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
 
-instance : Inhabited (InfinitePlace K) :=
-  ⟨Classical.choice (instNonemptyInfinitePlace K)⟩
-
 /-- The embedding of K as a subfield in ℂ using the embedding associated to the infinite place
 `v`. -/
 def subfield (v : InfinitePlace K) : Subfield ℂ where

@@ -4,9 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri, María Inés de Frutos-Fernández, Filippo A. E. Nuccio
 -/
 import Mathlib
-import LocalClassFieldTheory.DiscreteValuationRing.ResidueField
-import LocalClassFieldTheory.DiscreteValuationRing.Complete
-import LocalClassFieldTheory.DiscreteValuationRing.Extensions
+--import LocalClassFieldTheory.DiscreteValuationRing.ResidueField
+--import LocalClassFieldTheory.DiscreteValuationRing.Complete
+--import LocalClassFieldTheory.DiscreteValuationRing.Extensions
 import AdeleRingLocallyCompact.Algebra.Group.WithOne.Defs
 
 /-!
@@ -349,7 +349,7 @@ the maximal ideal, gives the coefficients of `x` in the finite `v`-adic expansio
 -/
 def toFiniteCoeffs {π : v.adicCompletionIntegers K} (n : ℕ) (hπ : IsUniformizer π.val) :
     v.adicCompletionIntegers K ⧸ (maximalIdeal K v)^n
-      → (Fin n → LocalRing.ResidueField (v.adicCompletionIntegers K)) :=
+      → (Fin n → residueField K v) :=
   fun x => (Classical.choose (finiteExpansion n (Quotient.out' x) hπ))
 
 theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K}
@@ -371,10 +371,8 @@ theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K}
 /-- The quotient of the `v`-adic integers with a power of the maximal ideal is finite. -/
 theorem quotient_maximalIdeal_pow_fintype {π : v.adicCompletionIntegers K} (n : ℕ)
     (hπ : IsUniformizer π.val) :
-    Fintype (v.adicCompletionIntegers K ⧸ (maximalIdeal K v)^n) := by
-  haveI : Fintype (Fin n → residueField K v) := Pi.fintype
-  unfold residueField at this
-  exact Fintype.ofInjective _ (toFiniteCoeffs_injective n hπ)
+    Fintype (v.adicCompletionIntegers K ⧸ (maximalIdeal K v)^n) :=
+  Fintype.ofInjective _ (toFiniteCoeffs_injective n hπ)
 
 variable (K v)
 

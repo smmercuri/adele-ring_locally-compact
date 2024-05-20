@@ -63,7 +63,7 @@ def projection (v : HeightOneSpectrum R) :
 def localInclusion (v : HeightOneSpectrum R) :
     v.adicCompletion K → ProdAdicCompletions R K :=
   fun x =>
-    (λ w =>
+    (fun w =>
       if hw : w = v then
         congrArg (λ v => v.adicCompletion K) hw ▸ x else
         (1 : w.adicCompletion K)
@@ -75,7 +75,7 @@ variable {K}
 theorem isFiniteAdele_localInclusion (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
     (localInclusion K v x).IsFiniteAdele := by
   rw [ProdAdicCompletions.IsFiniteAdele, Filter.eventually_cofinite]
-  have h : setOf (fun w => localInclusion K v x w ∉ w.adicCompletionIntegers K) ⊆ {v} := by
+  have h : {w | localInclusion K v x w ∉ w.adicCompletionIntegers K} ⊆ {v} := by
     intro w hw
     simp only [Set.mem_setOf_eq, Set.mem_singleton_iff] at hw ⊢
     contrapose! hw
@@ -128,12 +128,8 @@ each `Vᵥ` is open in `Kᵥ` and for all but finitely many `v` we have that `V�
 ring of integers. -/
 def generatingSet : Set (Set (finiteAdeleRing R K)) :=
   Set.preimage (Subtype.val) '' (Set.pi Set.univ '' (
-    setOf (
-      fun V =>
-        (∀ v, IsOpen (V v)) ∧
-        (∀ᶠ v in Filter.cofinite, V v = v.adicCompletionIntegers K)
-    )
-  ))
+    {V | (∀ v, IsOpen (V v)) ∧
+         (∀ᶠ v in Filter.cofinite, V v = v.adicCompletionIntegers K)}))
 
 instance topologicalSpace : TopologicalSpace (finiteAdeleRing R K) :=
   TopologicalSpace.generateFrom (generatingSet R K)
