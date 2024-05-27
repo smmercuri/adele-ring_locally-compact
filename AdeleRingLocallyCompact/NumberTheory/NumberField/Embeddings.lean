@@ -150,7 +150,7 @@ theorem extensionEmbedding_injective : Function.Injective (extensionEmbedding K 
 
 variable {K v}
 
-/-- The embedding `Kᵥ → ℂ` preserves distances. -/
+/-- The embedding `v.completion K → ℂ` is an isometry. -/
 theorem extensionEmbedding_dist_eq (x y : v.completion K) :
     dist (extensionEmbedding K v x) (extensionEmbedding K v y) =
       dist x y := by
@@ -170,20 +170,21 @@ theorem extensionEmbedding_dist_eq (x y : v.completion K) :
 
 variable (K v)
 
+/-- The embedding `v.completion K → ℂ` is an isometry. -/
 theorem extensionEmbedding_isometry :
     @Isometry _ _ (metricSpace K v).toPseudoEMetricSpace _ (extensionEmbedding K v) :=
   Isometry.of_dist_eq extensionEmbedding_dist_eq
 
-/-- The embedding `Kᵥ → ℂ` is uniform inducing. -/
+/-- The embedding `v.completion K → ℂ` is uniform inducing. -/
 theorem extensionEmbedding_uniformInducing :
     UniformInducing (extensionEmbedding K v) :=
   (extensionEmbedding_isometry K v).uniformInducing
 
-/-- The embedding `Kᵥ → ℂ` is a closed embedding. -/
+/-- The embedding `v.completion K → ℂ` is a closed embedding. -/
 theorem closedEmbedding : ClosedEmbedding (extensionEmbedding K v) :=
   (extensionEmbedding_isometry K v).closedEmbedding
 
-/-- The completion of a number field at an Archimedean place is locally compact. -/
+/-- The completion of a number field at an infinite place is locally compact. -/
 instance locallyCompactSpace : LocallyCompactSpace (v.completion K) :=
   (closedEmbedding K v).locallyCompactSpace
 
