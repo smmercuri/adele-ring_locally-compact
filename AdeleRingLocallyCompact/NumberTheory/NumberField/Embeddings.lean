@@ -140,6 +140,7 @@ end DerivedInstances
 def coeRingHom : K →+* v.completion K :=
   @UniformSpace.Completion.coeRingHom _ _ v.uniformSpace _ v.uniformAddGroup
 
+/-- The embedding associated to an infinite place extended to `v.completion K →+* ℂ`. -/
 def extensionEmbedding :=
   @UniformSpace.Completion.extensionHom K _ v.uniformSpace v.topologicalRing v.uniformAddGroup
     _ _ _ _ _ v.embedding v.continuous _ _
@@ -149,7 +150,7 @@ theorem extensionEmbedding_injective : Function.Injective (extensionEmbedding K 
 
 variable {K v}
 
-/- The embedding `Kᵥ → ℂ` preserves distances. -/
+/-- The embedding `Kᵥ → ℂ` preserves distances. -/
 theorem extensionEmbedding_dist_eq (x y : v.completion K) :
     dist (extensionEmbedding K v x) (extensionEmbedding K v y) =
       dist x y := by
@@ -173,7 +174,7 @@ theorem extensionEmbedding_isometry :
     @Isometry _ _ (metricSpace K v).toPseudoEMetricSpace _ (extensionEmbedding K v) :=
   Isometry.of_dist_eq extensionEmbedding_dist_eq
 
-/- The embedding `Kᵥ → ℂ` is uniform inducing. -/
+/-- The embedding `Kᵥ → ℂ` is uniform inducing. -/
 theorem extensionEmbedding_uniformInducing :
     UniformInducing (extensionEmbedding K v) :=
   (extensionEmbedding_isometry K v).uniformInducing
