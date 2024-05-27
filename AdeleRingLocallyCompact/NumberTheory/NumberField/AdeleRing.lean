@@ -11,11 +11,13 @@ import AdeleRingLocallyCompact.NumberTheory.NumberField.InfiniteAdeleRing
 # Adele Ring
 
 We define the adele ring of a number field `K` as the direct product of the infinite adele ring
-of `K` and the finite adele ring of `K`, whose product is restricted with respect to the ring
-of integers in `K`. We show that the adele ring of `K` is a locally compact space.
+of `K` and the finite adele ring of `K`. We show that the adele ring of `K` is a
+locally compact space.
 
 ## Main definitions
- - `adeleRing K` is the adele ring of a number field `K`.
+ - `NumberField.adeleRing K` is the adele ring of a number field `K`.
+ - `NumberField.AdeleRing.globalEmbedding K` is the map sending `x ∈ K` to `(x)ᵥ`.
+ - `NumberField.AdeleRing.principalSubgroup K` is the subgroup of principal adeles `(x)ᵥ`.
 
 ## Main results
  - `AdeleRing.locallyCompactSpace` : the adele ring of a number field is a locally compact space.
@@ -55,6 +57,7 @@ instance topologicalRing : TopologicalRing (adeleRing K) :=
 
 end DerivedInstances
 
+/-- The global embedding sending `x ∈ K` to `(x)ᵥ`. -/
 def globalEmbedding : K →+* adeleRing K :=
   RingHom.prod (InfiniteAdeleRing.globalEmbedding K) (FiniteAdeleRing.globalEmbedding _ _)
 

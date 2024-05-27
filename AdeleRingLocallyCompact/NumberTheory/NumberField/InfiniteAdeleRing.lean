@@ -20,18 +20,7 @@ The definition of the completions are formalised in
 
 ## Main results
  - `DedekindDomain.InfiniteAdeleRing.locallyCompactSpace` : the infinite adele ring is a
-  locally compact space since it's a finite product of locally compact spaces.
-
-## Implementation notes
- - In the literature, the global embedding is usually defined by `x ↦ (x, x, ..., x)`, where
-  the absolute value at each infinite place is extended from the embedding associated to `v`
-  composed with the complex absolute value. Here the formalisation of `v.completion K` is
-  obtained by injecting `K` to a `Subfield ℂ` type using the embedding associated to `v` and then
-  completing this image with respect to the complex absolute value (see the implementation
-  notes of `NumberTheory/NumberField/Embeddings.lean`). Thus, in our case
-  the global embedding is defined by `x ↦ (e₁(x), ..., eₙ(x))`, where `eᵢ` are the embeddings
-  and the absolute value at each infinite place is extended from the usual complex absolute value.
-  These two definitions are clearly equivalent.
+  locally compact space since it is a finite product of locally compact spaces.
 
 ## References
  * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
@@ -46,6 +35,7 @@ namespace NumberField
 
 variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
 
+/-- The infinite adele ring of a number field. -/
 def infiniteAdeleRing := (v : InfinitePlace K) → v.completion K
 
 namespace InfiniteAdeleRing

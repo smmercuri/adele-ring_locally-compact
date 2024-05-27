@@ -22,6 +22,8 @@ variable {α : Type u} {β : Type v}
 
 namespace UniformSpace
 
+/-- The pullback of a completable topological field along a ring homomorphism
+is a completable topological field. -/
 theorem comap_completableTopField [Field β] [Field α] {f : α →+* β} [b : UniformSpace β]
     [@T0Space α (UniformSpace.comap f b).toTopologicalSpace] [CompletableTopField β] :
     @CompletableTopField _ _ (UniformSpace.comap f b) := by

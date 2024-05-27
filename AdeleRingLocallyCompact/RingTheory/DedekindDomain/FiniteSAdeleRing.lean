@@ -12,16 +12,20 @@ import AdeleRingLocallyCompact.Topology.Homeomorph
 # Finite S-adele ring
 
 Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions and `S` a
-finite set of finite places `v` of `R`. In this file we define the finite S-adele ring, whose
+finite set of finite places `v` of `K`. In this file we define the finite S-adele ring, whose
 carrier is the set of all elements in `ProdAdicCompletions R K` which are in the `v`-adic ring
 of integers outside of `S`, and we show that this is locally compact. The finite S-adele ring
 affords an open embedding into the regular finite adele ring and, moreover, cover the finite
 adele ring. This allows us to show that the finite adele ring is also locally compact.
 
 ## Main definitions
- - `DedekindDomain.SProdAdicCompletionIntegers_subtype` is the direct product whose left type
+ - `DedekindDomain.SProdAdicCompletions R K S` is the `DedekindDomain.ProdAdicCompletions R K`
+   split into a product along the predicate `v ∈ S`.
+ - `DedekindDomain.SProdAdicCompletionIntegers` is the direct product whose left type
    is the product of the `v`-adic completions of `K` over all `v ∈ S` and whose right type is
    the product of the `v`-adic ring of integers over all `v ∉ S`.
+ - `DedekindDomain.SProdAdicCompletionIntegers_subtype` is the subtype of
+   `DedekindDomain.SProdAdicCompletions R K S` analogous to `DedekindDomain.SProdAdicCompletionIntegers`.
  - `DedekindDomain.finiteSAdeleRing` is the subring of `ProdAdicCompletions R K` of all finite
    S-adeles.
  - `DedekindDomain.FiniteSAdeleRing.toFiniteAdeleRing` is the map embedding the finite S-adele
@@ -60,10 +64,6 @@ adele ring. This allows us to show that the finite adele ring is also locally co
 
 ## Tags
 finite s-adele ring, dedekind domain
-
-## TODO
- - Move the local compactness of the finite adele ring to `FiniteAdeleRing.lean`, currently this
-   results in circular imports.
 -/
 
 noncomputable section
@@ -94,7 +94,7 @@ def SProdAdicCompletionIntegers_subtype :=
 namespace SProdAdicCompletions
 
 instance : Coe (SProdAdicCompletionIntegers R K S) (SProdAdicCompletions R K S) where
-  coe := λ x => (λ (v : S) => x.1 v, λ (v : {v // v ∉ S}) => (x.2 v : v.val.adicCompletion K))
+  coe := fun x => (λ (v : S) => x.1 v, λ (v : {v // v ∉ S}) => (x.2 v : v.val.adicCompletion K))
 
 theorem coe_injective :
     (Coe.coe : SProdAdicCompletionIntegers R K S → SProdAdicCompletions R K S).Injective := by
@@ -136,8 +136,8 @@ end DerivedInstances
 /-- The type equivalence between the two formalisations of `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
 theorem subtypeEquiv :
     SProdAdicCompletionIntegers_subtype R K S ≃ SProdAdicCompletionIntegers R K S where
-  toFun x := (x.val.1 , λ v => ⟨x.val.2 v, x.property v⟩)
-  invFun x := ⟨x, λ v => SetLike.coe_mem (x.2 v)⟩
+  toFun x := (x.val.1 , fun v => ⟨x.val.2 v, x.property v⟩)
+  invFun x := ⟨x, fun v => SetLike.coe_mem (x.2 v)⟩
   left_inv _ := rfl
   right_inv _ := rfl
 
@@ -149,14 +149,14 @@ theorem homeomorph :
     unfold subtypeEquiv
     refine Continuous.prod_mk (Continuous.fst (Continuous.subtype_val
       ({ isOpen_preimage := fun s a => a }) )) ?_
-    refine continuous_pi (λ v => Continuous.subtype_mk ?_ _)
+    refine continuous_pi (fun v => Continuous.subtype_mk ?_ _)
     refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
     exact (Continuous.snd (Continuous.subtype_val ({ isOpen_preimage := fun s a => a }) ))
   continuous_invFun := by
     unfold subtypeEquiv
     refine Continuous.subtype_mk (Continuous.prod_mk
       (Continuous.fst { isOpen_preimage := fun s a => a }) ?_) _
-    refine continuous_pi (λ v => Continuous.subtype_val ?_)
+    refine continuous_pi (fun v => Continuous.subtype_val ?_)
     refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
     exact Continuous.snd  ({ isOpen_preimage := fun s a => a })
 
@@ -336,7 +336,7 @@ theorem adelicGenerateFrom :
       TopologicalSpace.generateFrom (FiniteSAdeleRing.adelicGeneratingSet R K S) := by
   rw [adelicGeneratingSet, ← induced_generateFrom_eq]; rfl
 
-theorem set_univ_mem_generatingSet : Set.univ ∈ adelicGeneratingSet R K S := by
+theorem univ_mem_generatingSet : Set.univ ∈ adelicGeneratingSet R K S := by
   simp only [adelicGeneratingSet, Set.mem_image, Set.preimage_eq_univ_iff]
   use (Set.range (e S)), toFiniteAdeleRing_range_mem_generatingSet R K S
 
@@ -362,19 +362,18 @@ theorem adelicGeneratingSet_eq : adelicGeneratingSet R K S =
   ext x
   simp only [adelicGeneratingSet, FiniteAdeleRing.generatingSet, Filter.eventually_cofinite,
     Set.mem_image, Set.mem_setOf_eq, exists_exists_and_eq_and]
-  refine ⟨λ ⟨V, ⟨hV_open, hV_fin⟩, hV_pi⟩ => ?_, λ ⟨y, ⟨V, I, hV_open, hV_pi⟩, hy⟩ => ?_⟩
+  refine ⟨fun ⟨V, ⟨hV_open, hV_fin⟩, hV_pi⟩ => ?_, λ ⟨y, ⟨V, I, hV_open, hV_pi⟩, hy⟩ => ?_⟩
   · set I := Set.Finite.toFinset hV_fin with IDef
     rw [← Set.preimage_comp, ← subtype_val_embedding] at hV_pi
     rw [← hV_pi]
-    use Set.pi Set.univ
-      (λ (v : HeightOneSpectrum R) =>
+    refine ⟨Set.pi Set.univ
+      (fun (v : HeightOneSpectrum R) =>
         if (v ∈ (I ∪ S).toSet) then
           (if (v ∈ I.toSet)
             then (V v) else (v.adicCompletionIntegers K)
           ) else
         Set.univ
-      )
-    refine ⟨?_, ?_⟩
+      ), ?_, ?_⟩
     · use (fun v => ite (v ∈ I) (V v) (v.adicCompletionIntegers K)), I ∪ S
       refine ⟨fun v _ => ?_, by rw [Set.univ_pi_ite]; rfl⟩
       · by_cases hv : v ∈ I <;> simp only [dif_pos, dif_neg, hv, if_true, if_false, hV_open v];
@@ -429,7 +428,6 @@ theorem toFiniteAdeleRing_openEmbedding : OpenEmbedding (e S) := by
 
 end FiniteSAdeleRing
 
--- TODO: move to FiniteAdeleRing.lean?
 namespace FiniteAdeleRing
 
 open FiniteSAdeleRing

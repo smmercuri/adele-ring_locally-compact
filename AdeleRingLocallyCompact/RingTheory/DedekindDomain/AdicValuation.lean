@@ -4,9 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri, María Inés de Frutos-Fernández, Filippo A. E. Nuccio
 -/
 import Mathlib
---import LocalClassFieldTheory.DiscreteValuationRing.ResidueField
---import LocalClassFieldTheory.DiscreteValuationRing.Complete
---import LocalClassFieldTheory.DiscreteValuationRing.Extensions
 import AdeleRingLocallyCompact.Algebra.Group.WithOne.Defs
 
 /-!
@@ -40,7 +37,7 @@ in [https://github.com/mariainesdff/local_fields_journal/](https://github.com/ma
 ## Main results
  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.residueField_finite` : the
    residue field of the `v`-adic ring of integers is finite.
- - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.quotient_maximalIdeal_pow_fintype` :
+ - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.quotient_maximalIdeal_pow_finite` :
    the quotient of the `v`-adic ring of integers by a power of the maximal ideal is finite.
  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.isCompact` : the `v`-adic ring
    of integers is compact.
@@ -66,11 +63,13 @@ variable {R : Type*} [CommRing R] [IsDomain R] [IsDedekindDomain R] {K : Type*} 
 
 namespace IsDedekindDomain.HeightOneSpectrum
 
-local notation "μ_v" => @WithZero.unitsWithZeroEquiv (Multiplicative ℤ)
+local notation "μᵥ" => @WithZero.unitsWithZeroEquiv (Multiplicative ℤ)
 
 namespace AdicCompletion
 
-/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L137](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L137) -/
+/-- An element `π ∈ v.adicCompletion K` is a uniformizer if it has valuation `ofAdd(-1)`.
+
+[https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L137](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L137) -/
 def IsUniformizer (π : v.adicCompletion K) : Prop :=
   Valued.v π = Multiplicative.ofAdd (-1 : ℤ)
 
@@ -79,7 +78,9 @@ variable (K v)
 def coeRingHom : K →+* v.adicCompletion K :=
   @UniformSpace.Completion.coeRingHom K _ v.adicValued.toUniformSpace _ _
 
-/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L95](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L95) -/
+/-- Uniformizers exist in the field completion `v.adicCompletion K`.
+
+[https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L95](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L95) -/
 theorem exists_uniformizer :
     ∃ (π : v.adicCompletion K), IsUniformizer π := by
   obtain ⟨x, hx⟩ := valuation_exists_uniformizer K v
@@ -90,7 +91,7 @@ theorem exists_uniformizer :
 def openBall (γ : (WithZero (Multiplicative ℤ))ˣ) : Set (v.adicCompletion K) :=
   setOf (λ y => Valued.v y < γ)
 
-/-- Open balls are open in the `v`-adic Completion of `K`. -/
+/-- Open balls are open in the `v`-adic completion of `K`. -/
 theorem openBall_isOpen (γ : (WithZero (Multiplicative ℤ))ˣ) : IsOpen (openBall K v γ) := by
   rw [isOpen_iff_mem_nhds]
   intros x hx
@@ -114,7 +115,7 @@ theorem openBall_isClosed (γ : (WithZero (Multiplicative ℤ))ˣ) : IsClosed (o
   rw [← hy] at hx
   exact (not_le_of_lt hy') hx
 
-/-- Small open balls are contained in the `v`-adic integers. -/
+/-- Open balls of radius `≤ 1` are contained in the `v`-adic integers. -/
 theorem openBall_of_le_one_subset_adicCompletionIntegers (γ : (WithZero (Multiplicative ℤ))ˣ)
     (hγ : γ ≤ 1) :
     openBall K v γ ⊆ v.adicCompletionIntegers K := by
@@ -122,10 +123,11 @@ theorem openBall_of_le_one_subset_adicCompletionIntegers (γ : (WithZero (Multip
   rw [openBall, Set.mem_setOf_eq] at hx
   exact le_of_lt (lt_of_lt_of_le hx hγ)
 
-/-- Open balls can be shrunk by multiplying by an appropriate power of a uniformizer. -/
+/-- Open balls can be shrunk to radius `< 1` by multiplying by an appropriate
+power of a uniformizer. -/
 theorem mem_openBall_mul_uniformizer_pow (x π : v.adicCompletion K) (hx : x ∈ openBall K v γ)
     (hπ : IsUniformizer π) :
-    Valued.v (π^(Multiplicative.toAdd (μ_v γ)) * x) < 1 := by
+    Valued.v (π^(Multiplicative.toAdd (μᵥ γ)) * x) < 1 := by
   rw [Valued.v.map_mul, map_zpow₀, hπ]
   rw [openBall, Set.mem_setOf_eq] at hx
   have h_ne_zero : γ.val⁻¹ ≠ 0 := by simp only [ne_eq, inv_eq_zero, Units.ne_zero,
@@ -133,7 +135,7 @@ theorem mem_openBall_mul_uniformizer_pow (x π : v.adicCompletion K) (hx : x ∈
   rw [(Units.inv_mul' γ).symm]
   apply mul_lt_mul_of_lt_of_le₀ _ h_ne_zero hx
   rw [ofAdd_neg, WithZero.coe_inv, inv_zpow', zpow_neg]
-  have h_val : γ.val = (μ_v γ : WithZero (Multiplicative ℤ)) := by
+  have h_val : γ.val = (μᵥ γ : WithZero (Multiplicative ℤ)) := by
     simp only [WithZero.unitsWithZeroEquiv, MulEquiv.coe_mk, Equiv.coe_fn_mk, WithZero.coe_unzero]
   rw [h_val, ← WithZero.coe_inv, ← WithZero.coe_zpow, ← WithZero.coe_inv,
     WithZero.coe_le_coe, ← ofAdd_zsmul, smul_eq_mul, mul_one, ofAdd_toAdd]
@@ -151,7 +153,9 @@ open AdicCompletion
 
 variable (K v)
 
-/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L79](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L79)-/
+/-- Uniformizers exist in the ring of `v`-adic integers.
+
+[https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L79](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/complete.lean#L79)-/
 theorem exists_uniformizer :
     ∃ (π : v.adicCompletionIntegers K), IsUniformizer π.val := by
   obtain ⟨π, hπ⟩ := valuation_exists_uniformizer K v
@@ -212,7 +216,9 @@ theorem isUnit_iff_valuation_eq_one (x : v.adicCompletionIntegers K) :
     IsUnit x ↔ Valued.v x.val = 1 :=
   ⟨valuation_eq_one_of_isUnit, isUnit_of_valuation_eq_one⟩
 
-/-- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L116](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L116)-/
+/-- A `v`-adic integer is not a unit if and only if it has valuation `< 1`.
+
+[https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L116](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L116)-/
 theorem not_isUnit_iff_valuation_lt_one (x : v.adicCompletionIntegers K) :
     ¬IsUnit x ↔ Valued.v x.val < 1 := by
   rw [← not_le, not_iff_not, isUnit_iff_valuation_eq_one, le_antisymm_iff]
@@ -232,7 +238,9 @@ theorem isUniformizer_not_isUnit {π : v.adicCompletionIntegers K} (h : IsUnifor
   simp only [not_isUnit_iff_valuation_lt_one, h, ← WithZero.coe_one, ← ofAdd_zero,
     WithZero.coe_lt_coe, Multiplicative.ofAdd_lt, Left.neg_neg_iff, zero_lt_one]
 
-/- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L259](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L259)-/
+/-- Any `v`-adic integer can be written as a unit multiplied by a power of a uniformizer.
+
+[https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L259](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L259)-/
 theorem eq_pow_uniformizer_mul_unit {x π : v.adicCompletionIntegers K} (hx : x.val ≠ 0)
     (hπ : IsUniformizer π.val) :
     ∃ (n : ℕ) (u : (v.adicCompletionIntegers K)ˣ), x = π^n * u := by
@@ -258,7 +266,9 @@ theorem eq_pow_uniformizer_mul_unit {x π : v.adicCompletionIntegers K} (hx : x.
   simp only [ne_eq, ZeroMemClass.coe_eq_zero]
   exact isUniformizer_ne_zero hπ
 
-/- [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L295](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L295)-/
+/-- A uniformizer generates the maximal ideal of the `v`-adic integers.
+
+[https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L295](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L295)-/
 theorem isUniformizer_is_generator {π : v.adicCompletionIntegers K} (hπ : IsUniformizer π.val) :
     maximalIdeal K v = Ideal.span {π} := by
   apply (LocalRing.maximalIdeal.isMaximal _).eq_of_le
@@ -369,7 +379,7 @@ theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K}
   exact Ideal.sub_mem _ hx hy
 
 /-- The quotient of the `v`-adic integers with a power of the maximal ideal is finite. -/
-theorem quotient_maximalIdeal_pow_fintype {π : v.adicCompletionIntegers K} (n : ℕ)
+theorem quotient_maximalIdeal_pow_finite {π : v.adicCompletionIntegers K} (n : ℕ)
     (hπ : IsUniformizer π.val) :
     Fintype (v.adicCompletionIntegers K ⧸ (maximalIdeal K v)^n) :=
   Fintype.ofInjective _ (toFiniteCoeffs_injective n hπ)
@@ -412,7 +422,7 @@ theorem hasFiniteSubcover_of_openBall_eq_one {γ : (WithZero (Multiplicative ℤ
         {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
   set quotientMap : v.adicCompletionIntegers K → residueField K v := Submodule.Quotient.mk
   obtain ⟨π, hπ⟩ := exists_uniformizer K v
-  have h := quotient_maximalIdeal_pow_fintype 1 hπ
+  have h := quotient_maximalIdeal_pow_finite 1 hπ
   rw [pow_one] at h
   set T := Quotient.out' '' (h.elems.toSet)
   use T, (Set.Finite.image Subtype.val (Set.Finite.image Quotient.out'
@@ -439,14 +449,14 @@ theorem hasFiniteSubcover_of_openBall_lt_one {γ : (WithZero (Multiplicative ℤ
       ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t,
         {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
   have ho : ∃ μ : Multiplicative ℤ, γ.val = (μ : WithZero (Multiplicative ℤ)) := by
-      use μ_v γ
+      use μᵥ γ
       simp only [WithZero.unitsWithZeroEquiv, MulEquiv.coe_mk, Equiv.coe_fn_mk, WithZero.coe_unzero]
   obtain ⟨μ, hμ⟩ := ho
   set M := (maximalIdeal K v)^((-Multiplicative.toAdd μ + 1).toNat)
   set S := (v.adicCompletionIntegers K) ⧸ M
   set quotientMap : v.adicCompletionIntegers K → S := Submodule.Quotient.mk
   obtain ⟨π, hπ⟩ := exists_uniformizer K v
-  have h : Fintype S := quotient_maximalIdeal_pow_fintype (-Multiplicative.toAdd μ + 1).toNat hπ
+  have h : Fintype S := quotient_maximalIdeal_pow_finite (-Multiplicative.toAdd μ + 1).toNat hπ
   set T := Quotient.out' '' (h.elems.toSet)
   use T, (Set.Finite.image Subtype.val (Set.Finite.image Quotient.out'
     (Finset.finite_toSet h.elems)))
@@ -510,13 +520,13 @@ theorem openBall_isCompact (γ : (WithZero (Multiplicative ℤ))ˣ) : IsCompact 
       (openBall_of_le_one_subset_adicCompletionIntegers K v γ hγ)
   · rw [not_le] at hγ
     obtain ⟨π, hπ⟩ := AdicCompletionIntegers.exists_uniformizer K v
-    set f := λ x => π.val^(-Multiplicative.toAdd (μ_v γ)) * x with f_def
+    set f := λ x => π.val^(-Multiplicative.toAdd (μᵥ γ)) * x with f_def
     have hπ_ne_zero : π.val ≠ 0 := by
       convert isUniformizer_ne_zero hπ
       rw [ZeroMemClass.coe_eq_zero]
     have h_range : openBall K v γ ⊆ Set.range f := by
       intro x _
-      use π ^ (Multiplicative.toAdd (μ_v γ)) * x
+      use π ^ (Multiplicative.toAdd (μᵥ γ)) * x
       simp only [f_def, ← mul_assoc, ← zpow_add₀ hπ_ne_zero, add_left_neg,
         zpow_zero, one_mul]
     have h_preimage_subset : f⁻¹' (openBall K v γ) ⊆ (v.adicCompletionIntegers K) := by
@@ -527,12 +537,12 @@ theorem openBall_isCompact (γ : (WithZero (Multiplicative ℤ))ˣ) : IsCompact 
       exact le_of_lt h_mul_π
     have h_image_f_closed :=
       continuous_iff_isClosed.1
-        (continuous_mul_left (π.val^(-Multiplicative.toAdd (μ_v γ)))) _
+        (continuous_mul_left (π.val^(-Multiplicative.toAdd (μᵥ γ)))) _
         (openBall_isClosed K v γ)
     have h_image_preimage_f_compact :=
       IsCompact.image
         (IsCompact.of_isClosed_subset (isCompact K v) h_image_f_closed h_preimage_subset)
-        (continuous_mul_left (π.val^(-Multiplicative.toAdd (μ_v γ))))
+        (continuous_mul_left (π.val^(-Multiplicative.toAdd (μᵥ γ))))
     rw [Set.image_preimage_eq_of_subset h_range] at h_image_preimage_f_compact
     exact h_image_preimage_f_compact
 

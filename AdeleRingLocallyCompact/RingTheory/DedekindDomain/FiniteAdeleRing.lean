@@ -25,7 +25,10 @@ the finite adele ring.
    the finite adele ring.
 
 ## Main results
- - `DedekindDomain.FiniteAdeleRing.topologicalSpace` : the topological space on the finite
+ - `DedekindDomain.FiniteAdeleRing.continuous_if_factors₂` : Any map on the product
+   of the finite adele ring to the finite adele ring is continuous if it factors through
+   continuous maps at each place `v`, each of which preserve the integers.
+ - `DedekindDomain.FiniteAdeleRing.topologicalRing` : the topological ring structure on the finite
    adele ring.
 
 ## References
@@ -316,7 +319,9 @@ instance topologicalRing : TopologicalRing (finiteAdeleRing R K) where
   continuous_add := continuous_add' R K
   continuous_mul := continuous_mul' R K
 
-/-- [https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685)-/
+/-- The element `(x)ᵥ` where `x ∈ K` is a finite adele.
+
+[https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685)-/
 theorem globalEmbedding_isFiniteAdele (x : K) :
     ProdAdicCompletions.IsFiniteAdele (ProdAdicCompletions.globalEmbedding R K x) := by
   set supp := setOf (fun (v : HeightOneSpectrum R) =>
