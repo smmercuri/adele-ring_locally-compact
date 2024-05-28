@@ -68,7 +68,7 @@ def localInclusion (v : HeightOneSpectrum R) :
   fun x =>
     (fun w =>
       if hw : w = v then
-        congrArg (λ v => v.adicCompletion K) hw ▸ x else
+        congrArg (fun v => v.adicCompletion K) hw ▸ x else
         (1 : w.adicCompletion K)
     )
 
@@ -254,11 +254,10 @@ theorem continuous_if_factors₂
         → v.adicCompletion K × v.adicCompletion K
         → v.adicCompletion K,
           ∀ v,
-            (g v ∘ (RingHom.prodMap (π v) (π v)) = (π v) ∘ f
-            ∧ Continuous (g v)
-            ∧ ∀ (x y : v.adicCompletion K),
-              x ∈ v.adicCompletionIntegers K
-                → y ∈ v.adicCompletionIntegers K
+            (g v ∘ (RingHom.prodMap (π v) (π v)) = (π v) ∘ f ∧
+            Continuous (g v) ∧
+            ∀ (x y : v.adicCompletion K),
+              x ∈ v.adicCompletionIntegers K → y ∈ v.adicCompletionIntegers K
                 → g v (x, y) ∈ v.adicCompletionIntegers K
       )
     ) :

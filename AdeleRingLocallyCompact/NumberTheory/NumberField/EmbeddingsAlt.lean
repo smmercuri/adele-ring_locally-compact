@@ -107,11 +107,10 @@ instance : T0Space (v.completion' K) :=
   @UniformSpace.Completion.t0Space _ (subfield_uniformSpace K v)
 
 instance : Coe (subfield K v) (v.completion' K) :=
-  (inferInstance : Coe (subfield K v)
-    (@UniformSpace.Completion (subfield K v) (subfield_uniformSpace K v)))
+  UniformSpace.Completion.instCoeCompletion _
 
 instance : Coe K (v.completion' K) where
-  coe := (↑) ∘ v.toSubfield K
+  coe := (UniformSpace.Completion.coe' _) ∘ v.toSubfield K
 
 def coeRingHom' : K →+* v.completion' K :=
   RingHom.comp UniformSpace.Completion.coeRingHom (v.toSubfield K)

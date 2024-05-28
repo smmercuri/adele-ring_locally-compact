@@ -59,7 +59,8 @@ variable {K}
 def normedDivisionRing : NormedDivisionRing K :=
   NormedDivisionRing.induced _ _ v.embedding v.embedding.injective
 
-instance uniformSpace : UniformSpace K := UniformSpace.comap v.embedding inferInstance
+instance uniformSpace : UniformSpace K :=
+  UniformSpace.comap v.embedding inferInstance
 
 instance uniformAddGroup : @UniformAddGroup K v.uniformSpace _ :=
   UniformAddGroup.comap v.embedding

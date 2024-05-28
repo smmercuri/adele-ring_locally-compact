@@ -350,7 +350,6 @@ theorem finiteExpansion {π : v.adicCompletionIntegers K} (n : ℕ) (x : v.adicC
       rw [isUniformizer_is_generator hπ, ← Ideal.mem_span_singleton,
         ← Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_sub, Submodule.Quotient.mk,
         Quotient.out_eq', Submodule.Quotient.mk''_eq_mk, Ideal.Quotient.mk_eq_mk, sub_self]
-    rw [mul_comm]
     exact mul_dvd_mul_right h (π^d)
 
 /-- Given a uniformizer `π` of the `v`-adic integers and a `v`-adic integer `x` modulo a power of
