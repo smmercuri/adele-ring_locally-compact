@@ -12,6 +12,13 @@ We also formalise the local compactness of all completions of a number field, th
 We also port some foundational results on discrete valuations from more [recent work](https://github.com/mariainesdff/local_fields_journal/tree/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3) by Maria Inés de Frutos-Fernández and Filippo A. E. Nuccio.
 In particular we have an outstanding `sorry` in our result which follows immediately from that code.
 
+## Documentation
+
+The documentation for this project can be found [here](https://smmercuri.github.io/adele-ring_locally-compact/).
+This contains the documentation for all the code contained in this branch, as well as the versions of mathlib and Lean that the project uses.
+
+The latest mathlib documentation can be found [here](https://leanprover-community.github.io/mathlib4_docs/).
+
 ## Overview of the code
 
 The code for various sections of the paper can be found as follows.
@@ -39,6 +46,6 @@ The code for various sections of the paper can be found as follows.
 
 This project requires Lean 4 and mathlib. To install Lean follow the instructions [here](https://leanprover-community.github.io/get_started.html).
 
-After installation of Lean 4, this project can be installed by running `git clone https://github.com/smmercuri/adele-ring_locally-compact.git` and then `cd adele-ring_locally_compact`. This will install all branches and version history of the project. To obtain the version described in the paper and this branch, follow up with the command `git checkout journal`. The project can then be installed by running `lake exe cache get`.
+After installation of Lean 4, this project can be installed by running `git clone https://github.com/smmercuri/adele-ring_locally-compact.git` from a terminal in the location you wish to place this project, and then `cd adele-ring_locally_compact`. This will install all branches and version history of the project. To obtain the version described in the paper and contained within this branch, follow up with the command `git checkout journal`. The project be installed by first running `source ~/.profile` (or `source ~/.bash_profile` depending on the OS) and then running `lake exe cache get`.
 
 See [this page](https://leanprover-community.github.io/install/project.html) for further details on setting up Lean projects.
