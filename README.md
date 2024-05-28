@@ -33,7 +33,7 @@ The code for various sections of the paper can be found as follows.
 - Section 3.3: The formalisation of the adele ring is in [AdeleRing.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
 
 ### Section 4
-- Section 4.1: The proof that each Archimedean completion of a number field is locally compact is in [Embeddings.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean) and that the infinite adele ring is locally compact is in [InfiniteAdeleRing.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
+- Section 4.1: The proof that each Archimedean completion of a number field is locally compact is in [Embeddings.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lea) and that the infinite adele ring is locally compact is in [InfiniteAdeleRing.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
 - Section 4.2.1: Compactness results for non-Archimedean completions of a number field are found in [AdicValuation.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean). 
 - Section 4.2.2: The proof that the finite $S$-adele ring is locally compact is in [FiniteSAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean).
 - Section 4.2.3: The proof that the finite adele ring is locally compact is in [FiniteSAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean).
