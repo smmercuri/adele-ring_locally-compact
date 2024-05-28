@@ -24,23 +24,23 @@ The latest documentation for Lean and its various libraries can be found [here](
 The code for various sections of the paper can be found as follows.
 
 ### Section 2
-- Section 2.3: The result that the pullback under a field embedding of a completable topological field is a completable topological field is in [UniformSpace/Basic.lean](AdeleRingLocallyCompact/Topology/UniformSpace/Basic.lean).
+- Section 2.3: The result that the pullback under a field embedding of a completable topological field is a completable topological field is in [UniformSpace/Basic.lean](./AdeleRingLocallyCompact/Topology/UniformSpace/Basic.lean).
 
 ### Section 3
-- Section 3.1.2: The completion of a number field at an infinite place is in [Embeddings.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean).
-- Section 3.1.3: The formalisation of the infinite adele ring is in [InfiniteAdeleRing.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
-- Section 3.2.2: Topological results for the finite adele ring are in [FiniteAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteAdeleRing.lean).
-- Section 3.3: The formalisation of the adele ring is in [AdeleRing.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
+- Section 3.1.2: The completion of a number field at an infinite place is in [Embeddings.lean](./AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean).
+- Section 3.1.3: The formalisation of the infinite adele ring is in [InfiniteAdeleRing.lean](./AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
+- Section 3.2.2: Topological results for the finite adele ring are in [FiniteAdeleRing.lean](./AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteAdeleRing.lean).
+- Section 3.3: The formalisation of the adele ring is in [AdeleRing.lean](./AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
 
 ### Section 4
-- Section 4.1: The proof that each Archimedean completion of a number field is locally compact is in [Embeddings.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean) and that the infinite adele ring is locally compact is in [InfiniteAdeleRing.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
-- Section 4.2.1: Compactness results for non-Archimedean completions of a number field are found in [AdicValuation.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean). 
-- Section 4.2.2: The proof that the finite $S$-adele ring is locally compact is in [FiniteSAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean).
-- Section 4.2.3: The proof that the finite adele ring is locally compact is in [FiniteSAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean).
-- Section 4.3: The proof that the adele ring is locally compact is in [AdeleRing.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
+- Section 4.1: The proof that each Archimedean completion of a number field is locally compact is in [Embeddings.lean](./AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean) and that the infinite adele ring is locally compact is in [InfiniteAdeleRing.lean](./AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
+- Section 4.2.1: Compactness results for non-Archimedean completions of a number field are found in [AdicValuation.lean](./AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean). 
+- Section 4.2.2: The proof that the finite $S$-adele ring is locally compact is in [FiniteSAdeleRing.lean](./AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean).
+- Section 4.2.3: The proof that the finite adele ring is locally compact is in [FiniteSAdeleRing.lean](./AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean).
+- Section 4.3: The proof that the adele ring is locally compact is in [AdeleRing.lean](./AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
 
 ### Section 5
-- Section 5: The alternative approach for formalising the completion of a number field at an infinite place is in [EmbeddingsAlt.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/EmbeddingsAlt.lean).
+- Section 5: The alternative approach for formalising the completion of a number field at an infinite place is in [EmbeddingsAlt.lean](./AdeleRingLocallyCompact/NumberTheory/NumberField/EmbeddingsAlt.lean).
 
 ## Installation instructions
 
