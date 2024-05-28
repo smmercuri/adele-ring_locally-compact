@@ -17,7 +17,7 @@ In particular we have an outstanding `sorry` in our result which follows immedia
 The documentation for this project can be found [here](https://smmercuri.github.io/adele-ring_locally-compact/).
 This contains the documentation for all the code contained in this branch, as well as the versions of mathlib and Lean that the project uses.
 
-The latest mathlib documentation can be found [here](https://leanprover-community.github.io/mathlib4_docs/).
+The latest documentation for Lean and its various libraries can be found [here](https://leanprover-community.github.io/mathlib4_docs/).
 
 ## Overview of the code
 
