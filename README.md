@@ -1,6 +1,6 @@
 # Local Compactness of the Adele Ring of a Number Field
 
-This repository contains the source code for the paper "Formalising the local compactness of the adele ring".
+This repository contains the source code for the paper [_Formalising the local compactness of the adele ring_](https://arxiv.org/pdf/2405.19270v1).
 This code requires Lean 4.7.0 and uses mathlib's version [eaede86](https://github.com/leanprover-community/mathlib4/tree/eaede86aa7777630a3826cd8f3fbf0cbaafa53e6).
 
 The adele ring of a number field is a central object in modern number theory and its status as a locally compact topological ring is one of the key reasons why, leading to its widespread use within the Langlands Program. 
