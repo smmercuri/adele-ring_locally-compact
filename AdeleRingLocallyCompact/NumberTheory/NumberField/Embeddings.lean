@@ -5,6 +5,7 @@ Authors: Salvatore Mercuri
 -/
 import Mathlib
 import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
+import AdeleRingLocallyCompact.Analysis.NormedSpace.Completion
 
 /-!
 # Embeddings of number fields
@@ -47,6 +48,14 @@ noncomputable def normedDivisionRing : NormedDivisionRing K :=
 noncomputable def uniformSpace : UniformSpace K :=
   v.normedField.toUniformSpace
 
+/-- The uniform additive group structure of a number field induced by an infinite place. -/
+noncomputable def uniformAddGroup : @UniformAddGroup K v.uniformSpace _ :=
+  @SeminormedAddCommGroup.to_uniformAddGroup _ (
+    @NormedAddCommGroup.toSeminormedAddCommGroup _ (
+      @NonUnitalNormedRing.toNormedAddCommGroup _ (
+        @NormedRing.toNonUnitalNormedRing _ (
+          @NormedDivisionRing.toNormedRing _ v.normedDivisionRing))))
+
 /-- The topology of a number field infuced by an infinite place. -/
 noncomputable def topologicalSpace : TopologicalSpace K :=
   v.uniformSpace.toTopologicalSpace
@@ -68,10 +77,6 @@ theorem uniformEmbedding : @UniformEmbedding _ _ v.uniformSpace _ v.embedding :=
 /-- The embedding associated to an infinite palce is uniform inducing. -/
 theorem uniformInducing : @UniformInducing _ _ v.uniformSpace _ v.embedding :=
   @UniformEmbedding.toUniformInducing _ _ v.normedDivisionRing.toUniformSpace _ _ v.uniformEmbedding
-
-/-- The uniform additive group structure of a number field induced by an infinite place. -/
-def uniformAddGroup : @UniformAddGroup K v.uniformSpace _ :=
-  @UniformInducing.uniformAddGroup _ _ _ _ _ _ v.uniformSpace _ _ _ _ v.uniformInducing
 
 /-- The embedding associated to an infinite place of a number field is an isometry. -/
 theorem isometry : @Isometry _ _ v.normedField.toPseudoEMetricSpace _ (v.embedding) :=
@@ -95,25 +100,14 @@ def completion := @UniformSpace.Completion K v.normedDivisionRing.toUniformSpace
 
 namespace Completion
 
-noncomputable instance : UniformSpace v.completion :=
-  @UniformSpace.Completion.uniformSpace _ v.uniformSpace
+noncomputable instance : NormedField v.completion :=
+  @UniformSpace.Completion.instNormedField K v.normedField v.completableTopField
 
 instance : CompleteSpace v.completion :=
   @UniformSpace.Completion.completeSpace _ v.uniformSpace
 
-noncomputable instance : Field (v.completion) :=
-  @UniformSpace.Completion.instField _ _ v.normedDivisionRing.toUniformSpace
-    v.topologicalDivisionRing _ v.uniformAddGroup
-
 noncomputable instance : Inhabited v.completion :=
   ⟨0⟩
-
-noncomputable instance : TopologicalRing v.completion :=
-  @UniformSpace.Completion.topologicalRing K _ v.uniformSpace
-    v.topologicalRing v.uniformAddGroup
-
-noncomputable instance metricSpace : MetricSpace (v.completion) :=
-  @UniformSpace.Completion.instMetricSpace _ v.normedDivisionRing.toPseudoMetricSpace
 
 def coeRingHom : K →+* v.completion :=
   @UniformSpace.Completion.coeRingHom _ _ v.uniformSpace
@@ -138,22 +132,21 @@ theorem extensionEmbedding_dist_eq (x y : v.completion) :
     fun x y => dist (extensionEmbedding v x) (extensionEmbedding v y) = dist x y
   refine (@UniformSpace.Completion.induction_on₂ _
     v.uniformSpace _ v.uniformSpace p x y ?_ (fun x y => ?_))
-  · apply isClosed_eq
+  · refine isClosed_eq ?_ continuous_dist
     · exact (continuous_iff_continuous_dist.1
         (@UniformSpace.Completion.continuous_extension _ v.uniformSpace _ _ _ _))
-    · exact @continuous_dist _ (metricSpace v).toPseudoMetricSpace
   · simp only [extensionEmbedding, UniformSpace.Completion.extensionHom, RingHom.coe_mk,
       MonoidHom.coe_mk, OneHom.coe_mk, p]
-    rw [@UniformSpace.Completion.dist_eq _ v.normedDivisionRing.toPseudoMetricSpace]
+    rw [@UniformSpace.Completion.dist_eq _ v.normedField.toPseudoMetricSpace]
     simp only [@UniformSpace.Completion.extension_coe _ v.uniformSpace _ _ _
       T1Space.t0Space v.uniformContinuous]
-    rw [@Isometry.dist_eq _ _ v.normedDivisionRing.toPseudoMetricSpace _ _ (v.isometry) _ _]
+    rw [@Isometry.dist_eq _ _ v.normedField.toPseudoMetricSpace _ _ (v.isometry) _ _]
 
 variable (K v)
 
 /-- The embedding `v.completion → ℂ` is an isometry. -/
 theorem extensionEmbedding_isometry :
-    @Isometry _ _ (metricSpace v).toPseudoEMetricSpace _ (extensionEmbedding v) :=
+    Isometry (extensionEmbedding v) :=
   Isometry.of_dist_eq extensionEmbedding_dist_eq
 
 /-- The embedding `v.completion K → ℂ` is uniform inducing. -/

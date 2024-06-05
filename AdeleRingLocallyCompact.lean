@@ -1,4 +1,5 @@
 import AdeleRingLocallyCompact.Algebra.Group.WithOne.Defs
+import AdeleRingLocallyCompact.Analysis.NormedSpace.Completion
 import AdeleRingLocallyCompact.NumberTheory.NumberField.Embeddings
 import AdeleRingLocallyCompact.NumberTheory.NumberField.InfiniteAdeleRing
 import AdeleRingLocallyCompact.NumberTheory.NumberField.AdeleRing

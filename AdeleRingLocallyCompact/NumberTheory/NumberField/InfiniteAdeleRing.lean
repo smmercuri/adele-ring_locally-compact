@@ -36,7 +36,7 @@ namespace NumberField
 variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
 
 /-- The infinite adele ring of a number field. -/
-def infiniteAdeleRing := (v : InfinitePlace K) → v.completion K
+def infiniteAdeleRing := (v : InfinitePlace K) → v.completion
 
 namespace InfiniteAdeleRing
 
@@ -55,7 +55,7 @@ instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K) := Pi.topolog
 instance topologicalRing : TopologicalRing (infiniteAdeleRing K) := Pi.instTopologicalRing
 
 def globalEmbedding : K →+* infiniteAdeleRing K :=
-  Pi.ringHom (fun (v : InfinitePlace K) => InfinitePlace.Completion.coeRingHom K v)
+  Pi.ringHom (fun (v : InfinitePlace K) => InfinitePlace.Completion.coeRingHom v)
 
 theorem globalEmbedding_injective : Function.Injective (globalEmbedding K) :=
   (globalEmbedding K).injective
