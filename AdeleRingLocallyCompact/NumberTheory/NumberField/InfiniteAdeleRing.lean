@@ -46,7 +46,8 @@ instance : CommRing (infiniteAdeleRing K) := Pi.commRing
 
 instance : Inhabited (infiniteAdeleRing K) := ⟨0⟩
 
-instance : Nontrivial (infiniteAdeleRing K) := Pi.nontrivial
+instance : Nontrivial (infiniteAdeleRing K) :=
+  (inferInstanceAs <| Nonempty (InfinitePlace K)).elim fun w => Pi.nontrivial_at w
 
 end DerivedInstances
 
@@ -54,14 +55,17 @@ instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K) := Pi.topolog
 
 instance topologicalRing : TopologicalRing (infiniteAdeleRing K) := Pi.instTopologicalRing
 
-def globalEmbedding : K →+* infiniteAdeleRing K :=
-  Pi.ringHom (fun (v : InfinitePlace K) => InfinitePlace.Completion.coeRingHom v)
+instance : Algebra K (infiniteAdeleRing K) := Pi.algebra _ _
 
-theorem globalEmbedding_injective : Function.Injective (globalEmbedding K) :=
-  (globalEmbedding K).injective
+/-- The global embedding of a number field into its infinite adele ring,
+sending `x ∈ K` to `(x)ᵥ`. -/
+abbrev globalEmbedding : K →+* infiniteAdeleRing K := algebraMap K (infiniteAdeleRing K)
+
+@[simp]
+theorem globalEmbedding_apply (x : K) : globalEmbedding K x v = (x : v.completion) := rfl
 
 /-- The infinite adele ring is locally compact. -/
-theorem locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) :=
+instance locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) :=
   Pi.locallyCompactSpace_of_finite
 
 end InfiniteAdeleRing
