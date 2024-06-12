@@ -46,20 +46,24 @@ def completion := v.1.completion
 
 namespace Completion
 
-instance : NormedRing v.completion :=
-  inferInstanceAs (NormedRing v.1.completion)
-
 instance : NormedField v.completion :=
-  letI := v.normedField
   letI := (WithAbs.uniformInducing_of_comp v.embedding_eq_comp).completableTopField
   UniformSpace.Completion.instNormedField (WithAbs v.1)
 
 instance : CompleteSpace v.completion :=
-  inferInstanceAs (CompleteSpace (v.1.completion))
+  inferInstanceAs (CompleteSpace v.1.completion)
+
+instance : Inhabited v.completion :=
+  inferInstanceAs (Inhabited v.1.completion)
+
+instance : Coe K v.completion :=
+  inferInstanceAs (Coe (WithAbs v.1) v.1.completion)
+
+instance : Algebra K v.completion :=
+  inferInstanceAs (Algebra (WithAbs v.1) v.1.completion)
 
 /-- The embedding associated to an infinite place extended to an embedding `v.completion →+* ℂ`. -/
 def extensionEmbedding : v.completion →+* ℂ :=
-  letI := v.normedField
   UniformSpace.Completion.extensionHom _
     (WithAbs.uniformInducing_of_comp v.embedding_eq_comp).uniformContinuous.continuous
 
@@ -69,7 +73,6 @@ variable {v}
 theorem extensionEmbedding_dist_eq (x y : v.completion) :
     dist (extensionEmbedding v x) (extensionEmbedding v y) =
       dist x y := by
-  letI := v.normedField
   refine (UniformSpace.Completion.induction_on₂ x y ?_ (fun x y => ?_))
   · refine isClosed_eq ?_ continuous_dist
     · exact (continuous_iff_continuous_dist.1 (UniformSpace.Completion.continuous_extension))
@@ -82,8 +85,7 @@ theorem extensionEmbedding_dist_eq (x y : v.completion) :
 variable (v)
 
 /-- The embedding `v.completion →+* ℂ` is an isometry. -/
-theorem isometry_extensionEmbedding :
-    Isometry (extensionEmbedding v) :=
+theorem isometry_extensionEmbedding : Isometry (extensionEmbedding v) :=
   Isometry.of_dist_eq extensionEmbedding_dist_eq
 
 /-- The embedding `v.completion →+* ℂ` is a closed embedding. -/
