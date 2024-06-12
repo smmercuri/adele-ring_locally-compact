@@ -6,6 +6,7 @@ Authors: Salvatore Mercuri
 import Mathlib
 import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 import AdeleRingLocallyCompact.Analysis.NormedSpace.Completion
+import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
 
 /-!
 # Embeddings of number fields
@@ -31,39 +32,36 @@ namespace NumberField.InfinitePlace
 
 variable {K : Type*} [Field K] [NumberField K] (v : InfinitePlace K)
 
-/-- The normed field structure of a number field coming from the embedding asociated to
+/- The normed field structure of a number field coming from the embedding asociated to
 an infinite place. -/
 def normedField : NormedField K :=
-  NormedField.induced _ _ v.embedding v.embedding.injective
+  inferInstanceAs (NormedField (WithAbs v.1))
 
-/-- The embedding associated to an infinite place is a uniform embedding. -/
-theorem uniformEmbedding : letI := v.normedField; UniformEmbedding v.embedding :=
-  letI := v.normedField; ⟨uniformInducing_iff_uniformSpace.2 rfl, v.embedding.injective⟩
+theorem embedding_eq_comp :
+    v.1 = (IsAbsoluteValue.toAbsoluteValue (norm : ℂ → ℝ)).comp v.embedding.injective := by
+  rw [← v.2.choose_spec]; rfl
 
 /-- The completion of a number field at an infinite place. -/
-def completion :=
-  letI := v.normedField; UniformSpace.Completion K
+def completion := v.1.completion
 
 namespace Completion
 
+instance : NormedRing v.completion :=
+  inferInstanceAs (NormedRing v.1.completion)
+
 instance : NormedField v.completion :=
-  letI := v.normedField; UniformSpace.Completion.instNormedField K
+  letI := v.normedField
+  letI := (WithAbs.uniformInducing_of_comp v.embedding_eq_comp).completableTopField
+  UniformSpace.Completion.instNormedField (WithAbs v.1)
 
 instance : CompleteSpace v.completion :=
-  letI := v.normedField; UniformSpace.Completion.completeSpace K
-
-instance : Inhabited v.completion := ⟨0⟩
-
-instance : Coe K v.completion :=
-  letI := v.normedField; inferInstanceAs (Coe K (UniformSpace.Completion K))
-
-instance : Algebra K v.completion :=
-  letI := v.normedField; UniformSpace.Completion.algebra K _
+  inferInstanceAs (CompleteSpace (v.1.completion))
 
 /-- The embedding associated to an infinite place extended to an embedding `v.completion →+* ℂ`. -/
 def extensionEmbedding : v.completion →+* ℂ :=
   letI := v.normedField
-  UniformSpace.Completion.extensionHom _ v.uniformEmbedding.uniformContinuous.continuous
+  UniformSpace.Completion.extensionHom _
+    (WithAbs.uniformInducing_of_comp v.embedding_eq_comp).uniformContinuous.continuous
 
 variable {v}
 
@@ -77,8 +75,9 @@ theorem extensionEmbedding_dist_eq (x y : v.completion) :
     · exact (continuous_iff_continuous_dist.1 (UniformSpace.Completion.continuous_extension))
   · rw [extensionEmbedding, UniformSpace.Completion.extensionHom, RingHom.coe_mk,
       MonoidHom.coe_mk, OneHom.coe_mk, UniformSpace.Completion.dist_eq]
-    simp only [UniformSpace.Completion.extension_coe v.uniformEmbedding.uniformContinuous]
-    exact Isometry.dist_eq v.uniformEmbedding.to_isometry _ _
+    simp only [UniformSpace.Completion.extension_coe
+      (WithAbs.uniformInducing_of_comp v.embedding_eq_comp).uniformContinuous]
+    exact Isometry.dist_eq (WithAbs.isometry_of_comp v.embedding_eq_comp) _ _
 
 variable (v)
 
