@@ -5,6 +5,7 @@ Authors: Salvatore Mercuri
 -/
 import Mathlib
 import AdeleRingLocallyCompact.Analysis.NormedSpace.Completion
+import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 
 noncomputable section
 
@@ -99,3 +100,100 @@ instance : Coe K v.completion :=
 
 instance : Algebra (WithAbs v) v.completion :=
   UniformSpace.Completion.algebra (WithAbs v) _
+
+variable {A : Type*} [NormedField A] [CompleteSpace A] {f : WithAbs v →+* A} {v}
+
+/-- If the absolute value of a normed field factors through an embedding into another normed field
+`A`, then this extends that embedding to `v.completion →+* A`. -/
+def extensionEmbedding_of_comp
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
+    v.completion →+* A :=
+  UniformSpace.Completion.extensionHom _
+    (WithAbs.uniformInducing_of_comp h).uniformContinuous.continuous
+
+/-- If the absolute value of a normed field factors through a normed embedding, then the extended
+embedding `v.completion →+* A` preserves distances. -/
+theorem extensionEmbedding_dist_eq_of_comp
+      (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective)
+      (x y : v.completion) :
+    dist (extensionEmbedding_of_comp h x) (extensionEmbedding_of_comp h y) =
+      dist x y := by
+  refine (UniformSpace.Completion.induction_on₂ x y ?_ (fun x y => ?_))
+  · refine isClosed_eq ?_ continuous_dist
+    · exact (continuous_iff_continuous_dist.1 (UniformSpace.Completion.continuous_extension))
+  · rw [extensionEmbedding_of_comp, UniformSpace.Completion.extensionHom, RingHom.coe_mk,
+      MonoidHom.coe_mk, OneHom.coe_mk, UniformSpace.Completion.dist_eq]
+    simp only [UniformSpace.Completion.extension_coe
+      (WithAbs.uniformInducing_of_comp h).uniformContinuous]
+    exact Isometry.dist_eq (WithAbs.isometry_of_comp h) _ _
+
+/-- If the absolute value of a normed field factors through a normed embedding, then the
+extended embedding `v.completion →+* A` is an isometry. -/
+theorem isometry_extensionEmbedding_of_comp
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
+    Isometry (extensionEmbedding_of_comp h) :=
+  Isometry.of_dist_eq <| extensionEmbedding_dist_eq_of_comp h
+
+/-- If the absolute value of a normed field factors through a normed embedding, then the
+extended embedding `v.completion →+* A` is a closed embedding. -/
+theorem closedEmbedding_extensionEmbedding_of_comp
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
+    ClosedEmbedding (extensionEmbedding_of_comp h) :=
+  (isometry_extensionEmbedding_of_comp h).closedEmbedding
+
+/-- The completion of any normed field with an absolute value, such that the absolute value
+factors through an embedding into a normed locally compact field, is also locally compact. -/
+theorem locallyCompactSpace [LocallyCompactSpace A]
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective)  :
+    LocallyCompactSpace (v.completion) :=
+  (closedEmbedding_extensionEmbedding_of_comp h).locallyCompactSpace
+
+end AbsoluteValue.Completion
+
+namespace NumberField.InfinitePlace
+
+variable {K : Type*} [Field K] [NumberField K] (v : InfinitePlace K)
+
+/- The normed field structure of a number field coming from the absolute value associated to
+an infinite place. -/
+def normedField : NormedField K :=
+  inferInstanceAs (NormedField (WithAbs v.1))
+
+theorem embedding_eq_comp :
+    v.1 = (IsAbsoluteValue.toAbsoluteValue (norm : ℂ → ℝ)).comp v.embedding.injective := by
+  rw [← v.2.choose_spec]; rfl
+
+/-- The completion of a number field at an infinite place. -/
+def completion := v.1.completion
+
+namespace Completion
+
+instance : NormedField v.completion :=
+  letI := (WithAbs.uniformInducing_of_comp v.embedding_eq_comp).completableTopField
+  UniformSpace.Completion.instNormedField (WithAbs v.1)
+
+instance : CompleteSpace v.completion :=
+  inferInstanceAs (CompleteSpace v.1.completion)
+
+instance : Inhabited v.completion :=
+  inferInstanceAs (Inhabited v.1.completion)
+
+instance : Coe K v.completion :=
+  inferInstanceAs (Coe (WithAbs v.1) v.1.completion)
+
+instance : Algebra K v.completion :=
+  inferInstanceAs (Algebra (WithAbs v.1) v.1.completion)
+
+/-- The embedding associated to an infinite place extended to an embedding `v.completion →+* ℂ`. -/
+def extensionEmbedding :=
+  AbsoluteValue.Completion.extensionEmbedding_of_comp v.embedding_eq_comp
+
+/-- The embedding `v.completion →+* ℂ` is an isometry. -/
+theorem isometry_extensionEmbedding : Isometry (extensionEmbedding v) :=
+  Isometry.of_dist_eq (AbsoluteValue.Completion.extensionEmbedding_dist_eq_of_comp v.embedding_eq_comp)
+
+/-- The completion of a number field at an infinite place is locally compact. -/
+instance locallyCompactSpace : LocallyCompactSpace (v.completion) :=
+  AbsoluteValue.Completion.locallyCompactSpace v.embedding_eq_comp
+
+end NumberField.InfinitePlace.Completion

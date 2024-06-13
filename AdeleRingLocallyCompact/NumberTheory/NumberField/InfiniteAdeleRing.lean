@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri, María Inés de Frutos-Fernández
 -/
 import Mathlib
-import AdeleRingLocallyCompact.NumberTheory.NumberField.Embeddings
+import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
 
 /-!
 # Infinite adele ring
