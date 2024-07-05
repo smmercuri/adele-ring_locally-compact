@@ -156,6 +156,8 @@ open AbsoluteValue.Completion
 
 variable {K : Type*} [Field K] [NumberField K] (v : InfinitePlace K)
 
+theorem exists_finset_of_isReal : ∃ (S : Finset (InfinitePlace K)), IsReal v ↔ v ∈ S := sorry
+
 /- The normed field structure of a number field coming from the absolute value associated to
 an infinite place. -/
 def normedField : NormedField K :=

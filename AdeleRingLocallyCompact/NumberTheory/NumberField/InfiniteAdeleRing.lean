@@ -90,19 +90,9 @@ theorem RingEquiv.prodMap {R R' S S' : Type*} [NonAssocSemiring R] [NonAssocSemi
 
 instance : DecidablePred (IsReal : InfinitePlace K → Prop) := by
   intro v
-  haveI : ∀ φ : K →+* ℂ, Decidable (ComplexEmbedding.IsReal φ) := by
-    intro φ
-    rw [ComplexEmbedding.IsReal]
-    rw [IsSelfAdjoint]
-    haveI : DecidableEq (K →+* ℂ) := sorry
-    apply decEq
-  haveI : ∀ φ : K →+* ℂ, Decidable (InfinitePlace.mk φ = v) := by
-    intro φ
-    haveI : DecidableEq (InfinitePlace K) := sorry
-    apply decEq
-  apply decidable_of_iff (∃ φ, ComplexEmbedding.IsReal φ ∧ InfinitePlace.mk φ = v)
-  · rfl
-
+  have : { v : InfinitePlace K | IsReal v }.Finite :=
+    Set.Finite.subset (Set.univ_finite_iff_nonempty_fintype.2 ⟨inferInstance⟩) (Set.subset_univ _)
+  exact decidable_of_iff (v ∈ this.toFinset) (by rw [Set.Finite.mem_toFinset, Set.mem_setOf_eq])
 
 theorem equiv_mixedSpace :
     infiniteAdeleRing K ≃+* ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // ¬IsReal w} → ℂ) := by
