@@ -33,6 +33,8 @@ noncomputable section
 
 namespace NumberField
 
+open InfinitePlace
+
 variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
 
 /-- The infinite adele ring of a number field. -/
@@ -67,6 +69,48 @@ theorem globalEmbedding_apply (x : K) : globalEmbedding K x v = (x : v.completio
 /-- The infinite adele ring is locally compact. -/
 instance locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) :=
   Pi.locallyCompactSpace_of_finite
+
+theorem RingEquiv.piEquivPiSubtypeProd {ι : Type*} (p : ι → Prop) (Y : ι → Type*) [(i : ι) → Mul (Y i)]
+    [(i : ι) → Add (Y i)] [DecidablePred p] :
+    ((i : ι) → Y i) ≃+* ((i : { x : ι // p x }) → Y i) × ((i : { x : ι // ¬p x }) → Y i) where
+  toEquiv := Equiv.piEquivPiSubtypeProd p Y
+  map_mul' _ _ := rfl
+  map_add' _ _ := rfl
+
+theorem RingEquiv.prodMap {R R' S S' : Type*} [NonAssocSemiring R] [NonAssocSemiring S]
+    [NonAssocSemiring R'] [NonAssocSemiring S'] (f : R ≃+* R') (g : S ≃+* S') :
+    R × S ≃+* R' × S' where
+  toEquiv := Equiv.prodCongr f g
+  map_mul' _ _ := by
+    simp only [Equiv.toFun_as_coe, Equiv.prodCongr_apply, EquivLike.coe_coe, Prod_map, Prod.fst_mul,
+      map_mul, Prod.snd_mul, Prod.mk_mul_mk]
+  map_add' _ _ := by
+    simp only [Equiv.toFun_as_coe, Equiv.prodCongr_apply, EquivLike.coe_coe, Prod_map, Prod.fst_add,
+      map_add, Prod.snd_add, Prod.mk_add_mk]
+
+instance : DecidablePred (IsReal : InfinitePlace K → Prop) := by
+  intro v
+  haveI : ∀ φ : K →+* ℂ, Decidable (ComplexEmbedding.IsReal φ) := by
+    intro φ
+    rw [ComplexEmbedding.IsReal]
+    rw [IsSelfAdjoint]
+    haveI : DecidableEq (K →+* ℂ) := sorry
+    apply decEq
+  haveI : ∀ φ : K →+* ℂ, Decidable (InfinitePlace.mk φ = v) := by
+    intro φ
+    haveI : DecidableEq (InfinitePlace K) := sorry
+    apply decEq
+  apply decidable_of_iff (∃ φ, ComplexEmbedding.IsReal φ ∧ InfinitePlace.mk φ = v)
+  · rfl
+
+
+theorem equiv_mixedSpace :
+    infiniteAdeleRing K ≃+* ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // ¬IsReal w} → ℂ) := by
+  have := (RingEquiv.piEquivPiSubtypeProd (fun (v : InfinitePlace K) => IsReal v) (fun (v : InfinitePlace K) => v.completion))
+  apply RingEquiv.trans this
+  apply RingEquiv.prodMap
+  · exact RingEquiv.piCongrRight (fun ⟨v, hv⟩ => Completion.equivReal_of_isReal hv)
+  · exact RingEquiv.piCongrRight (fun ⟨v, hv⟩ => Completion.equivComplex_of_isComplex (not_isReal_iff_isComplex.1 hv))
 
 end InfiniteAdeleRing
 
