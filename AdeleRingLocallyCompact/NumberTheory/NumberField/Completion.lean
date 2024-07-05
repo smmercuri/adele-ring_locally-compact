@@ -152,6 +152,8 @@ end AbsoluteValue.Completion
 
 namespace NumberField.InfinitePlace
 
+open AbsoluteValue.Completion
+
 variable {K : Type*} [Field K] [NumberField K] (v : InfinitePlace K)
 
 /- The normed field structure of a number field coming from the absolute value associated to
@@ -163,14 +165,27 @@ theorem abs_eq_comp :
     v.1 = (IsAbsoluteValue.toAbsoluteValue (norm : ℂ → ℝ)).comp v.embedding.injective := by
   rw [← v.2.choose_spec]; rfl
 
+-- use norm_embedding_of_isReal for this after updating
 theorem abs_of_isReal_eq_comp (hv : IsReal v) :
     v.1 = (IsAbsoluteValue.toAbsoluteValue (norm : ℝ → ℝ)).comp (v.embedding_of_isReal hv).injective := by
   ext x
-  have := v.2.choose_spec
-  unfold place at this
-  rw [← v.2.choose_spec]
-  unfold place
-  sorry
+  suffices : v x = (IsAbsoluteValue.toAbsoluteValue (norm : ℝ → ℝ)).comp (v.embedding_of_isReal hv).injective x
+  · rw [← this]; rfl
+  rw [AbsoluteValue.comp, ← norm_embedding_eq]
+  have := embedding_of_isReal_apply hv x
+  simp
+  have h : ∃ r : ℝ, v.embedding x = r := by
+    use (v.embedding x).re
+    symm
+    rw [← Complex.conj_eq_iff_re]
+    rw [isReal_iff, ComplexEmbedding.isReal_iff, ComplexEmbedding.conjugate] at hv
+    nth_rw 2 [← hv]
+    rfl
+  obtain ⟨r, hr⟩ := h
+  rw [hr]
+  simp
+  rw [hr, Complex.ofReal_inj] at this
+  rw [this]
 
 /-- The completion of a number field at an infinite place. -/
 def completion := v.1.completion
@@ -245,7 +260,20 @@ private theorem isClosed_image_extensionEmbedding_of_isReal_subfield (hv : IsRea
 open Complex
 
 private theorem subfield_ne_real_of_isComplex (hv : IsComplex v) : subfield v ≠ ofReal.fieldRange := by
-  sorry
+  contrapose! hv
+  simp only [not_isComplex_iff_isReal, isReal_iff, ComplexEmbedding.isReal_iff]
+  ext x
+  have h : v.embedding x ∈ subfield v := by
+    simp only [subfield, Subfield.mem_mk, RingHom.mem_range, extensionEmbedding,
+      extensionEmbedding_of_comp, UniformSpace.Completion.extensionHom, RingHom.coe_mk,
+      MonoidHom.coe_mk, OneHom.coe_mk]
+    refine ⟨x, ?_⟩
+    rw [UniformSpace.Completion.extension_coe
+        (WithAbs.uniformInducing_of_comp (abs_eq_comp v)).uniformContinuous]
+    rfl
+  simp only [hv, RingHom.mem_fieldRange, ofReal_eq_coe] at h
+  obtain ⟨r, hr⟩ := h
+  simp only [ComplexEmbedding.conjugate_coe_eq, ← hr, conj_ofReal]
 
 open Set
 
@@ -262,22 +290,16 @@ theorem Real.subfield_eq_of_closed {K : Subfield ℝ} (hc : IsClosed (K : Set �
   rw [DenseRange.closure_range Rat.denseEmbedding_coe_real.dense]
 
 theorem equivReal_of_isReal (hv : IsReal v) : v.completion ≃+* ℝ := by
-  have h := Real.subfield_eq_of_closed <| isClosed_image_extensionEmbedding_of_isReal_subfield v hv
-  have h' := @Subfield.topEquiv ℝ _
-  apply RingEquiv.trans _ h'
-  rw [← h]
-  have h' := @RingHom.quotientKerEquivRange v.completion _ _ _ (extensionEmbedding_of_isReal v hv)
-  have h_inj := injective_extensionEmbedding_of_isReal v hv
-  rw [RingHom.injective_iff_ker_eq_bot] at h_inj
-  rw [h_inj] at h'
-  have h'' := RingEquiv.trans (RingEquiv.quotientBot _).symm h'
-  apply RingEquiv.trans h''
+  apply RingEquiv.trans _ Subfield.topEquiv
+  rw [← Real.subfield_eq_of_closed <| isClosed_image_extensionEmbedding_of_isReal_subfield v hv]
+  have h := @RingHom.quotientKerEquivRange v.completion _ _ _ (extensionEmbedding_of_isReal v hv)
+  rw [(extensionEmbedding_of_isReal v hv).injective_iff_ker_eq_bot.1 (injective_extensionEmbedding_of_isReal v hv)] at h
+  apply RingEquiv.trans <| RingEquiv.trans (RingEquiv.quotientBot _).symm h
   rfl
 
 theorem equivComplex_of_isComplex (hv : IsComplex v) : v.completion ≃+* ℂ := by
   have h := (Complex.subfield_eq_of_closed <| isClosed_image_extensionEmbedding_subfield v).resolve_left <| subfield_ne_real_of_isComplex v hv
-  have h' := @Subfield.topEquiv ℂ _
-  apply RingEquiv.trans _ h'
+  apply RingEquiv.trans _ Subfield.topEquiv
   rw [← h]
   have h' := @RingHom.quotientKerEquivRange v.completion _ _ _ (extensionEmbedding v)
   have h_inj := injective_extensionEmbedding v
