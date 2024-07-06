@@ -156,8 +156,6 @@ open AbsoluteValue.Completion
 
 variable {K : Type*} [Field K] [NumberField K] (v : InfinitePlace K)
 
-theorem exists_finset_of_isReal : ∃ (S : Finset (InfinitePlace K)), IsReal v ↔ v ∈ S := sorry
-
 /- The normed field structure of a number field coming from the absolute value associated to
 an infinite place. -/
 def normedField : NormedField K :=
@@ -171,23 +169,16 @@ theorem abs_eq_comp :
 theorem abs_of_isReal_eq_comp {v : InfinitePlace K} (hv : IsReal v) :
     v.1 = (IsAbsoluteValue.toAbsoluteValue (norm : ℝ → ℝ)).comp (v.embedding_of_isReal hv).injective := by
   ext x
-  suffices : v x = (IsAbsoluteValue.toAbsoluteValue (norm : ℝ → ℝ)).comp (v.embedding_of_isReal hv).injective x
+  suffices : v x =
+    (IsAbsoluteValue.toAbsoluteValue (norm : ℝ → ℝ)).comp (v.embedding_of_isReal hv).injective x
   · rw [← this]; rfl
-  rw [AbsoluteValue.comp, ← norm_embedding_eq]
-  have := embedding_of_isReal_apply hv x
-  simp
-  have h : ∃ r : ℝ, v.embedding x = r := by
-    use (v.embedding x).re
-    symm
-    rw [← Complex.conj_eq_iff_re]
-    rw [isReal_iff, ComplexEmbedding.isReal_iff, ComplexEmbedding.conjugate] at hv
-    nth_rw 2 [← hv]
-    rfl
-  obtain ⟨r, hr⟩ := h
-  rw [hr]
-  simp
-  rw [hr, Complex.ofReal_inj] at this
-  rw [this]
+  simp only [AbsoluteValue.comp, ← norm_embedding_eq, Complex.norm_eq_abs, AbsoluteValue.coe_mk,
+    MulHom.coe_comp, AbsoluteValue.coe_toMulHom, MulHom.coe_coe, Function.comp_apply,
+    IsAbsoluteValue.toAbsoluteValue_toFun, Real.norm_eq_abs]
+  simp only [isReal_iff, ComplexEmbedding.isReal_iff, ComplexEmbedding.conjugate, RingHom.ext_iff,
+    ComplexEmbedding.conjugate_coe_eq, Complex.conj_eq_iff_re] at hv
+  rw [← hv x, Complex.abs_ofReal, ← Complex.ofReal_inj, ← embedding_of_isReal_apply,
+    Complex.ofReal_re]
 
 /-- The completion of a number field at an infinite place. -/
 def completion := v.1.completion

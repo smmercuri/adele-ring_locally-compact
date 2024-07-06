@@ -70,8 +70,8 @@ theorem globalEmbedding_apply (x : K) : globalEmbedding K x v = (x : v.completio
 instance locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) :=
   Pi.locallyCompactSpace_of_finite
 
-theorem RingEquiv.piEquivPiSubtypeProd {ι : Type*} (p : ι → Prop) (Y : ι → Type*) [(i : ι) → Mul (Y i)]
-    [(i : ι) → Add (Y i)] [DecidablePred p] :
+theorem RingEquiv.piEquivPiSubtypeProd {ι : Type*} (p : ι → Prop) (Y : ι → Type*)
+    [(i : ι) → Mul (Y i)] [(i : ι) → Add (Y i)] [DecidablePred p] :
     ((i : ι) → Y i) ≃+* ((i : { x : ι // p x }) → Y i) × ((i : { x : ι // ¬p x }) → Y i) where
   toEquiv := Equiv.piEquivPiSubtypeProd p Y
   map_mul' _ _ := rfl
@@ -88,6 +88,18 @@ theorem RingEquiv.prodMap {R R' S S' : Type*} [NonAssocSemiring R] [NonAssocSemi
     simp only [Equiv.toFun_as_coe, Equiv.prodCongr_apply, EquivLike.coe_coe, Prod_map, Prod.fst_add,
       map_add, Prod.snd_add, Prod.mk_add_mk]
 
+-- TODO : add simp lemmas for these
+theorem RingEquiv.piCongrLeft' {α β : Type*} (R : α → Type*)
+    [(i : α) → NonUnitalNonAssocSemiring (R i)] (e : α ≃ β) :
+    ((a : α) → R a) ≃+* ((b : β) → R (e.symm b)) where
+  toEquiv := Equiv.piCongrLeft' R e
+  map_mul' _ _ := rfl
+  map_add' _ _ := rfl
+
+theorem RingEquiv.piCongrLeft {α β : Type*} (R : β → Type*)
+    [(i : β) → NonUnitalNonAssocSemiring (R i)] (e : α ≃ β) :
+    ((a : α) → R (e a)) ≃+* ((b : β) → R b) := (RingEquiv.piCongrLeft' R e.symm).symm
+
 instance : DecidablePred (IsReal : InfinitePlace K → Prop) := by
   intro v
   have : { v : InfinitePlace K | IsReal v }.Finite :=
@@ -95,12 +107,16 @@ instance : DecidablePred (IsReal : InfinitePlace K → Prop) := by
   exact decidable_of_iff (v ∈ this.toFinset) (by rw [Set.Finite.mem_toFinset, Set.mem_setOf_eq])
 
 theorem equiv_mixedSpace :
-    infiniteAdeleRing K ≃+* ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // ¬IsReal w} → ℂ) := by
-  have := (RingEquiv.piEquivPiSubtypeProd (fun (v : InfinitePlace K) => IsReal v) (fun (v : InfinitePlace K) => v.completion))
-  apply RingEquiv.trans this
-  apply RingEquiv.prodMap
+    infiniteAdeleRing K ≃+*
+      ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ) := by
+  have := (RingEquiv.piEquivPiSubtypeProd (fun (v : InfinitePlace K) => IsReal v)
+    (fun (v : InfinitePlace K) => v.completion))
+  refine RingEquiv.trans this (RingEquiv.prodMap ?_ ?_)
   · exact RingEquiv.piCongrRight (fun ⟨v, hv⟩ => Completion.equivReal_of_isReal hv)
-  · exact RingEquiv.piCongrRight (fun ⟨v, hv⟩ => Completion.equivComplex_of_isComplex (not_isReal_iff_isComplex.1 hv))
+  · apply RingEquiv.trans <| RingEquiv.piCongrRight (fun v => Completion.equivComplex_of_isComplex
+      ((not_isReal_iff_isComplex.1 v.2)))
+    exact RingEquiv.piCongrLeft (fun _ => _) <|
+      Equiv.subtypeEquivRight (fun v => not_isReal_iff_isComplex)
 
 end InfiniteAdeleRing
 
