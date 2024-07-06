@@ -108,15 +108,17 @@ instance : DecidablePred (IsReal : InfinitePlace K → Prop) := by
 
 theorem equiv_mixedSpace :
     infiniteAdeleRing K ≃+*
-      ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ) := by
-  have := (RingEquiv.piEquivPiSubtypeProd (fun (v : InfinitePlace K) => IsReal v)
-    (fun (v : InfinitePlace K) => v.completion))
-  refine RingEquiv.trans this (RingEquiv.prodMap ?_ ?_)
-  · exact RingEquiv.piCongrRight (fun ⟨v, hv⟩ => Completion.equivReal_of_isReal hv)
-  · apply RingEquiv.trans <| RingEquiv.piCongrRight (fun v => Completion.equivComplex_of_isComplex
-      ((not_isReal_iff_isComplex.1 v.2)))
-    exact RingEquiv.piCongrLeft (fun _ => _) <|
-      Equiv.subtypeEquivRight (fun v => not_isReal_iff_isComplex)
+      ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ) :=
+  RingEquiv.trans
+    (RingEquiv.piEquivPiSubtypeProd (fun (v : InfinitePlace K) => IsReal v)
+      (fun (v : InfinitePlace K) => v.completion))
+    (RingEquiv.prodMap
+      (RingEquiv.piCongrRight (fun ⟨_, hv⟩ => Completion.equivReal_of_isReal hv))
+      (RingEquiv.trans
+        (RingEquiv.piCongrRight (fun v => Completion.equivComplex_of_isComplex
+          ((not_isReal_iff_isComplex.1 v.2))))
+        (RingEquiv.piCongrLeft (fun _ => _) <|
+          Equiv.subtypeEquivRight (fun _ => not_isReal_iff_isComplex))))
 
 end InfiniteAdeleRing
 
