@@ -6,10 +6,65 @@ Authors: Salvatore Mercuri
 import Mathlib
 import AdeleRingLocallyCompact.Analysis.NormedSpace.Completion
 import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
+import AdeleRingLocallyCompact.Topology.Instances.Real
 
+/-!
+# Completions of a number field at an infinite place
+
+This file contains the completion of a number field at its infinite places.
+
+We first define abstractly the uniform structure associated to a (semi)ring with an associated
+absolute value, derived from a `NormedRing` instance. Let `v` be an infinite place, to which
+is associated an absolute value; the abstract uniform structure of this absolute value is
+used to define a `NormedField` instance, and therefore a uniform structure. We complete `K`
+at `v` using the `UniformSpace.Completion` functor with respect to this uniform structure to
+obtain `v.completion`.
+
+The embedding `v.embedding : K →+* ℂ` associated to an infinite place enjoys useful properties
+within the uniform structure defined by `v`; namely, it is a uniform embedding and an isometry.
+This is because the absolute value associated to `v` factors through `v.embedding`. This allows
+us to show that the completion of `K` at an infinite place is locally compact. Moreover, we can
+extend `v.embedding` to a embedding `v.completion →+* ℂ`. We show that if `v` is real (i.e.,
+`v.embedding (K) ⊆ ℝ`) then the extended embedding gives an isomorphism `v.completion ≃+* ℝ`,
+else the extended embedding gives an isomorphism `v.completion ≃+* ℂ`.
+
+## Main definitions
+ - `WithAbs` : type synonym equipping a semiring with an absolute value.
+ - `AbsoluteValue.completion` : the uniform space completion of a field `K` equipped with real
+  absolute value.
+ - `NumberField.InfinitePlace.completion` : the completion of a number field `K` at an infinite
+  place, obtained by completing `K` with respect to the absolute value associated to the infinite
+  place.
+ - `NumberField.InfinitePlace.Completion.extensionEmbedding` : the embedding `v.embedding : K →+* ℂ`
+  extended to `v.completion →+* ℂ`.
+ - `NumberField.InfinitePlace.Completion.extensionEmbedding_of_isReal` : if the infinite place `v`
+  is real, then this extends the embedding `v.embedding_of_isReal : K →+* ℝ` to
+  `v.completion →+* ℝ`.
+ - `NumberField.InfinitePlace.Completion.equivReal_of_isReal` : the ring isomorphism
+  `v.completion ≃+* ℝ` when `v` is a real infinite place; the forward direction of this is
+  `extensionEmbedding_of_isReal`.
+ - `NumberField.InfinitePlace.Completion.equivComplex_of_isComplex` : the ring isomorphism
+  `v.completion ≃+* ℂ` when `v` is a complex infinite place; the forward direction of this is
+  `extensionEmbedding`.
+
+## Main results
+ - `NumberField.Completion.locallyCompactSpace` : the completion of a number field at
+  an infinite place is locally compact.
+ - `NumberField.Completion.isometry_extensionEmbedding` : the embedding `v.completion →+* ℂ` is
+  an isometry. See also `isometry_extensionEmbedding_of_isReal` for the corresponding result on
+  `v.completion →+* ℝ` when `v` is real.
+ - `NumberField.Completion.bijective_extensionEmbedding_of_isComplex` : the embedding
+  `v.completion →+* ℂ` is bijective when `v` is complex. See also
+  `bijective_extensionEmebdding_of_isReal` for the corresponding result for `v.completion →+* ℝ`
+  when `v` is real.
+
+## Tags
+number field, embeddings, infinite places, completion
+-/
 noncomputable section
 
-def WithAbs {R S} [Semiring R] [OrderedSemiring S] : AbsoluteValue R S → Type _ := fun _ ↦ R
+/-- Type synonym equipping a semiring with an absolute value. -/
+def WithAbs {R S} [Semiring R] [OrderedSemiring S] : AbsoluteValue R S → Type _ := fun _ => R
 
 namespace WithAbs
 
@@ -37,6 +92,8 @@ instance instNormedFieldWithAbs : NormedField (WithAbs v) where
 
 variable {A : Type*} [NormedField A] {f : WithAbs v →+* A} {v}
 
+/-- If the absolute value `v` factors through an embedding `f` into a normed field, then
+the distance associated to the absolute value also factors through `f`. -/
 theorem dist_of_comp
     (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
     dist x y = dist (f x) (f y) := by
@@ -45,27 +102,31 @@ theorem dist_of_comp
 
 instance : Inhabited (WithAbs v) := ⟨0⟩
 
+/-- If the absolute value `v` factors through an embedding `f` into a normed field, then
+the pseudo metric space associated to the absolute value is the same as the pseudo metric space
+induced by `f`. -/
 theorem pseudoMetricSpace_induced_of_comp
     (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
-    letI := inferInstanceAs (PseudoMetricSpace (WithAbs v));
     (instNormedFieldWithAbs v).toPseudoMetricSpace = PseudoMetricSpace.induced f inferInstance := by
   ext; exact dist_of_comp h
 
+/-- If the absolute value `v` factors through an embedding `f` into a normed field, then
+the uniform structure associated to the absolute value is the same as the uniform structure
+induced by `f`. -/
 theorem uniformSpace_eq_comap_of_comp
     (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
     (instNormedFieldWithAbs v).toUniformSpace = UniformSpace.comap f inferInstance := by
   rw [pseudoMetricSpace_induced_of_comp h]; rfl
 
+/-- If the absolute value `v` factors through an embedding `f` into a normed field, then
+`f` is uniform inducing. -/
 theorem uniformInducing_of_comp
     (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
     UniformInducing f :=
   uniformInducing_iff_uniformSpace.2 (Eq.symm (uniformSpace_eq_comap_of_comp h))
 
-theorem uniformEmbedding
-    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
-    UniformEmbedding f :=
-  (uniformInducing_of_comp h).uniformEmbedding
-
+/-- If the absolute value `v` factors through an embedding `f` into a normed field, then
+`f` is an isometry. -/
 theorem isometry_of_comp
     (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
     Isometry f :=
@@ -79,6 +140,7 @@ open WithAbs
 
 variable {K : Type*} [Field K] (v : AbsoluteValue K ℝ)
 
+/-- The completion of a field with respect to a real absolute value. -/
 def completion := UniformSpace.Completion (WithAbs v)
 
 namespace Completion
@@ -156,11 +218,13 @@ open AbsoluteValue.Completion
 
 variable {K : Type*} [Field K] [NumberField K] (v : InfinitePlace K)
 
-/- The normed field structure of a number field coming from the absolute value associated to
+/-- The normed field structure of a number field coming from the absolute value associated to
 an infinite place. -/
 def normedField : NormedField K :=
   inferInstanceAs (NormedField (WithAbs v.1))
 
+/-- The absolute value of an infinite place factors through the embedding associated to
+an infinite place. -/
 theorem abs_eq_comp :
     v.1 = (IsAbsoluteValue.toAbsoluteValue (norm : ℂ → ℝ)).comp v.embedding.injective := by
   rw [← v.2.choose_spec]; rfl
@@ -205,6 +269,7 @@ instance : Algebra K v.completion :=
 def extensionEmbedding :=
   extensionEmbedding_of_comp v.abs_eq_comp
 
+/-- The embedding `K →+* ℝ` associated to a real infinite place extended to `v.completion →+* ℝ`. -/
 def extensionEmbedding_of_isReal {v : InfinitePlace K} (hv : IsReal v) :=
   extensionEmbedding_of_comp <| abs_of_isReal_eq_comp hv
 
@@ -212,6 +277,7 @@ def extensionEmbedding_of_isReal {v : InfinitePlace K} (hv : IsReal v) :=
 theorem isometry_extensionEmbedding : Isometry (extensionEmbedding v) :=
   Isometry.of_dist_eq (extensionEmbedding_dist_eq_of_comp v.abs_eq_comp)
 
+/-- The embedding `v.completion →+* ℝ` at a real infinite palce is an isometry. -/
 theorem isometry_extensionEmbedding_of_isReal {v : InfinitePlace K} (hv : IsReal v) :
     Isometry (extensionEmbedding_of_isReal hv) :=
   Isometry.of_dist_eq (extensionEmbedding_dist_eq_of_comp <| abs_of_isReal_eq_comp hv)
@@ -229,9 +295,12 @@ theorem injective_extensionEmbedding_of_isReal {v : InfinitePlace K} (hv : IsRea
 instance locallyCompactSpace : LocallyCompactSpace (v.completion) :=
   AbsoluteValue.Completion.locallyCompactSpace v.abs_eq_comp
 
+/-- The embedding `v.completion →+* ℂ` has closed image inside `ℂ`. -/
 theorem isClosed_image_extensionEmbedding : IsClosed (Set.range (extensionEmbedding v)) := by
   exact ((closedEmbedding_iff _).1 <| closedEmbedding_extensionEmbedding_of_comp v.abs_eq_comp).2
 
+/-- The embedding `v.completion →+* ℝ` associated to a real infinite place has closed image
+inside `ℝ`. -/
 theorem isClosed_image_extensionEmbedding_of_isReal {v : InfinitePlace K} (hv : IsReal v) :
     IsClosed (Set.range (extensionEmbedding_of_isReal hv)) :=
   ((closedEmbedding_iff _).1 <|
@@ -273,34 +342,40 @@ private theorem subfield_ne_real_of_isComplex {v : InfinitePlace K} (hv : IsComp
   obtain ⟨r, hr⟩ := h
   simp only [ComplexEmbedding.conjugate_coe_eq, ← hr, Complex.conj_ofReal]
 
-theorem Real.subfield_eq_of_closed {K : Subfield ℝ} (hc : IsClosed (K : Set ℝ)) : K = ⊤ := by
-  suffices : Set.univ ⊆ (K : Set ℝ)
-  · exact eq_top_iff.2 fun _ _ => this (Set.mem_univ _)
-  suffices : Set.univ ⊆ closure (Set.range ((↑) : ℚ → ℝ))
-  · refine subset_trans this ?_
-    rw [← IsClosed.closure_eq hc]
-    apply closure_mono
-    rintro _ ⟨_, rfl⟩
-    simp only [Complex.ofReal_rat_cast, SetLike.mem_coe, SubfieldClass.coe_rat_mem]
-  rw [DenseRange.closure_range Rat.denseEmbedding_coe_real.dense]
-
-theorem equivReal_of_isReal {v : InfinitePlace K} (hv : IsReal v) : v.completion ≃+* ℝ := by
-  apply RingEquiv.trans _ Subfield.topEquiv
-  rw [← Real.subfield_eq_of_closed <| isClosed_subfield_of_isReal hv]
-  have h := @RingHom.quotientKerEquivRange v.completion _ _ _ (extensionEmbedding_of_isReal hv)
-  rw [(extensionEmbedding_of_isReal hv).injective_iff_ker_eq_bot.1
-    (injective_extensionEmbedding_of_isReal hv)] at h
-  apply RingEquiv.trans <| RingEquiv.trans (RingEquiv.quotientBot _).symm h
+/-- If `v` is a complex infinite place, then the embedding `v.completion →+* ℂ` is surjective. -/
+theorem surjective_extensionEmbedding_of_isComplex {v : InfinitePlace K} (hv : IsComplex v) :
+    Function.Surjective (extensionEmbedding v) := by
+  rw [← RingHom.range_top_iff_surjective, (show ⊤ = (⊤ : Subfield ℂ).toSubring by rfl),
+    ← (Complex.subfield_eq_of_closed <| isClosed_subfield v).resolve_left <|
+      subfield_ne_real_of_isComplex hv]
   rfl
 
-theorem equivComplex_of_isComplex {v : InfinitePlace K} (hv : IsComplex v) :
-    v.completion ≃+* ℂ := by
-  apply RingEquiv.trans _ Subfield.topEquiv
-  rw [← (Complex.subfield_eq_of_closed <| isClosed_subfield v).resolve_left <|
-    subfield_ne_real_of_isComplex hv]
-  have h := @RingHom.quotientKerEquivRange v.completion _ _ _ (extensionEmbedding v)
-  rw [(extensionEmbedding v).injective_iff_ker_eq_bot.1 (injective_extensionEmbedding v)] at h
-  apply RingEquiv.trans <| RingEquiv.trans (RingEquiv.quotientBot _).symm h
+/-- If `v` is a complex infinite place, then the embedding `v.completion →+* ℂ` is bijective. -/
+theorem bijective_extensionEmbedding_of_isComplex {v : InfinitePlace K} (hv : IsComplex v) :
+    Function.Bijective (extensionEmbedding v) :=
+  ⟨injective_extensionEmbedding v, surjective_extensionEmbedding_of_isComplex hv⟩
+
+/-- The ring isomorphism `v.completion ≃+* ℂ`, when `v` is complex, given by the bijection
+`v.completion →+* ℂ`. -/
+def equivComplex_of_isComplex {v : InfinitePlace K} (hv : IsComplex v) :
+    v.completion ≃+* ℂ :=
+  RingEquiv.ofBijective _ (bijective_extensionEmbedding_of_isComplex hv)
+
+/-- If `v` is a real infinite place, then the embedding `v.completion →+* ℝ` is surjective. -/
+theorem surjective_extensionEmbedding_of_isReal {v : InfinitePlace K} (hv : IsReal v) :
+    Function.Surjective (extensionEmbedding_of_isReal hv) := by
+  rw [← RingHom.range_top_iff_surjective, (show ⊤ = (⊤ : Subfield ℝ).toSubring by rfl),
+    ← Real.subfield_eq_of_closed <| isClosed_subfield_of_isReal hv]
   rfl
+
+/-- If `v` is a real infinite place, then the embedding `v.completion →+* ℝ` is bijective. -/
+theorem bijective_extensionEmbedding_of_isReal {v : InfinitePlace K} (hv : IsReal v) :
+    Function.Bijective (extensionEmbedding_of_isReal hv) :=
+  ⟨injective_extensionEmbedding_of_isReal hv, surjective_extensionEmbedding_of_isReal hv⟩
+
+/-- The ring isomorphism `v.completion ≃+* ℝ`, when `v` is real, given by the bijection
+`v.completion →+* ℝ`. -/
+def equivReal_of_isReal {v : InfinitePlace K} (hv : IsReal v) : v.completion ≃+* ℝ :=
+  RingEquiv.ofBijective _ (bijective_extensionEmbedding_of_isReal hv)
 
 end NumberField.InfinitePlace.Completion
