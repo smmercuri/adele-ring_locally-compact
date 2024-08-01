@@ -29,11 +29,15 @@ def prodMap {R R' S S' : Type*} [Add R] [Add R'] [Mul R] [Mul R'] [Add S] [Add S
     R × S ≃+* R' × S' where
   toEquiv := Equiv.prodCongr f g
   map_mul' _ _ := by
-    simp only [Equiv.toFun_as_coe, Equiv.prodCongr_apply, EquivLike.coe_coe, Prod_map, Prod.fst_mul,
-      map_mul, Prod.snd_mul, Prod.mk_mul_mk]
+    simp only [Equiv.toFun_as_coe, Equiv.prodCongr_apply, EquivLike.coe_coe]
+    rw [Prod.map_apply]
+    simp only [Prod.fst_mul, map_mul, Prod.snd_mul, Prod.mk_mul_mk]
+    rfl
   map_add' _ _ := by
-    simp only [Equiv.toFun_as_coe, Equiv.prodCongr_apply, EquivLike.coe_coe, Prod_map, Prod.fst_add,
-      map_add, Prod.snd_add, Prod.mk_add_mk]
+    simp only [Equiv.toFun_as_coe, Equiv.prodCongr_apply, EquivLike.coe_coe]
+    rw [Prod.map_apply]
+    simp only [Prod.fst_add, map_add, Prod.snd_add, Prod.mk_add_mk]
+    rfl
 
 @[simp]
 theorem coe_prodMap {R R' S S' : Type*} [Add R] [Add R'] [Mul R] [Mul R'] [Add S] [Add S'] [Mul S]

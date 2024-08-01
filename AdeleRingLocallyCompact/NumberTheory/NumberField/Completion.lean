@@ -147,7 +147,7 @@ def completion := UniformSpace.Completion (WithAbs v)
 namespace Completion
 
 instance : NormedRing v.completion :=
-  UniformSpace.Completion.instNormedRingCompletionToUniformSpaceToPseudoMetricSpace _
+  UniformSpace.Completion.instNormedRing _
 
 instance [CompletableTopField (WithAbs v)] : NormedField v.completion :=
   UniformSpace.Completion.instNormedField (WithAbs v)

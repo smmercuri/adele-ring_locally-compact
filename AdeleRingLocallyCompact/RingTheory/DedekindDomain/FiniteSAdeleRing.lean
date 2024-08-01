@@ -6,7 +6,6 @@ Authors: Salvatore Mercuri
 import Mathlib
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
-import AdeleRingLocallyCompact.Topology.Homeomorph
 
 /-!
 # Finite S-adele ring
@@ -134,7 +133,7 @@ instance : Inhabited (SProdAdicCompletionIntegers R K S) := instInhabitedProd
 end DerivedInstances
 
 /-- The type equivalence between the two formalisations of `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
-theorem subtypeEquiv :
+def subtypeEquiv :
     SProdAdicCompletionIntegers_subtype R K S ≃ SProdAdicCompletionIntegers R K S where
   toFun x := (x.val.1 , fun v => ⟨x.val.2 v, x.property v⟩)
   invFun x := ⟨x, fun v => SetLike.coe_mem (x.2 v)⟩
@@ -142,7 +141,7 @@ theorem subtypeEquiv :
   right_inv _ := rfl
 
 /-- The homeomorphism between the two formalisations of `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
-theorem homeomorph :
+def homeomorph :
     SProdAdicCompletionIntegers_subtype R K S ≃ₜ SProdAdicCompletionIntegers R K S where
   toEquiv := subtypeEquiv R K S
   continuous_toFun := by
@@ -222,7 +221,7 @@ def finiteSAdeleRing : Subring (ProdAdicCompletions R K) where
 namespace FiniteSAdeleRing
 
 /-- the finite S-adele ring is homeomorphic to `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
-theorem homeomorph_piSubtypeProd :
+def homeomorph_piSubtypeProd :
     finiteSAdeleRing R K S ≃ₜ SProdAdicCompletionIntegers_subtype R K S :=
   Homeomorph.subtype (Homeomorph.piEquivPiSubtypeProd _ _) <| fun _ =>
     ⟨fun hx v => hx v.1 v.2, fun hx v hv => hx ⟨v, hv⟩⟩
@@ -235,7 +234,7 @@ variable {R K S}
 
 /-- A finite S-adele is a finite adele. -/
 theorem mem_isFiniteAdele {x : ProdAdicCompletions R K} (hx : x ∈ finiteSAdeleRing R K S) :
-    x ∈ finiteAdeleRing R K := by
+    x ∈ FiniteAdeleRing R K := by
   rw [mem_finiteAdeleRing_iff, ProdAdicCompletions.IsFiniteAdele, Filter.eventually_cofinite]
   refine Set.Finite.subset S.finite_toSet (fun v hv => ?_)
   contrapose hv

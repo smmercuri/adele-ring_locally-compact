@@ -107,7 +107,7 @@ theorem equiv_mixedSpace_apply (x : infiniteAdeleRing K) :
         fun (v : {w : InfinitePlace K // IsComplex w}) => equivComplex_of_isComplex v.2 (x v)) := by
   simp only [equiv_mixedSpace, RingEquiv.piEquivPiSubtypeProd, RingEquiv.prodMap,
     RingEquiv.piCongrLeft, RingEquiv.coe_trans, Equiv.prodCongr_apply, EquivLike.coe_coe,
-    Function.comp_apply, Prod_map, RingEquiv.piCongrRight, Equiv.piEquivPiSubtypeProd,
+    Function.comp_apply, Prod.map_apply, RingEquiv.piCongrRight, Equiv.piEquivPiSubtypeProd,
     RingEquiv.piCongrLeft', Equiv.piCongrLeft', RingEquiv.symm_mk, RingEquiv.coe_mk,
     Equiv.coe_fn_mk, Equiv.subtypeEquivRight_symm_apply_coe]
 

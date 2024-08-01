@@ -9,4 +9,3 @@ import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteSAdeleRing
 import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 import AdeleRingLocallyCompact.Topology.Instances.Real
-import AdeleRingLocallyCompact.Topology.Homeomorph
