@@ -19,5 +19,5 @@ theorem Real.subfield_eq_of_closed {K : Subfield ℝ} (hc : IsClosed (K : Set �
     rw [← IsClosed.closure_eq hc]
     apply closure_mono
     rintro _ ⟨_, rfl⟩
-    simp only [Complex.ofReal_rat_cast, SetLike.mem_coe, SubfieldClass.coe_rat_mem]
-  rw [DenseRange.closure_range Rat.denseEmbedding_coe_real.dense]
+    simp only [SetLike.mem_coe, SubfieldClass.coe_rat_mem]
+  rw [DenseRange.closure_range Rat.denseRange_cast]

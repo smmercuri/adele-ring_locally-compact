@@ -37,7 +37,7 @@ theorem isReal_iff_basis :
   · rw [← (FiniteDimensional.finBasis ℚ K).sum_repr x]
     simp only [map_sum, Complex.im_sum, map_rat_smul, Complex.smul_im, hv, smul_zero,
       Finset.sum_const_zero]
-
+/-
 instance : DecidablePred (IsReal : InfinitePlace K → Prop) :=
   letI (v : InfinitePlace K) : Decidable (∀ (i : Fin (FiniteDimensional.finrank ℚ K)),
     (v.embedding ((FiniteDimensional.finBasis ℚ K) i)).im = 0) := Fintype.decidableForallFintype
@@ -47,5 +47,5 @@ instance : DecidablePred (IsReal : InfinitePlace K → Prop) :=
 
 instance : DecidablePred (IsComplex : InfinitePlace K → Prop) :=
   fun v => decidable_of_iff (¬IsReal v) not_isReal_iff_isComplex
-
+-/
 end NumberField.InfinitePlace

@@ -16,7 +16,7 @@ product of completions of `K` over its infinite places. The definition of the co
 formalised in [AdeleRingLocallyCompact.NumberTheory.NumberField.Completion](Completion.lean).
 
 We show that the infinite adele ring is locally compact and that it is isomorphic to the
-mixed space `ℝ ^ r₁ × ℂ ^ r₂` used in `Mathlib.NumberTheory.NumberField.mixedEmbedding`.
+space `ℝ ^ r₁ × ℂ ^ r₂` used in `Mathlib.NumberTheory.NumberField.mixedEmbedding`.
 
 ## Main definitions
  - `NumberField.infiniteAdeleRing` of a number field `K` is defined as the product of
@@ -47,6 +47,8 @@ noncomputable section
 namespace NumberField
 
 open InfinitePlace InfinitePlace.Completion AbsoluteValue.Completion
+
+open scoped Classical
 
 variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
 
@@ -83,7 +85,9 @@ theorem globalEmbedding_apply (x : K) : globalEmbedding K x v = (x : v.completio
 instance locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) :=
   Pi.locallyCompactSpace_of_finite
 
-def equiv_mixedSpace :
+/-- The ring isomorphism between the infinite adele ring of a number field and the
+space `ℝ ^ r₁ × ℂ ^ r₂`, where `(r₁, r₂)` is the signature of the number field. -/
+abbrev equiv_mixedSpace :
     infiniteAdeleRing K ≃+*
       ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ) :=
   RingEquiv.trans
@@ -108,6 +112,9 @@ theorem equiv_mixedSpace_apply (x : infiniteAdeleRing K) :
     RingEquiv.piCongrLeft', Equiv.piCongrLeft', RingEquiv.symm_mk, RingEquiv.coe_mk,
     Equiv.coe_fn_mk, Equiv.subtypeEquivRight_symm_apply_coe]
 
+/-- Transfers the global embedding of `x ↦ (x)ᵥ` of the number field `K` into its infinite adele
+ring to the mixed embedding `x ↦ (φᵢ(x))ᵢ` of `K` into the space `ℝ ^ r₁ × ℂ ^ r₂`, where
+`(r₁, r₂)` is the signature of `K` and `φᵢ` are the complex embeddings of `K`. -/
 theorem mixedEmbedding_eq_globalEmbedding_comp {x : K} :
     mixedEmbedding K x = equiv_mixedSpace K (globalEmbedding K x) := by
   ext ⟨v, hv⟩ <;> simp only [equiv_mixedSpace_apply, globalEmbedding_apply,

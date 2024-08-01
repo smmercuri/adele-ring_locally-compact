@@ -95,7 +95,8 @@ variable {A : Type*} [NormedField A] {f : WithAbs v →+* A} {v}
 /-- If the absolute value `v` factors through an embedding `f` into a normed field, then
 the distance associated to the absolute value also factors through `f`. -/
 theorem dist_of_comp
-    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective)
+    (x y : WithAbs v) :
     dist x y = dist (f x) (f y) := by
   rw [(instNormedFieldWithAbs v).dist_eq, (inferInstanceAs <| NormedField A).dist_eq,
     ← f.map_sub, h]; rfl
@@ -108,7 +109,7 @@ induced by `f`. -/
 theorem pseudoMetricSpace_induced_of_comp
     (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
     (instNormedFieldWithAbs v).toPseudoMetricSpace = PseudoMetricSpace.induced f inferInstance := by
-  ext; exact dist_of_comp h
+  ext; exact dist_of_comp h _ _
 
 /-- If the absolute value `v` factors through an embedding `f` into a normed field, then
 the uniform structure associated to the absolute value is the same as the uniform structure
