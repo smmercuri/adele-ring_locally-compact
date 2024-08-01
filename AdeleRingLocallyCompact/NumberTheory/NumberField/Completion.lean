@@ -9,7 +9,7 @@ import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 import AdeleRingLocallyCompact.Topology.Instances.Real
 
 /-!
-# Completions of a number field at an infinite place
+# The completion of a number field at an infinite place
 
 This file contains the completion of a number field at its infinite places.
 
