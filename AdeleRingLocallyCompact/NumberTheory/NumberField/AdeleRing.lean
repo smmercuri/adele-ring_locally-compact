@@ -62,7 +62,7 @@ def globalEmbedding : K →+* adeleRing K :=
   RingHom.prod (InfiniteAdeleRing.globalEmbedding K) (FiniteAdeleRing.globalEmbedding _ _)
 
 theorem globalEmbedding_injective : Function.Injective (globalEmbedding K) :=
-  fun _ _ hxy => InfiniteAdeleRing.globalEmbedding_injective K (Prod.ext_iff.1 hxy).1
+  fun _ _ hxy => (InfiniteAdeleRing.globalEmbedding K).injective (Prod.ext_iff.1 hxy).1
 
 /-- The adele ring of a number field is a locally compact space. -/
 theorem locallyCompactSpace : LocallyCompactSpace (adeleRing K) := by

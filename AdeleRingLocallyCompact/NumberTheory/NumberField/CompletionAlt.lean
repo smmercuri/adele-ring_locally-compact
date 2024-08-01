@@ -6,7 +6,7 @@ Authors: Salvatore Mercuri
 import Mathlib
 
 /-!
-# Embeddings of number fields
+# The completion of a number field at an infinite place
 
 This file defines an indirect approach to the completion of a number field with respect to
 an infinite place. While this suffices for the proof of the local compactness of the adele ring,
@@ -28,20 +28,22 @@ We keep this approach here for reference.
    and apply the `UniformSpace.Completion` functor to this. To show that
    the resultant completion is a field requires one to prove that `K` has a
    `completableTopField` instance with this uniform space. This approach is the principal
-   approach taken in [Embeddings.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean),
-   namely we pullback the uniform structure on `ℂ` via the embedding
-   associated to an infinite place, through `UniformSpace.comap`. In such a scenario,
-   the completable topological field instance from `ℂ` transfers to `K`, which we show in
-   [Topology/UniformSpace/UniformEmbedding.lean](AdeleRingLocallyCompact/Topology/UniformSpace/Basic.lean)
- - The alternative approach is to use the embedding associated to an infinite place to embed
-   `K` to a `Subfield ℂ` term, which already has a `CompletableTopField` instance. We complete
-   `K` indirectly by applying the `UniformSpace.Completion` functor to the `Subfield ℂ` term.
-   This is the approach taken in this file.
-   It leads to an isomorphic field completion to the direct approach, since both define abstract
-   completions. However, the API for the alternative approach in this file is deficient, because
-   we lose any `UniformSpace.Completion` constructions which transfer properties of the base
-   field `K` to its completion; for example, `UniformSpace.Completion.extension` which extends
-   a uniform continuous map on `K` to one on its completion. These would have to be re-established.
+   approach taken in [Completion.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Completion.lean),
+   by defining a normed field instance coming from the absolute value associated to an infinite
+   place. In such a scenario, the completable topological field instance from `ℂ` transfers to `K`
+   because the uniform structure of the absolute value is shown to be equivalent to the pullback
+   uniform structure of `ℂ` along the embedding associated to an infinite place. We show that
+   the pullback of a completable topological field is a completable topological field here:
+   [Topology/UniformSpace/Basic.lean](AdeleRingLocallyCompact/Topology/UniformSpace/Basic.lean)
+ - The alternative approach (in this file) is to use the embedding associated to an infinite place
+   to embed `K` to a `Subfield ℂ` term, which already has a `CompletableTopField` instance. We
+   complete `K` indirectly by applying the `UniformSpace.Completion` functor to the `Subfield ℂ`
+   term. This is the approach taken in this file. It leads to an isomorphic field completion to
+   the approach described above, since both define abstract completions. However, the API for
+   the alternative approach in this file is deficient, because we lose any `UniformSpace.Completion`
+   constructions which transfer properties of the base field `K` to its completion; for example,
+   `UniformSpace.Completion.extension` which extends a uniform continuous map on `K` to one on its
+   completion. These would have to be re-established.
 
 ## Tags
 number field, embeddings, places, infinite places
