@@ -332,11 +332,10 @@ private theorem subfield_ne_real_of_isComplex {v : InfinitePlace K} (hv : IsComp
   simp only [not_isComplex_iff_isReal, isReal_iff, ComplexEmbedding.isReal_iff]
   ext x
   have h : v.embedding x ∈ subfield v := by
+    refine ⟨x, ?_⟩
     simp only [subfield, Subfield.mem_mk, RingHom.mem_range, extensionEmbedding,
       extensionEmbedding_of_comp, UniformSpace.Completion.extensionHom, RingHom.coe_mk,
-      MonoidHom.coe_mk, OneHom.coe_mk]
-    refine ⟨x, ?_⟩
-    rw [UniformSpace.Completion.extension_coe
+      MonoidHom.coe_mk, OneHom.coe_mk, UniformSpace.Completion.extension_coe
         (WithAbs.uniformInducing_of_comp (abs_eq_comp v)).uniformContinuous]
     rfl
   simp only [hv, RingHom.mem_fieldRange, Complex.ofReal_eq_coe] at h
