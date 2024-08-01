@@ -5,7 +5,6 @@ Authors: Salvatore Mercuri, María Inés de Frutos-Fernández
 -/
 import Mathlib
 import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
-import AdeleRingLocallyCompact.NumberTheory.NumberField.Embeddings
 import AdeleRingLocallyCompact.Algebra.Ring.Equiv
 
 /-!
