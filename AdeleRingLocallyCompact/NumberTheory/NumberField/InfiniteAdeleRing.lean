@@ -52,42 +52,42 @@ open scoped Classical
 variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
 
 /-- The infinite adele ring of a number field. -/
-def infiniteAdeleRing := (v : InfinitePlace K) → v.completion
+def InfiniteAdeleRing := (v : InfinitePlace K) → v.completion
 
 namespace InfiniteAdeleRing
 
 section DerivedInstances
 
-instance : CommRing (infiniteAdeleRing K) := Pi.commRing
+instance : CommRing (InfiniteAdeleRing K) := Pi.commRing
 
-instance : Inhabited (infiniteAdeleRing K) := ⟨0⟩
+instance : Inhabited (InfiniteAdeleRing K) := ⟨0⟩
 
-instance : Nontrivial (infiniteAdeleRing K) :=
+instance : Nontrivial (InfiniteAdeleRing K) :=
   (inferInstanceAs <| Nonempty (InfinitePlace K)).elim fun w => Pi.nontrivial_at w
 
 end DerivedInstances
 
-instance topologicalSpace : TopologicalSpace (infiniteAdeleRing K) := Pi.topologicalSpace
+instance topologicalSpace : TopologicalSpace (InfiniteAdeleRing K) := Pi.topologicalSpace
 
-instance topologicalRing : TopologicalRing (infiniteAdeleRing K) := Pi.instTopologicalRing
+instance topologicalRing : TopologicalRing (InfiniteAdeleRing K) := Pi.instTopologicalRing
 
-instance : Algebra K (infiniteAdeleRing K) := Pi.algebra _ _
+instance : Algebra K (InfiniteAdeleRing K) := Pi.algebra _ _
 
 /-- The global embedding of a number field into its infinite adele ring,
 sending `x ∈ K` to `(x)ᵥ`. -/
-abbrev globalEmbedding : K →+* infiniteAdeleRing K := algebraMap K (infiniteAdeleRing K)
+abbrev globalEmbedding : K →+* InfiniteAdeleRing K := algebraMap K (InfiniteAdeleRing K)
 
 @[simp]
 theorem globalEmbedding_apply (x : K) : globalEmbedding K x v = (x : v.completion) := rfl
 
 /-- The infinite adele ring is locally compact. -/
-instance locallyCompactSpace : LocallyCompactSpace (infiniteAdeleRing K) :=
+instance locallyCompactSpace : LocallyCompactSpace (InfiniteAdeleRing K) :=
   Pi.locallyCompactSpace_of_finite
 
 /-- The ring isomorphism between the infinite adele ring of a number field and the
 space `ℝ ^ r₁ × ℂ ^ r₂`, where `(r₁, r₂)` is the signature of the number field. -/
 abbrev equiv_mixedSpace :
-    infiniteAdeleRing K ≃+*
+    InfiniteAdeleRing K ≃+*
       ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ) :=
   RingEquiv.trans
     (RingEquiv.piEquivPiSubtypeProd (fun (v : InfinitePlace K) => IsReal v)
@@ -101,7 +101,7 @@ abbrev equiv_mixedSpace :
           Equiv.subtypeEquivRight (fun _ => not_isReal_iff_isComplex))))
 
 @[simp]
-theorem equiv_mixedSpace_apply (x : infiniteAdeleRing K) :
+theorem equiv_mixedSpace_apply (x : InfiniteAdeleRing K) :
     equiv_mixedSpace K x =
       (fun (v : {w : InfinitePlace K // IsReal w}) => equivReal_of_isReal v.2 (x v),
         fun (v : {w : InfinitePlace K // IsComplex w}) => equivComplex_of_isComplex v.2 (x v)) := by

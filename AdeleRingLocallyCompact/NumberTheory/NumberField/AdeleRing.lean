@@ -39,39 +39,39 @@ namespace NumberField
 variable (K : Type*) [Field K] [NumberField K]
 
 /-- The adele ring of a number field. -/
-def adeleRing := infiniteAdeleRing K × finiteAdeleRing (ringOfIntegers K) K
+def AdeleRing := infiniteAdeleRing K × FiniteAdeleRing (RingOfIntegers K) K
 
 namespace AdeleRing
 
 section DerivedInstances
 
-instance : CommRing (adeleRing K) := Prod.instCommRing
+instance : CommRing (AdeleRing K) := Prod.instCommRing
 
-instance : Inhabited (adeleRing K) := ⟨0⟩
+instance : Inhabited (AdeleRing K) := ⟨0⟩
 
-instance topologicalSpace : TopologicalSpace (adeleRing K) :=
+instance topologicalSpace : TopologicalSpace (AdeleRing K) :=
   instTopologicalSpaceProd
 
-instance topologicalRing : TopologicalRing (adeleRing K) :=
-  instTopologicalRingProdInstTopologicalSpaceProdInstNonUnitalNonAssocRing
+instance topologicalRing : TopologicalRing (AdeleRing K) :=
+  instTopologicalRingProd
 
 end DerivedInstances
 
 /-- The global embedding sending `x ∈ K` to `(x)ᵥ`. -/
-def globalEmbedding : K →+* adeleRing K :=
+def globalEmbedding : K →+* AdeleRing K :=
   RingHom.prod (InfiniteAdeleRing.globalEmbedding K) (FiniteAdeleRing.globalEmbedding _ _)
 
 theorem globalEmbedding_injective : Function.Injective (globalEmbedding K) :=
   fun _ _ hxy => (InfiniteAdeleRing.globalEmbedding K).injective (Prod.ext_iff.1 hxy).1
 
 /-- The adele ring of a number field is a locally compact space. -/
-theorem locallyCompactSpace : LocallyCompactSpace (adeleRing K) := by
+theorem locallyCompactSpace : LocallyCompactSpace (AdeleRing K) := by
   haveI := InfiniteAdeleRing.locallyCompactSpace K
-  haveI := FiniteAdeleRing.locallyCompactSpace (ringOfIntegers K) K
+  haveI := FiniteAdeleRing.locallyCompactSpace (RingOfIntegers K) K
   exact Prod.locallyCompactSpace _ _
 
 /-- The subgroup of principal adeles `(x)ᵥ` where `x ∈ K`. -/
-def principalSubgroup : AddSubgroup (adeleRing K) := (globalEmbedding K).range.toAddSubgroup
+def principalSubgroup : AddSubgroup (AdeleRing K) := (globalEmbedding K).range.toAddSubgroup
 
 end AdeleRing
 

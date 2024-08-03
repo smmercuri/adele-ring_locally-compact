@@ -6,7 +6,7 @@ package «adele-ring_locally-compact» {
 }
 
 require mathlib from git
-  "https://github.com/leanprover-community/mathlib4.git"
+  "https://github.com/leanprover-community/mathlib4.git" @ "375e19f6b656fcd594cdca3a38b8578634df8cd"
 
 @[default_target]
 lean_lib «AdeleRingLocallyCompact» {
