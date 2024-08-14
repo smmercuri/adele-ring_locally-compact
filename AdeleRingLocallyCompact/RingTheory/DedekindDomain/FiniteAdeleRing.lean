@@ -74,20 +74,17 @@ def localInclusion (v : HeightOneSpectrum R) :
 
 variable {K}
 
-/- The local inclusion of any element is a finite adele. -/
+/-- The local inclusion of any element is a finite adele. -/
 theorem isFiniteAdele_localInclusion (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-    (localInclusion K v x).IsFiniteAdele := sorry
-/- theorem isFiniteAdele_localInclusion (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
     (localInclusion K v x).IsFiniteAdele := by
   rw [ProdAdicCompletions.IsFiniteAdele, Filter.eventually_cofinite]
   have h : {w | localInclusion K v x w ∉ w.adicCompletionIntegers K} ⊆ {v} := by
     intro w hw
-    simp only [Set.mem_setOf_eq, Set.mem_singleton_iff] at hw ⊢
+    simp only [localInclusion, Set.mem_setOf_eq, Set.mem_singleton_iff] at hw ⊢
     contrapose! hw
-    simp only [localInclusion, hw]
-    simp?
-    sorry --exact (w.adicCompletionIntegers K).one_mem'
-  sorry --exact Set.Finite.subset (Set.finite_singleton _) h-/
+    simp only [hw, ↓reduceDIte]
+    exact (w.adicCompletionIntegers K).one_mem'
+  exact Set.Finite.subset (Set.finite_singleton _) h
 
 /-- The `v`th place of the local inclusion is the original element. -/
 theorem localInclusion_rfl (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
@@ -183,14 +180,13 @@ def globalEmbedding : K →+* FiniteAdeleRing R K where
 theorem nontrivial_of_nonEmpty [i : Nonempty (HeightOneSpectrum R)] :
     Nontrivial (FiniteAdeleRing R K) := by
   obtain v := (Classical.inhabited_of_nonempty i).default
-  use 0, ι v 1
-  simp only [ne_eq, ← Subtype.val_inj, ZeroMemClass.coe_zero, localInclusion]
-  unfold ProdAdicCompletions.localInclusion
-  sorry
-  /-intro h
+  use ⟨0, DedekindDomain.ProdAdicCompletions.IsFiniteAdele.zero⟩, ι v 1
+  simp only [localInclusion]
+  intro h
+  rw [Subtype.mk.injEq] at h
   have h := congrFun h v
-  simp only [dif_pos] at h
-  exact zero_ne_one h-/
+  simp only [ProdAdicCompletions.localInclusion, dif_pos] at h
+  exact zero_ne_one h
 
 theorem globalEmbedding_injective [i : Nonempty (HeightOneSpectrum R)] :
     Function.Injective (globalEmbedding R K) := by

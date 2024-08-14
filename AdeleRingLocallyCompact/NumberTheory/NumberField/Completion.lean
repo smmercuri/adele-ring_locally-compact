@@ -90,15 +90,15 @@ instance instNormedFieldWithAbs : NormedField (WithAbs v) where
   __ := inferInstanceAs (NormedRing (WithAbs v))
   norm_mul' := v.map_mul
 
-variable {A : Type*} [NormedField A] {f : WithAbs v →+* A} {v}
+variable {L : Type*} [NormedField L] {f : WithAbs v →+* L} {v}
 
 /-- If the absolute value `v` factors through an embedding `f` into a normed field, then
 the distance associated to the absolute value also factors through `f`. -/
 theorem dist_of_comp
-    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective)
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : L → ℝ)).comp f.injective)
     (x y : WithAbs v) :
     dist x y = dist (f x) (f y) := by
-  rw [(instNormedFieldWithAbs v).dist_eq, (inferInstanceAs <| NormedField A).dist_eq,
+  rw [(instNormedFieldWithAbs v).dist_eq, (inferInstanceAs <| NormedField L).dist_eq,
     ← f.map_sub, h]; rfl
 
 instance : Inhabited (WithAbs v) := ⟨0⟩
@@ -107,7 +107,7 @@ instance : Inhabited (WithAbs v) := ⟨0⟩
 the pseudo metric space associated to the absolute value is the same as the pseudo metric space
 induced by `f`. -/
 theorem pseudoMetricSpace_induced_of_comp
-    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : L → ℝ)).comp f.injective) :
     (instNormedFieldWithAbs v).toPseudoMetricSpace = PseudoMetricSpace.induced f inferInstance := by
   ext; exact dist_of_comp h _ _
 
@@ -115,21 +115,21 @@ theorem pseudoMetricSpace_induced_of_comp
 the uniform structure associated to the absolute value is the same as the uniform structure
 induced by `f`. -/
 theorem uniformSpace_eq_comap_of_comp
-    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : L → ℝ)).comp f.injective) :
     (instNormedFieldWithAbs v).toUniformSpace = UniformSpace.comap f inferInstance := by
   rw [pseudoMetricSpace_induced_of_comp h]; rfl
 
 /-- If the absolute value `v` factors through an embedding `f` into a normed field, then
 `f` is uniform inducing. -/
 theorem uniformInducing_of_comp
-    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : L → ℝ)).comp f.injective) :
     UniformInducing f :=
   uniformInducing_iff_uniformSpace.2 (Eq.symm (uniformSpace_eq_comap_of_comp h))
 
 /-- If the absolute value `v` factors through an embedding `f` into a normed field, then
 `f` is an isometry. -/
 theorem isometry_of_comp
-    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : L → ℝ)).comp f.injective) :
     Isometry f :=
   Isometry.of_dist_eq <| fun x y => by rw [pseudoMetricSpace_induced_of_comp h]; rfl
 
@@ -164,20 +164,20 @@ instance : Coe K v.completion :=
 instance : Algebra (WithAbs v) v.completion :=
   UniformSpace.Completion.algebra (WithAbs v) _
 
-variable {A : Type*} [NormedField A] [CompleteSpace A] {f : WithAbs v →+* A} {v}
+variable {L : Type*} [NormedField L] [CompleteSpace L] {f : WithAbs v →+* L} {v}
 
 /-- If the absolute value of a normed field factors through an embedding into another normed field
 `A`, then this extends that embedding to `v.completion →+* A`. -/
 def extensionEmbedding_of_comp
-    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
-    v.completion →+* A :=
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : L → ℝ)).comp f.injective) :
+    v.completion →+* L :=
   UniformSpace.Completion.extensionHom _
     (WithAbs.uniformInducing_of_comp h).uniformContinuous.continuous
 
 /-- If the absolute value of a normed field factors through a normed embedding, then the extended
 embedding `v.completion →+* A` preserves distances. -/
 theorem extensionEmbedding_dist_eq_of_comp
-      (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective)
+      (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : L → ℝ)).comp f.injective)
       (x y : v.completion) :
     dist (extensionEmbedding_of_comp h x) (extensionEmbedding_of_comp h y) =
       dist x y := by
@@ -193,21 +193,21 @@ theorem extensionEmbedding_dist_eq_of_comp
 /-- If the absolute value of a normed field factors through a normed embedding, then the
 extended embedding `v.completion →+* A` is an isometry. -/
 theorem isometry_extensionEmbedding_of_comp
-    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : L → ℝ)).comp f.injective) :
     Isometry (extensionEmbedding_of_comp h) :=
   Isometry.of_dist_eq <| extensionEmbedding_dist_eq_of_comp h
 
 /-- If the absolute value of a normed field factors through a normed embedding, then the
 extended embedding `v.completion →+* A` is a closed embedding. -/
 theorem closedEmbedding_extensionEmbedding_of_comp
-    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective) :
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : L → ℝ)).comp f.injective) :
     ClosedEmbedding (extensionEmbedding_of_comp h) :=
   (isometry_extensionEmbedding_of_comp h).closedEmbedding
 
 /-- The completion of any normed field with an absolute value, such that the absolute value
 factors through an embedding into a normed locally compact field, is also locally compact. -/
-theorem locallyCompactSpace [LocallyCompactSpace A]
-    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp f.injective)  :
+theorem locallyCompactSpace [LocallyCompactSpace L]
+    (h : v = (IsAbsoluteValue.toAbsoluteValue (norm : L → ℝ)).comp f.injective)  :
     LocallyCompactSpace (v.completion) :=
   (closedEmbedding_extensionEmbedding_of_comp h).locallyCompactSpace
 

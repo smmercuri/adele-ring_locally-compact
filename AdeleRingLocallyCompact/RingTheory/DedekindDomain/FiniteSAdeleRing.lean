@@ -180,6 +180,8 @@ def IsFiniteSAdele (x : ProdAdicCompletions R K) :=
 
 variable {S}
 
+namespace IsFiniteSAdele
+
 theorem mul {x y : ProdAdicCompletions R K} (hx : IsFiniteSAdele S x) (hy : IsFiniteSAdele S y) :
     IsFiniteSAdele S (x * y) := by
   intros v hv
@@ -207,39 +209,60 @@ theorem neg {x : ProdAdicCompletions R K} (hx : IsFiniteSAdele S x) :
   rw [mem_adicCompletionIntegers, Pi.neg_apply, Valuation.map_neg]
   exact hx v hv
 
+end IsFiniteSAdele
+
 variable (R K S)
 
 /-- The finite S-adele ring. -/
-def finiteSAdeleRing : Subring (ProdAdicCompletions R K) where
-  carrier := {x | IsFiniteSAdele S x}
-  mul_mem' hx hy := mul hx hy
-  one_mem' := one
-  add_mem' hx hy := add hx hy
-  zero_mem' := zero
-  neg_mem' hx := neg hx
+def FiniteSAdeleRing := {x : ProdAdicCompletions R K // IsFiniteSAdele S x}
 
 namespace FiniteSAdeleRing
 
+/-- The finite S-adele ring regarded as a subring of the product of local completions of K.
+
+Note that the finite S-adele ring is not a subalegrba of the product of local completions of K,
+but it is of `∏ K × ∏ O_K`, where the first product is over `v ∈ S` and the second is over `v ∉ S`.
+-/
+def subring : Subring (ProdAdicCompletions R K) where
+  carrier := {x | IsFiniteSAdele S x}
+  mul_mem' hx hy := hx.mul hy
+  one_mem' := IsFiniteSAdele.one
+  add_mem' hx hy := hx.add hy
+  zero_mem' := IsFiniteSAdele.zero
+  neg_mem' hx := hx.neg
+
+instance : CommRing (FiniteSAdeleRing R K S) := (subring R K S).toCommRing
+
+instance : TopologicalSpace (FiniteSAdeleRing R K S) :=
+  inferInstanceAs (TopologicalSpace (subring R K S))
+
+instance : TopologicalRing (FiniteSAdeleRing R K S) :=
+  inferInstanceAs (TopologicalRing (subring R K S))
+
+@[ext]
+lemma ext {x y : FiniteSAdeleRing R K S} (h : x.val = y.val) : x = y :=
+  Subtype.ext h
+
 /-- the finite S-adele ring is homeomorphic to `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
 def homeomorph_piSubtypeProd :
-    finiteSAdeleRing R K S ≃ₜ SProdAdicCompletionIntegers_subtype R K S :=
+    FiniteSAdeleRing R K S ≃ₜ SProdAdicCompletionIntegers_subtype R K S :=
   Homeomorph.subtype (Homeomorph.piEquivPiSubtypeProd _ _) <| fun _ =>
     ⟨fun hx v => hx v.1 v.2, fun hx v hv => hx ⟨v, hv⟩⟩
 
 /-- The finite S-adele ring is locally compact. -/
-theorem locallyCompactSpace : LocallyCompactSpace (finiteSAdeleRing R K S) :=
+theorem locallyCompactSpace : LocallyCompactSpace (FiniteSAdeleRing R K S) :=
   (Homeomorph.locallyCompactSpace_iff (homeomorph_piSubtypeProd R K S)).2 inferInstance
 
 variable {R K S}
 
 /-- A finite S-adele is a finite adele. -/
-theorem mem_isFiniteAdele {x : ProdAdicCompletions R K} (hx : x ∈ finiteSAdeleRing R K S) :
-    x.IsFiniteAdele := by
+theorem isFiniteAdele (x : FiniteSAdeleRing R K S) :
+    x.1.IsFiniteAdele := by
   rw [ProdAdicCompletions.IsFiniteAdele, Filter.eventually_cofinite]
   refine Set.Finite.subset S.finite_toSet (fun v hv => ?_)
   contrapose hv
   rw [Set.mem_setOf_eq, not_not]
-  exact hx v hv
+  exact x.2 v hv
 
 /-- If `x` is a `v`-adic integer, then the local inclusion of `x` at any place `v` is a
 finite S-adele. -/
@@ -268,8 +291,8 @@ theorem isFiniteSAdele_localInclusion_of_S {v : HeightOneSpectrum R}
 variable (R K S)
 
 /-- Ring homomorphism sending finite S-adeles to finite adeles. -/
-def toFiniteAdeleRing : finiteSAdeleRing R K S →+* FiniteAdeleRing R K where
-  toFun x := ⟨x.1, mem_isFiniteAdele x.2⟩
+def toFiniteAdeleRing : FiniteSAdeleRing R K S →+* FiniteAdeleRing R K where
+  toFun x := ⟨x.1, isFiniteAdele x⟩
   map_add' _ _ := rfl
   map_one' := rfl
   map_zero' := rfl
@@ -280,7 +303,7 @@ local notation "e" => toFiniteAdeleRing R K
 theorem toFiniteAdeleRing_injective : Function.Injective (e S) := by
   intro x y hxy
   rwa [toFiniteAdeleRing, RingHom.coe_mk, MonoidHom.coe_mk,
-    OneHom.coe_mk, Subtype.mk.injEq, SetLike.coe_eq_coe] at hxy
+    OneHom.coe_mk, Subtype.mk.injEq, Subtype.val_inj] at hxy
 
 theorem toFiniteAdeleRing_range :
     Set.range (e S) = {x : FiniteAdeleRing R K | IsFiniteSAdele S x.val} :=
@@ -321,17 +344,17 @@ theorem toFiniteAdeleRing_range_mem_generatingSet :
 
 /-- The S-adeles are given a second subspace topology, viewed as a subspace of the
 finite adele ring. -/
-def adelicTopologicalSpace : TopologicalSpace (finiteSAdeleRing R K S) :=
+def adelicTopologicalSpace : TopologicalSpace (FiniteSAdeleRing R K S) :=
   TopologicalSpace.induced (e S) inferInstance
 
 /-- The generating set of the adelic topology of the finite S-adele ring. -/
-def adelicGeneratingSet : Set (Set (finiteSAdeleRing R K S)) :=
+def adelicGeneratingSet : Set (Set (FiniteSAdeleRing R K S)) :=
   Set.preimage (e S) '' (FiniteAdeleRing.generatingSet R K)
 
-theorem adelicGenerateFrom :
+/-theorem adelicGenerateFrom :
     adelicTopologicalSpace R K S =
       TopologicalSpace.generateFrom (FiniteSAdeleRing.adelicGeneratingSet R K S) := by
-  rw [adelicGeneratingSet, ← induced_generateFrom_eq]; sorry
+  rw [adelicGeneratingSet, ← induced_generateFrom_eq]; sorry-/
 
 theorem univ_mem_generatingSet : Set.univ ∈ adelicGeneratingSet R K S := by
   simp only [adelicGeneratingSet, Set.mem_image, Set.preimage_eq_univ_iff]
@@ -340,10 +363,10 @@ theorem univ_mem_generatingSet : Set.univ ∈ adelicGeneratingSet R K S := by
 /-- Subtype val of the finite S-adele ring factors through the embedding into the
 finite adele ring. -/
 theorem subtype_val_embedding :
-    (Subtype.val : finiteSAdeleRing R K S → ProdAdicCompletions R K) = Subtype.val ∘ e S := rfl
+    (Subtype.val : FiniteSAdeleRing R K S → ProdAdicCompletions R K) = Subtype.val ∘ e S := rfl
 
 theorem subtype_val_range_eq_pi :
-    Set.range (Subtype.val : finiteSAdeleRing R K S → ProdAdicCompletions R K)
+    Set.range (Subtype.val : FiniteSAdeleRing R K S → ProdAdicCompletions R K)
       = Set.pi Set.univ (λ v => ite (v ∈ S) Set.univ (v.adicCompletionIntegers K)) := by
   rw [subtype_val_embedding, Set.range_comp, toFiniteAdeleRing_range_eq_pi]
 
@@ -390,39 +413,133 @@ theorem adelicGeneratingSet_eq : adelicGeneratingSet R K S =
           )
         )
     refine ⟨⟨fun v => ?_, ?_⟩, ?_⟩
-    · sorry/-by_cases hv₀ : v ∈ I <;> by_cases hv₁ : v ∈ S <;>
-        simp [hv₀, hv₁]; exact hV_open v hv₀; exact hV_open v hv₀;
-        exact Valued.valuationSubring_isOpen (v.adicCompletion K)
+    · by_cases hv₀ : v ∈ I <;> by_cases hv₁ : v ∈ S <;>
+        simp only [hv₀, hv₁, if_true, if_false]; exact hV_open v hv₀; exact hV_open v hv₀;
+      · exact isOpen_univ
+      · exact Valued.valuationSubring_isOpen (v.adicCompletion K)
     · refine Set.Finite.subset (Set.Finite.union (Finset.finite_toSet S) (Finset.finite_toSet I))
         (fun v hv => ?_)
       contrapose! hv
       simp only [Set.mem_union, Finset.mem_coe, not_or] at hv
-      simp only [Set.mem_setOf_eq, hv, if_false, not_not]-/
-    · sorry /-simp only [← Set.preimage_comp, ← subtype_val_embedding, ← hy,
-        ← Set.image_eq_image Subtype.val_injective, Set.image_preimage_eq_inter_range, hV_pi,
-        subtype_val_range_eq_pi]
-      rw [← Set.pi_inter_distrib]
+      simp only [Set.mem_setOf_eq, hv, if_false, not_not]
+    · rw [← Set.preimage_comp, ← subtype_val_embedding, ← hy,
+        ← Set.image_eq_image Subtype.val_injective, Set.image_preimage_eq_inter_range,
+        Set.image_preimage_eq_inter_range, hV_pi, subtype_val_range_eq_pi, ← Set.pi_inter_distrib]
       nth_rewrite 2 [← Set.pi_univ_ite]
       rw [← Set.pi_inter_distrib]
       refine Set.pi_congr rfl (fun v _ => ?_)
-      by_cases hv₀ : v ∈ I <;> by_cases hv₁ : v ∈ S <;> simp [hv₀, hv₁]-/
-    · sorry
+      by_cases hv₀ : v ∈ I <;> by_cases hv₁ : v ∈ S <;> simp [hv₀, hv₁]
+
+/-- Finite S-adele ring has subtype topology -/
+theorem nhds_iff (x : FiniteSAdeleRing R K S) : U ∈ nhds x ↔
+    ∃ (V : (v: HeightOneSpectrum R) → Set (v.adicCompletion K)) (I : Finset (HeightOneSpectrum R)),
+      (∀ v, V v ∈ nhds (x.val v)) ∧
+        Subtype.val ⁻¹' Set.pi (I.toSet) V ⊆ U := by
+  rw [nhds_induced (Subtype.val : FiniteSAdeleRing R K S → _), Filter.mem_comap, nhds_pi]
+  refine ⟨fun ⟨t, ht, h⟩  => ?_, fun ⟨V, I, hV, hVU⟩ => ?_⟩
+  · obtain ⟨I, V, hV⟩ := Filter.mem_pi'.1 ht
+    exact ⟨V, I, ⟨hV.1, Set.Subset.trans (fun _ hx => hV.2 hx) h⟩⟩
+  · exact ⟨I.toSet.pi V, Filter.mem_pi'.2 ⟨I, V, ⟨fun v => hV v, subset_rfl⟩⟩, hVU⟩
+
+/-- Neighbourhoods in the finite adele ring look like -/
+theorem FiniteAdeleRing_nhds_iff (x : FiniteAdeleRing R K) : U ∈ nhds x ↔
+    ∃ (I : Finset (HeightOneSpectrum R)) (V : (v: HeightOneSpectrum R) → Set (v.adicCompletion K)),
+      (∀ v ∈ I, V v ∈ nhds (x v)) ∧
+        (∀ v ∉ I, V v = v.adicCompletionIntegers K) ∧
+          (U = Subtype.val ⁻¹' Set.pi Set.univ V) :=
+  sorry
 
 /-- The subspace topology of the finite S-adele ring viewed as a subspace of the finite adele
 ring coincides with the subspace topology when viewed as a subspace of `ProdAdicCompletions`. -/
 theorem topologicalSpace_eq_adelicTopologicalSpace :
     adelicTopologicalSpace R K S = instTopologicalSpaceSubtype := by
-  rw [adelicGenerateFrom, instTopologicalSpaceSubtype, instTopologicalSpaceProdAdicCompletions,
-    pi_eq_generateFrom, induced_generateFrom_eq, adelicGeneratingSet_eq]
+  refine TopologicalSpace.ext_nhds (fun x => ?_)
+  rw [instTopologicalSpaceSubtype, adelicTopologicalSpace]
+  ext U
+  rw [nhds_induced, Filter.mem_comap]
+  simp only [Filter.mem_comap, subtype_val_embedding, FiniteAdeleRing_nhds_iff]
+  constructor
+  · rintro ⟨V, ⟨I, W, hI, hnI, hVW⟩, hVU⟩
+    rw [nhds_induced, Filter.mem_comap]
+    -- need to modify W here?
+    -- Use same as first one in above proof
+    -- (I ∪ S).toSet pi (fun v => if v ∈ I then W v else v.adicCompletionIntegers K)
+    use I.toSet.pi W
+    rw [set_pi_mem_nhds_iff I.finite_toSet, Set.preimage_comp]
+    -- this is not true for W as above, but we can modify W to make it true
+    --have : (e S) ⁻¹' (Subtype.val ⁻¹' I.toSet.pi W) = (e S) ⁻¹' (Subtype.val ⁻¹' Set.univ.pi W)
+    --· sorry
+    refine ⟨hI, ?_⟩
+    intro x hx
+    simp at hx
+    apply hVU
+    rw [hVW]
+    simp
+    intro i
+    rw [Set.mem_pi] at hx
+    by_cases hi : i ∈ I
+    · exact hx _ hi
+    · rw [hnI _ hi]
+      simp
+      by_cases hi' : i ∉ S
+      · rw [toFiniteAdeleRing]
+        simp
+        exact x.2 _ hi'
+      · simp at hi'
+        -- is this true?
+        have hIS : S ⊆ I := by
+          sorry
+
+        exfalso
+        exact hi (hIS hi')
+    --rw [this, ← hVW]
+    --exact ⟨hI, hVU⟩
+  · simp only [nhds_iff]
+    rintro ⟨t, I, ht, htU⟩
+    set t' := (fun v =>
+      if (v ∈ I) then
+        (t v) else
+            (v.adicCompletionIntegers K)
+          )
+    use Subtype.val ⁻¹' Set.univ.pi t'
+    -- I think I need to tweak t' to make this true
+    have : Subtype.val ⁻¹' Set.univ.pi t' ⊆ U :=
+      sorry
+    rw [← Set.preimage_comp]
+    refine ⟨?_, this⟩
+    refine ⟨I, t', ?_, fun v hv => by simp only [t', hv, if_false], rfl⟩
+    · intro v hv
+      simp only [t', hv, if_true]
+      exact ht _
 
 theorem toFiniteAdeleRing_inducing : Inducing (e S) := by
-  rw [inducing_iff, ← topologicalSpace_eq_adelicTopologicalSpace]; rfl
+  simp only [inducing_iff, instTopologicalSpace, ← topologicalSpace_eq_adelicTopologicalSpace]
+  rfl
 
 /-- The map sending finite S-adeles to finite adeles is open and injective. -/
 theorem toFiniteAdeleRing_openEmbedding : OpenEmbedding (e S) := by
   use ⟨toFiniteAdeleRing_inducing R K S, toFiniteAdeleRing_injective R K S⟩
-  sorry /-exact TopologicalSpace.isOpen_generateFrom_of_mem
-    (toFiniteAdeleRing_range_mem_generatingSet R K S)-/
+  rw [isOpen_iff_mem_nhds]
+  intro x _
+  rw [FiniteAdeleRing_nhds_iff]
+  use S
+  use fun v => if (v ∈ S) then Set.univ else v.adicCompletionIntegers K
+  refine ⟨?_, fun v hv => by simp only [hv, if_false], ?_⟩
+  · intro v hv
+    simp only [hv, if_true]
+    exact Filter.univ_mem
+  · rw [Set.range_eq_iff]
+    refine ⟨?_, ?_⟩
+    · intro x
+      simp only [Set.mem_preimage, Set.mem_pi, Set.mem_univ, Set.mem_ite_univ_left, SetLike.mem_coe,
+        true_implies]
+      intro v hv
+      exact x.2 _ hv
+    · simp only [Set.mem_preimage, Set.mem_pi, Set.mem_univ, Set.mem_ite_univ_left,
+      SetLike.mem_coe, true_implies]
+      intro x hx
+      use ⟨x, hx⟩
+      rfl
 
 end FiniteSAdeleRing
 
@@ -436,7 +553,7 @@ local notation "e" => toFiniteAdeleRing R K
 theorem locallyCompactSpace : LocallyCompactSpace (FiniteAdeleRing R K) := by
   refine LocallyCompactSpace.mk (fun x N hN => ?_)
   set S := (Filter.eventually_cofinite.1 x.2).toFinset
-  have hx : x.val ∈ finiteSAdeleRing R K S :=
+  have hx : IsFiniteSAdele S x.1 :=
     fun v hv => by rwa [Set.Finite.mem_toFinset, Set.nmem_setOf_iff, not_not] at hv
   obtain ⟨U, hU₀, hU₁, hU₂⟩ := mem_nhds_iff.1 hN
   have hU_S : (e S) ⁻¹' U ∈ nhds ⟨x, hx⟩ :=

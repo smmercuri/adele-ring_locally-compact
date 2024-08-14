@@ -39,7 +39,7 @@ namespace NumberField
 variable (K : Type*) [Field K] [NumberField K]
 
 /-- The adele ring of a number field. -/
-def AdeleRing := infiniteAdeleRing K × FiniteAdeleRing (RingOfIntegers K) K
+def AdeleRing := InfiniteAdeleRing K × FiniteAdeleRing (RingOfIntegers K) K
 
 namespace AdeleRing
 
