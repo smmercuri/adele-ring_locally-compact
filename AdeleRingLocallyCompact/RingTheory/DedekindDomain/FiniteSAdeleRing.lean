@@ -145,14 +145,12 @@ def homeomorph :
     SProdAdicCompletionIntegers_subtype R K S ≃ₜ SProdAdicCompletionIntegers R K S where
   toEquiv := subtypeEquiv R K S
   continuous_toFun := by
-    unfold subtypeEquiv
     refine Continuous.prod_mk (Continuous.fst (Continuous.subtype_val
       ({ isOpen_preimage := fun s a => a }) )) ?_
     refine continuous_pi (fun v => Continuous.subtype_mk ?_ _)
     refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
     exact (Continuous.snd (Continuous.subtype_val ({ isOpen_preimage := fun s a => a }) ))
   continuous_invFun := by
-    unfold subtypeEquiv
     refine Continuous.subtype_mk (Continuous.prod_mk
       (Continuous.fst { isOpen_preimage := fun s a => a }) ?_) _
     refine continuous_pi (fun v => Continuous.subtype_val ?_)
@@ -342,23 +340,6 @@ theorem toFiniteAdeleRing_range_mem_generatingSet :
   · simp only [Set.mem_setOf_eq, ite_eq_right_iff, not_forall, exists_prop] at hv
     exact hv.1
 
-/-- The S-adeles are given a second subspace topology, viewed as a subspace of the
-finite adele ring. -/
-def adelicTopologicalSpace : TopologicalSpace (FiniteSAdeleRing R K S) :=
-  TopologicalSpace.induced (e S) inferInstance
-
-/-- The generating set of the adelic topology of the finite S-adele ring. -/
-def adelicGeneratingSet : Set (Set (FiniteSAdeleRing R K S)) :=
-  Set.preimage (e S) '' (FiniteAdeleRing.generatingSet R K)
-
-/-theorem adelicGenerateFrom :
-    adelicTopologicalSpace R K S =
-      TopologicalSpace.generateFrom (FiniteSAdeleRing.adelicGeneratingSet R K S) := by
-  rw [adelicGeneratingSet, ← induced_generateFrom_eq]; sorry-/
-
-theorem univ_mem_generatingSet : Set.univ ∈ adelicGeneratingSet R K S := by
-  simp only [adelicGeneratingSet, Set.mem_image, Set.preimage_eq_univ_iff]
-  use (Set.range (e S)), toFiniteAdeleRing_range_mem_generatingSet R K S
 
 /-- Subtype val of the finite S-adele ring factors through the embedding into the
 finite adele ring. -/
@@ -370,176 +351,368 @@ theorem subtype_val_range_eq_pi :
       = Set.pi Set.univ (λ v => ite (v ∈ S) Set.univ (v.adicCompletionIntegers K)) := by
   rw [subtype_val_embedding, Set.range_comp, toFiniteAdeleRing_range_eq_pi]
 
-/-- The generating set of the subspace topology of the finite S-adele ring viewed as a
-subspace of the finite adele ring coincides with the generating set of the subspace topology
-obtained as a subspace of `ProdAdicCompletions`. -/
-theorem adelicGeneratingSet_eq : adelicGeneratingSet R K S =
-    Set.preimage Subtype.val '' (
-      {U | ∃ (V : (v: HeightOneSpectrum R) → Set (v.adicCompletion K))
-            (I : Finset (HeightOneSpectrum R)),
-              (∀ v ∈ I, IsOpen (V v)) ∧ U = Set.pi (I.toSet) V}
-     ) := by
-  ext x
-  simp only [adelicGeneratingSet, FiniteAdeleRing.generatingSet, Filter.eventually_cofinite,
-    Set.mem_image, Set.mem_setOf_eq, exists_exists_and_eq_and]
-  refine ⟨fun ⟨V, ⟨hV_open, hV_fin⟩, hV_pi⟩ => ?_, λ ⟨y, ⟨V, I, hV_open, hV_pi⟩, hy⟩ => ?_⟩
-  · set I := Set.Finite.toFinset hV_fin with IDef
-    rw [← Set.preimage_comp, ← subtype_val_embedding] at hV_pi
-    rw [← hV_pi]
-    refine ⟨Set.pi Set.univ
-      (fun (v : HeightOneSpectrum R) =>
-        if (v ∈ (I ∪ S).toSet) then
-          (if (v ∈ I.toSet)
-            then (V v) else (v.adicCompletionIntegers K)
-          ) else
-        Set.univ
-      ), ?_, ?_⟩
-    · use (fun v => ite (v ∈ I) (V v) (v.adicCompletionIntegers K)), I ∪ S
-      refine ⟨fun v _ => ?_, by rw [Set.univ_pi_ite]; rfl⟩
-      · by_cases hv : v ∈ I <;> simp only [dif_pos, dif_neg, hv, if_true, if_false, hV_open v];
-          exact Valued.valuationSubring_isOpen (v.adicCompletion K)
-    · simp only [← Set.image_eq_image Subtype.val_injective, Set.image_preimage_eq_inter_range]
-      rw [subtype_val_range_eq_pi, ← Set.pi_inter_distrib, ← Set.pi_inter_distrib]
-      refine Set.pi_congr rfl (fun v _ => ?_)
-      by_cases hv₀ : v ∈ I ∪ S <;> by_cases hv₁ : v ∈ I <;> by_cases hv₂ : v ∈ S <;>
-        simp [hv₀, hv₁, hv₂] <;>
-        rw [Set.Finite.mem_toFinset, Set.nmem_setOf_iff, not_not] at hv₁ <;> rw [← hv₁]
-  · use (fun v =>
-      if (v ∈ I) then
-        (V v) else
-          (if (v ∈ S) then
-            Set.univ else
-            (v.adicCompletionIntegers K)
-          )
-        )
-    refine ⟨⟨fun v => ?_, ?_⟩, ?_⟩
-    · by_cases hv₀ : v ∈ I <;> by_cases hv₁ : v ∈ S <;>
-        simp only [hv₀, hv₁, if_true, if_false]; exact hV_open v hv₀; exact hV_open v hv₀;
-      · exact isOpen_univ
-      · exact Valued.valuationSubring_isOpen (v.adicCompletion K)
-    · refine Set.Finite.subset (Set.Finite.union (Finset.finite_toSet S) (Finset.finite_toSet I))
-        (fun v hv => ?_)
-      contrapose! hv
-      simp only [Set.mem_union, Finset.mem_coe, not_or] at hv
-      simp only [Set.mem_setOf_eq, hv, if_false, not_not]
-    · rw [← Set.preimage_comp, ← subtype_val_embedding, ← hy,
-        ← Set.image_eq_image Subtype.val_injective, Set.image_preimage_eq_inter_range,
-        Set.image_preimage_eq_inter_range, hV_pi, subtype_val_range_eq_pi, ← Set.pi_inter_distrib]
-      nth_rewrite 2 [← Set.pi_univ_ite]
-      rw [← Set.pi_inter_distrib]
-      refine Set.pi_congr rfl (fun v _ => ?_)
-      by_cases hv₀ : v ∈ I <;> by_cases hv₁ : v ∈ S <;> simp [hv₀, hv₁]
-
-/-- Finite S-adele ring has subtype topology -/
+/-- Neighbourhoods of the finite S-adele ring. -/
 theorem nhds_iff (x : FiniteSAdeleRing R K S) : U ∈ nhds x ↔
     ∃ (V : (v: HeightOneSpectrum R) → Set (v.adicCompletion K)) (I : Finset (HeightOneSpectrum R)),
       (∀ v, V v ∈ nhds (x.val v)) ∧
         Subtype.val ⁻¹' Set.pi (I.toSet) V ⊆ U := by
   rw [nhds_induced (Subtype.val : FiniteSAdeleRing R K S → _), Filter.mem_comap, nhds_pi]
-  refine ⟨fun ⟨t, ht, h⟩  => ?_, fun ⟨V, I, hV, hVU⟩ => ?_⟩
+  refine ⟨fun ⟨t, ht, h⟩ => ?_, fun ⟨V, I, hV, hVU⟩ => ?_⟩
   · obtain ⟨I, V, hV⟩ := Filter.mem_pi'.1 ht
     exact ⟨V, I, ⟨hV.1, Set.Subset.trans (fun _ hx => hV.2 hx) h⟩⟩
   · exact ⟨I.toSet.pi V, Filter.mem_pi'.2 ⟨I, V, ⟨fun v => hV v, subset_rfl⟩⟩, hVU⟩
 
-/-- Neighbourhoods in the finite adele ring look like -/
-theorem FiniteAdeleRing_nhds_iff (x : FiniteAdeleRing R K) : U ∈ nhds x ↔
-    ∃ (I : Finset (HeightOneSpectrum R)) (V : (v: HeightOneSpectrum R) → Set (v.adicCompletion K)),
-      (∀ v ∈ I, V v ∈ nhds (x v)) ∧
-        (∀ v ∉ I, V v = v.adicCompletionIntegers K) ∧
-          (U = Subtype.val ⁻¹' Set.pi Set.univ V) :=
-  sorry
+local notation "μᵥ" => @WithZero.unitsWithZeroEquiv (Multiplicative ℤ)
 
-/-- The subspace topology of the finite S-adele ring viewed as a subspace of the finite adele
-ring coincides with the subspace topology when viewed as a subspace of `ProdAdicCompletions`. -/
-theorem topologicalSpace_eq_adelicTopologicalSpace :
-    adelicTopologicalSpace R K S = instTopologicalSpaceSubtype := by
-  refine TopologicalSpace.ext_nhds (fun x => ?_)
-  rw [instTopologicalSpaceSubtype, adelicTopologicalSpace]
-  ext U
-  rw [nhds_induced, Filter.mem_comap]
-  simp only [Filter.mem_comap, subtype_val_embedding, FiniteAdeleRing_nhds_iff]
-  constructor
-  · rintro ⟨V, ⟨I, W, hI, hnI, hVW⟩, hVU⟩
-    rw [nhds_induced, Filter.mem_comap]
-    -- need to modify W here?
-    -- Use same as first one in above proof
-    -- (I ∪ S).toSet pi (fun v => if v ∈ I then W v else v.adicCompletionIntegers K)
-    use I.toSet.pi W
-    rw [set_pi_mem_nhds_iff I.finite_toSet, Set.preimage_comp]
-    -- this is not true for W as above, but we can modify W to make it true
-    --have : (e S) ⁻¹' (Subtype.val ⁻¹' I.toSet.pi W) = (e S) ⁻¹' (Subtype.val ⁻¹' Set.univ.pi W)
-    --· sorry
-    refine ⟨hI, ?_⟩
-    intro x hx
-    simp at hx
-    apply hVU
-    rw [hVW]
-    simp
-    intro i
-    rw [Set.mem_pi] at hx
-    by_cases hi : i ∈ I
-    · exact hx _ hi
-    · rw [hnI _ hi]
-      simp
-      by_cases hi' : i ∉ S
-      · rw [toFiniteAdeleRing]
+open AdicCompletion in
+theorem AdicCompletion.exists_nmem_of_open_ball (v : HeightOneSpectrum R)
+    (γ : (WithZero (Multiplicative ℤ))ˣ) (y : v.adicCompletion K) :
+    ∃ x : v.adicCompletion K, Valued.v (x - y) > γ := by
+  choose p hp using @valuation_exists_uniformizer R _ _ K _ _ _ v
+  use p ^ (- Multiplicative.toAdd (μᵥ γ) - 1) + y
+  have h_val : γ.val = (μᵥ γ : WithZero (Multiplicative ℤ)) := by
+    simp only [WithZero.unitsWithZeroEquiv, MulEquiv.coe_mk, Equiv.coe_fn_mk, WithZero.coe_unzero]
+  simp only [add_sub_cancel_right, h_val, map_zpow₀, Valued.valuedCompletion_apply,
+    v.adicValued_apply, hp, gt_iff_lt, ← WithZero.coe_zpow, WithZero.coe_lt_coe,
+    ← Multiplicative.toAdd_lt, ofAdd_neg, inv_zpow', neg_sub, sub_neg_eq_add, toAdd_zpow,
+    toAdd_ofAdd, smul_eq_mul, mul_one, lt_add_iff_pos_left, zero_lt_one]
+
+open AdicCompletion in
+theorem FiniteAdeleRing.exists_nmem_of_finite_open_balls
+    (γ : (v : HeightOneSpectrum R) → (WithZero (Multiplicative ℤ))ˣ)
+    (y : FiniteAdeleRing R K) :
+    ∃ (x : FiniteAdeleRing R K), ∀ v ∈ S, Valued.v (x v - y v) > γ v := by
+  choose x hx using fun v => AdicCompletion.exists_nmem_of_open_ball R K v (γ v) (y v)
+  let y : ProdAdicCompletions R K := fun v => if v ∈ S then x v else 1
+  have hy : y.IsFiniteAdele := by
+    refine y.isFiniteAdele_iff.2 <| Set.Finite.subset S.finite_toSet (fun v hv => ?_)
+    contrapose! hv
+    simp only [Finset.mem_coe] at hv
+    simp only [Set.mem_setOf_eq, y, hv, if_false, one_mem, not_not]
+  refine ⟨⟨y, hy⟩, fun v hv => ?_⟩
+  simp only [y, hv, if_true]
+  exact hx _
+
+theorem FiniteAdeleRing.smul_apply (x : FiniteIntegralAdeles R K) (y : FiniteAdeleRing R K) :
+    (x • y) v = x v * y v := rfl
+
+theorem FiniteAdeleRing.add_apply (x : FiniteAdeleRing R K) (y : FiniteAdeleRing R K) :
+    (x + y) v = x v + y v := rfl
+
+theorem image_toFiniteAdeleRing_mem_nhds_zero {U : Set (FiniteSAdeleRing R K S)} (h : U ∈ nhds 0) :
+    (e S) '' U ∈ nhds 0 := by
+  rw [Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds_zero _)]
+  simp_rw [true_and]
+  rw [nhds_iff] at h
+  obtain ⟨V, I, hV, hVU⟩ := h
+  have (v : HeightOneSpectrum R) : (0 : FiniteSAdeleRing R K S).val v = 0 := rfl
+  simp_rw [this] at hV
+  simp only [Valued.mem_nhds_zero] at hV
+  simp only [Submodule.coe_toAddSubgroup, Subtype.exists, exists_prop]
+  choose γ hγ using hV
+  choose x hx using FiniteAdeleRing.exists_nmem_of_finite_open_balls R K I (fun v => (γ v)⁻¹) 0
+  choose r s hrs using FiniteAdeleRing.mul_nonZeroDivisor_mem_finiteIntegralAdeles x
+  use r
+  use r.2
+  intro z hz
+  simp only [SetLike.mem_coe, Submodule.mem_span_singleton] at hz
+  rw [Set.mem_image]
+  rw [subtype_val_embedding, Set.preimage_comp] at hVU
+  rw [← Set.image_subset_image_iff (toFiniteAdeleRing_injective R K S)] at hVU
+  apply hVU
+  rw [Set.image_preimage_eq_inter_range]
+  simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_pi, Finset.mem_coe]
+  obtain ⟨b, rfl⟩ := hz
+  refine ⟨fun v hv => ?_, ?_⟩
+  · apply hγ
+    simp only [Set.mem_setOf_eq, FiniteAdeleRing.smul_apply, Valued.v.map_mul]
+    apply lt_of_le_of_lt <| mul_le_mul_right' ((v.mem_adicCompletionIntegers R K).1 (b v).2)
+      (Valued.v (Algebra.cast r.val : v.adicCompletion K))
+    rw [one_mul]
+    specialize hx v hv
+    --simp at hx
+    have : ((γ v))⁻¹ * Valued.v (algebraMap R (v.adicCompletion K) r) < 1 := by
+      have h_ne_zero : Valued.v ((algebraMap R (adicCompletion K v)) ↑r) ≠ 0 := by
+        rw [v.valuedAdicCompletion_eq_valuation]
+        simp only [ne_eq, map_eq_zero]
+        rw [IsFractionRing.to_map_eq_zero_iff]
+        exact nonZeroDivisors.coe_ne_zero r
+      have := mul_lt_right₀ _ hx h_ne_zero
+      --simp at this
+      apply lt_of_lt_of_le this
+      rw [← Valued.v.map_mul]
+      have : x v * algebraMap _ _ r.val = (algebraMap _ (FiniteAdeleRing R K) s) v := by
         simp
-        exact x.2 _ hi'
-      · simp at hi'
-        -- is this true?
-        have hIS : S ⊆ I := by
-          sorry
+        have := congrArg (fun x => x v) hrs
+        simp at this
+        rw [← this]
+        rfl
+      simp at this
+      have this' : x.val v - (0 : FiniteAdeleRing R K).val v = (x - 0).val v := rfl
+      rw [this']
+      simp only [sub_zero]
+      rw [this]
+      have : ((algebraMap (FiniteIntegralAdeles R K) (FiniteAdeleRing R K)) s).val v = s v := rfl
+      rw [this]
+      rw [← mem_adicCompletionIntegers R K v]
+      simp only [SetLike.coe_mem]
+    have := mul_lt_mul_of_lt_of_le₀ le_rfl (Units.ne_zero (γ v)) this
+    simp at this
+    exact this
+  · rw [toFiniteAdeleRing_range]
+    exact fun v _ => mul_mem (SetLike.coe_mem _) (v.coe_mem_adicCompletionIntegers r)
 
-        exfalso
-        exact hi (hIS hi')
-    --rw [this, ← hVW]
-    --exact ⟨hI, hVU⟩
-  · simp only [nhds_iff]
-    rintro ⟨t, I, ht, htU⟩
-    set t' := (fun v =>
-      if (v ∈ I) then
-        (t v) else
-            (v.adicCompletionIntegers K)
-          )
-    use Subtype.val ⁻¹' Set.univ.pi t'
-    -- I think I need to tweak t' to make this true
-    have : Subtype.val ⁻¹' Set.univ.pi t' ⊆ U :=
-      sorry
-    rw [← Set.preimage_comp]
-    refine ⟨?_, this⟩
-    refine ⟨I, t', ?_, fun v hv => by simp only [t', hv, if_false], rfl⟩
-    · intro v hv
-      simp only [t', hv, if_true]
-      exact ht _
+theorem image_toFiniteAdeleRing_mem_nhds (x : FiniteSAdeleRing R K S) {U : Set (FiniteSAdeleRing R K S)} (h : U ∈ nhds x) :
+    (e S) '' U ∈ nhds (e S x) := by
+  rw [Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds _ _)]
+  simp_rw [true_and]
+  rw [nhds_iff] at h
+  obtain ⟨V, I, hV, hVU⟩ := h
+  have (v : HeightOneSpectrum R) : (0 : FiniteSAdeleRing R K S).val v = 0 := rfl
+  simp only [Valued.mem_nhds] at hV
+  simp only [Submodule.coe_toAddSubgroup, Subtype.exists, exists_prop]
+  choose γ hγ using hV
+  choose y hy using FiniteAdeleRing.exists_nmem_of_finite_open_balls R K I (fun v => (γ v)⁻¹) (e S x)
+  choose r₁ s₁ hrs₁ using FiniteAdeleRing.mul_nonZeroDivisor_mem_finiteIntegralAdeles y
+  choose r₂ s₂ hrs₂ using FiniteAdeleRing.mul_nonZeroDivisor_mem_finiteIntegralAdeles (e S x)
+  use r₁ * r₂
+  use mul_mem_nonZeroDivisors.2 ⟨r₁.2, r₂.2⟩
+  intro z hz
+  simp only [Submodule.mem_toAddSubgroup, Set.mem_setOf_eq] at hz
+  simp only [SetLike.mem_coe, Submodule.mem_span_singleton] at hz
+  rw [Set.mem_image]
+  rw [subtype_val_embedding, Set.preimage_comp] at hVU
+  rw [← Set.image_subset_image_iff (toFiniteAdeleRing_injective R K S)] at hVU
+  apply hVU
+  rw [Set.image_preimage_eq_inter_range]
+  simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_pi, Finset.mem_coe]
+  obtain ⟨b, hb⟩ := hz
+  have := add_eq_of_eq_sub hb
+  rw [← this]
+  refine ⟨fun v hv => ?_, ?_⟩
+  · apply hγ
+    simp only [Set.mem_setOf_eq, FiniteAdeleRing.smul_apply, Valued.v.map_mul]
+    rw [subtype_val_embedding, Function.comp_apply]
+    simp only [FiniteAdeleRing.add_apply]
+    simp only [FiniteAdeleRing.smul_apply, Valued.v.map_mul, add_sub_cancel_right]
+    apply lt_of_le_of_lt <| mul_le_mul_right' ((v.mem_adicCompletionIntegers R K).1 (b v).2)
+      (Valued.v (Algebra.cast (r₁ * r₂).val : v.adicCompletion K))
+    rw [one_mul]
+    specialize hy v hv
+    simp only at hy
+    --simp at hy
+    have : ((γ v))⁻¹ * Valued.v (algebraMap R (v.adicCompletion K) (r₁ * r₂)) < 1 := by
+      have h_ne_zero : Valued.v ((algebraMap R (adicCompletion K v)) ↑(r₁ * r₂)) ≠ 0 := by
+        rw [v.valuedAdicCompletion_eq_valuation]
+        simp only [ne_eq, map_eq_zero]
+        rw [IsFractionRing.to_map_eq_zero_iff]
+        exact nonZeroDivisors.coe_ne_zero _
+      have := mul_lt_right₀ _ hy h_ne_zero
+      simp only at this
+      apply lt_of_lt_of_le this
+      rw [← Valued.v.map_mul]
+      have : (y v) * algebraMap _ _ (r₁ * r₂).val = (algebraMap _ (FiniteAdeleRing R K) (s₁) * algebraMap _ _ r₂.val) v := by
+        simp
+        have := congrArg (fun x => x v) hrs₁
+        simp [Algebra.cast] at this
+        have this' : (y * algebraMap _ _ r₁.val) v = y v * algebraMap _ _ r₁.val := rfl
+        rw [← mul_assoc, ← this']
+        simp only [this]
+        rfl
+      --simp at this
+      rw [sub_mul, this]
 
-theorem toFiniteAdeleRing_inducing : Inducing (e S) := by
-  simp only [inducing_iff, instTopologicalSpace, ← topologicalSpace_eq_adelicTopologicalSpace]
-  rfl
+      have : (((algebraMap (FiniteIntegralAdeles R K) (FiniteAdeleRing R K)) s₁) * (algebraMap _ _ r₂.val)) v = s₁ v * (algebraMap _ _ r₂.val):= rfl
+      simp only
+      simp_rw [this]
+      rw [← mem_adicCompletionIntegers R K v]
+      simp
+      apply Subring.sub_mem
+      · exact mul_mem (SetLike.coe_mem _) (v.coe_mem_adicCompletionIntegers r₂)
+      · nth_rewrite 2 [mul_comm]
+        rw [← mul_assoc]
+        have := congrArg (fun x => x v) hrs₂
+        simp [Algebra.cast] at this
+
+        have this' : ((e S) x * algebraMap _ _ r₂.val) v = (e S x) v * algebraMap _ _ r₂.val := rfl
+        rw [← this']
+        simp only [this]
+        exact mul_mem (SetLike.coe_mem _) (v.coe_mem_adicCompletionIntegers r₁)
+    have := mul_lt_mul_of_lt_of_le₀ le_rfl (Units.ne_zero (γ v)) this
+    rw [Units.mul_inv_cancel_left, mul_one] at this
+    exact this
+  · simp only [toFiniteAdeleRing_range, map_mul]
+    exact fun v hv => add_mem (mul_mem (SetLike.coe_mem _) (mul_mem (v.coe_mem_adicCompletionIntegers r₁) (v.coe_mem_adicCompletionIntegers r₂)))
+      (x.2 v hv)
+
+theorem AdicCompletion.dvd_of_valued_le {v : HeightOneSpectrum R}
+    {x y : v.adicCompletion K} (h : Valued.v x ≤ Valued.v y) (hy : y ≠ 0):
+    ∃ r : v.adicCompletionIntegers K, r * y = x := by
+  have : Valued.v (x * y⁻¹) ≤ 1 := by
+    rw [Valued.v.map_mul]
+    simp
+    rw [mul_inv_le_iff₀ ((map_ne_zero _).2 hy), one_mul]
+    exact h
+  use ⟨x * y⁻¹, this⟩
+  rw [inv_mul_cancel_right₀ hy]
+
+theorem AdicCompletion.dvd_of_valued_lt {v : HeightOneSpectrum R}
+    {x y : v.adicCompletion K} (h : Valued.v x < Valued.v y) (hy : y ≠ 0) :
+    ∃ r : v.adicCompletionIntegers K, r * y = x :=
+  AdicCompletion.dvd_of_valued_le _ _ (le_of_lt h) hy
+
+theorem FiniteAdeleRing.dvd_of_valued_lt {x : FiniteAdeleRing R K} {r : nonZeroDivisors R}
+    {S : Finset (HeightOneSpectrum R)}
+    (hS : ∀ v, v.asIdeal ∣ Ideal.span {r.val} → v ∈ S)
+    (h : ∀ v ∈ S, Valued.v (x v) < Valued.v (algebraMap _ (v.adicCompletion K) r.val))
+    (h' : ∀ v ∉ S, x v ∈ v.adicCompletionIntegers K) :
+    ∃ a : FiniteIntegralAdeles R K, a • (algebraMap _ _ r.val) = x := by
+  have : ∀ v : HeightOneSpectrum R, Valued.v (x v) ≤ Valued.v (algebraMap _ (v.adicCompletion K) r.val) := by
+    intro v
+    by_cases hv : v ∈ S
+    · exact le_of_lt <| h v hv
+    · have : Valued.v (algebraMap _ (v.adicCompletion K) r.val) = 1 := by
+        rw [v.valuedAdicCompletion_eq_valuation]
+        rw [v.valuation_eq_intValuationDef]
+        have := not_lt.1 <| (v.intValuation_lt_one_iff_dvd _).1.mt <| (hS v).mt hv
+        exact le_antisymm (v.intValuation_le_one _) this
+      rw [this]
+      exact h' v hv
+  have hr (v : HeightOneSpectrum R) : Valued.v ((algebraMap R (v.adicCompletion K)) r.val) ≠ 0 := by
+    rw [v.valuedAdicCompletion_eq_valuation]
+    simp only [ne_eq, map_eq_zero]
+    rw [IsFractionRing.to_map_eq_zero_iff]
+    exact nonZeroDivisors.coe_ne_zero _
+  choose a ha using fun v => AdicCompletion.dvd_of_valued_le R K (this v) ((map_ne_zero _).1 (hr v))
+  use a
+  ext
+  funext v
+  exact ha v
+
+theorem mem_nhds_zero_comap_toFiniteAdeleRing {U : Set (FiniteSAdeleRing R K S)}
+    (h : U ∈ Filter.comap (e S) (nhds 0)) : U ∈ nhds 0 := by
+  rw [nhds_iff]
+  rw [Filter.mem_comap] at h
+  simp_rw [Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds_zero _ ), true_and] at h
+  obtain ⟨t, ⟨r, hrt⟩, htU⟩ := h
+  rw [subtype_val_embedding]
+  simp at hrt
+  simp only [Valued.mem_nhds]
+  simp only [Function.comp_apply]
+  simp only [map_zero]
+  have : (0 : FiniteAdeleRing R K).val = 0 := rfl
+  simp only [this]
+  clear this
+  have (v : HeightOneSpectrum R) : (0 : ProdAdicCompletions R K) v = 0 := rfl
+  simp only [this, sub_zero]
+  clear this
+  -- I should be S ∪ (divisors of r)
+  -- V should just be balls of radius p^(v r)
+  use fun (v : HeightOneSpectrum R) => { y | Valued.v y < Valued.v (algebraMap _ (v.adicCompletion K) r.val) }
+  let I := S ∪ ((Ideal.span {r.val}).finite_factors (nonZeroDivisors.ne_zero <| (Ideal.span_singleton_nonZeroDivisors.2 r.2))).toFinset
+  use I
+  constructor
+  · intro v
+    let r := Valued.v (algebraMap _ (v.adicCompletion K) r.val)
+    have h_ne_zero : r ≠ 0 := by
+      simp only [r, v.valuedAdicCompletion_eq_valuation]
+      simp only [ne_eq, map_eq_zero]
+      rw [IsFractionRing.to_map_eq_zero_iff]
+      exact nonZeroDivisors.coe_ne_zero _
+    use (isUnit_iff_ne_zero.2 h_ne_zero).unit
+    exact subset_rfl
+  · apply Set.Subset.trans _ htU
+    rw [Set.preimage_comp]
+    intro x hx
+    simp
+    apply hrt
+    simp only [Set.mem_preimage, Set.mem_pi, Finset.mem_coe, Set.mem_setOf_eq] at hx
+    simp
+    rw [Submodule.mem_span_singleton]
+    have : ∀ v, v.asIdeal ∣ Ideal.span {r.val} → v ∈ I := by
+      intro v hv
+      simp only [I, Finset.mem_union]
+      right
+      simp at hv ⊢
+      exact hv
+    apply FiniteAdeleRing.dvd_of_valued_lt R K this hx
+    intro v hv
+    simp [toFiniteAdeleRing]
+    simp [I] at hv
+    exact x.2 v hv.1
+
+theorem mem_nhds_comap_toFiniteAdeleRing (x : FiniteSAdeleRing R K S) {U : Set (FiniteSAdeleRing R K S)}
+    (h : U ∈ Filter.comap (e S) (nhds (e S x))) : U ∈ nhds x := by
+  rw [nhds_iff]
+  rw [Filter.mem_comap] at h
+  simp_rw [Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds _ _), true_and] at h
+  obtain ⟨t, ⟨r, hrt⟩, htU⟩ := h
+  rw [subtype_val_embedding]
+  simp at hrt
+  simp only [Valued.mem_nhds]
+  simp only [Function.comp_apply]
+  use fun (v : HeightOneSpectrum R) => { y | Valued.v (y - (e S x) v) < Valued.v (algebraMap _ (v.adicCompletion K) r.val) }
+  let I := S ∪ ((Ideal.span {r.val}).finite_factors (nonZeroDivisors.ne_zero <| (Ideal.span_singleton_nonZeroDivisors.2 r.2))).toFinset
+  use I
+  constructor
+  · intro v
+    let r := Valued.v (algebraMap _ (v.adicCompletion K) r.val)
+    have h_ne_zero : r ≠ 0 := by
+      simp only [r, v.valuedAdicCompletion_eq_valuation]
+      simp only [ne_eq, map_eq_zero]
+      rw [IsFractionRing.to_map_eq_zero_iff]
+      exact nonZeroDivisors.coe_ne_zero _
+    use (isUnit_iff_ne_zero.2 h_ne_zero).unit
+    exact subset_rfl
+  · apply Set.Subset.trans _ htU
+    rw [Set.preimage_comp]
+    intro y hy
+    simp
+    apply hrt
+    simp only [Set.mem_preimage, Set.mem_pi, Finset.mem_coe, Set.mem_setOf_eq] at hy
+    have (v : HeightOneSpectrum R) : ((e S y) v - (e S x) v) = (e S y - e S x) v := rfl
+    simp only [this] at hy
+    simp
+    rw [Submodule.mem_span_singleton]
+    have : ∀ v, v.asIdeal ∣ Ideal.span {r.val} → v ∈ I := by
+      intro v hv
+      simp only [I, Finset.mem_union]
+      right
+      simp at hv ⊢
+      exact hv
+    apply FiniteAdeleRing.dvd_of_valued_lt R K this hy
+    intro v hv
+    simp [toFiniteAdeleRing]
+    simp [I] at hv
+    exact sub_mem (y.2 v hv.1) (x.2 v hv.1)
+
+theorem inducing_toFiniteAdeleRing : Inducing (e S) := by
+  refine inducing_iff_nhds.2 (fun x => Filter.ext (fun U => ⟨fun hU => ⟨e S '' U,  ?_⟩, mem_nhds_comap_toFiniteAdeleRing R K S x⟩))
+  exact ⟨image_toFiniteAdeleRing_mem_nhds R K S x hU, by rw [(toFiniteAdeleRing_injective R K S).preimage_image]⟩
 
 /-- The map sending finite S-adeles to finite adeles is open and injective. -/
 theorem toFiniteAdeleRing_openEmbedding : OpenEmbedding (e S) := by
-  use ⟨toFiniteAdeleRing_inducing R K S, toFiniteAdeleRing_injective R K S⟩
+  use ⟨inducing_toFiniteAdeleRing R K S, toFiniteAdeleRing_injective R K S⟩
   rw [isOpen_iff_mem_nhds]
-  intro x _
-  rw [FiniteAdeleRing_nhds_iff]
-  use S
-  use fun v => if (v ∈ S) then Set.univ else v.adicCompletionIntegers K
-  refine ⟨?_, fun v hv => by simp only [hv, if_false], ?_⟩
-  · intro v hv
-    simp only [hv, if_true]
-    exact Filter.univ_mem
-  · rw [Set.range_eq_iff]
-    refine ⟨?_, ?_⟩
-    · intro x
-      simp only [Set.mem_preimage, Set.mem_pi, Set.mem_univ, Set.mem_ite_univ_left, SetLike.mem_coe,
-        true_implies]
-      intro v hv
-      exact x.2 _ hv
-    · simp only [Set.mem_preimage, Set.mem_pi, Set.mem_univ, Set.mem_ite_univ_left,
-      SetLike.mem_coe, true_implies]
-      intro x hx
-      use ⟨x, hx⟩
-      rfl
+  intro x hx
+  rw [Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds _ _)]
+  simp_rw [true_and]
+  choose a b hab using FiniteAdeleRing.mul_nonZeroDivisor_mem_finiteIntegralAdeles x
+  use a
+  rw [toFiniteAdeleRing_range] at hx ⊢
+  intro y hy
+  simp at hy ⊢
+  intro v hv
+  rw [Submodule.mem_span_singleton] at hy
+  obtain ⟨c, hc⟩ := hy
+  have := add_eq_of_eq_sub hc
+  rw [← this]
+  apply (v.adicCompletionIntegers K).add_mem'
+  · apply (v.adicCompletionIntegers K).mul_mem'
+    · simp only [Subsemiring.coe_carrier_toSubmonoid, Subring.coe_toSubsemiring, SetLike.mem_coe,
+      ValuationSubring.mem_toSubring, SetLike.coe_mem]
+    · exact v.coe_mem_adicCompletionIntegers _
+  · exact hx v hv
 
 end FiniteSAdeleRing
 
