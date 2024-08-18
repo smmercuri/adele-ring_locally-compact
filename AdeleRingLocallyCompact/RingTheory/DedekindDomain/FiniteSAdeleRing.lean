@@ -220,7 +220,7 @@ namespace FiniteSAdeleRing
 
 /-- The finite S-adele ring regarded as a subring of the product of local completions of K.
 
-Note that the finite S-adele ring is not a subalegrba of the product of local completions of K,
+Note that the finite S-adele ring is not a subalgerba of the product of local completions of K,
 but it is of `∏ K × ∏ O_K`, where the first product is over `v ∈ S` and the second is over `v ∉ S`.
 -/
 def subring : Subring (ProdAdicCompletions R K) where
@@ -300,21 +300,21 @@ def toFiniteAdeleRing : FiniteSAdeleRing R K S →+* FiniteAdeleRing R K where
 
 local notation "e" => toFiniteAdeleRing R K
 
-theorem toFiniteAdeleRing_injective : Function.Injective (e S) := by
+theorem injective_toFiniteAdeleRing : Function.Injective (e S) := by
   intro x y hxy
   rwa [toFiniteAdeleRing, RingHom.coe_mk, MonoidHom.coe_mk,
     OneHom.coe_mk, Subtype.mk.injEq, Subtype.val_inj] at hxy
 
-theorem toFiniteAdeleRing_range :
+theorem range_toFiniteAdeleRing :
     Set.range (e S) = {x : FiniteAdeleRing R K | IsFiniteSAdele S x.val} :=
   (Set.range_eq_iff _ _).2 ⟨λ x => x.2, λ x hx => by {use ⟨x, hx⟩; rfl}⟩
 
-theorem isOpen_toFiniteAdeleRing_range : IsOpen (Set.range (e S)) := by
+theorem isOpen_range_toFiniteAdeleRing : IsOpen (Set.range (e S)) := by
   refine isOpen_iff_mem_nhds.2 (fun x hx => ?_)
   simp only [Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds _ _), true_and]
   choose a b hab using FiniteAdeleRing.mul_nonZeroDivisor_mem_finiteIntegralAdeles x
   refine ⟨a, fun y hy => ?_⟩
-  rw [toFiniteAdeleRing_range] at hx ⊢
+  rw [range_toFiniteAdeleRing] at hx ⊢
   intro v hv
   rw [Set.mem_setOf_eq, Submodule.mem_toAddSubgroup, Submodule.mem_span_singleton] at hy
   obtain ⟨c, hc⟩ := hy
@@ -354,11 +354,11 @@ theorem image_toFiniteAdeleRing_mem_nhds (x : FiniteSAdeleRing R K S)
   refine ⟨r₁ * r₂, mul_mem_nonZeroDivisors.2 ⟨r₁.2, r₂.2⟩, fun z hz => ?_⟩
   simp only [Submodule.mem_toAddSubgroup, Submodule.mem_span_singleton] at hz
   rw [subtype_val_embedding, Set.preimage_comp,
-    ← Set.image_subset_image_iff (toFiniteAdeleRing_injective R K S)] at hVU
+    ← Set.image_subset_image_iff (injective_toFiniteAdeleRing R K S)] at hVU
   apply hVU
   simp only [Set.image_preimage_eq_inter_range]
   obtain ⟨b, hb⟩ := hz
-  rw [← add_eq_of_eq_sub hb, toFiniteAdeleRing_range]
+  rw [← add_eq_of_eq_sub hb, range_toFiniteAdeleRing]
   refine ⟨fun v hv => hγ v ?_, ?_⟩
   · simp only [Set.mem_setOf_eq, smul_apply, Valued.v.map_mul]
     rw [subtype_val_embedding, Function.comp_apply]
@@ -404,12 +404,12 @@ theorem inducing_toFiniteAdeleRing : Inducing (e S) := by
   refine inducing_iff_nhds.2 (fun x => Filter.ext (fun U => ⟨fun hU => ⟨e S '' U,  ?_⟩,
     mem_nhds_comap_toFiniteAdeleRing x⟩))
   exact ⟨image_toFiniteAdeleRing_mem_nhds x hU,
-    by rw [(toFiniteAdeleRing_injective R K S).preimage_image]⟩
+    by rw [(injective_toFiniteAdeleRing R K S).preimage_image]⟩
 
 /-- The map sending finite S-adeles to finite adeles is open and injective. -/
 theorem toFiniteAdeleRing_openEmbedding : OpenEmbedding (e S) :=
-  ⟨⟨inducing_toFiniteAdeleRing R K S, toFiniteAdeleRing_injective R K S⟩,
-    isOpen_toFiniteAdeleRing_range R K S⟩
+  ⟨⟨inducing_toFiniteAdeleRing R K S, injective_toFiniteAdeleRing R K S⟩,
+    isOpen_range_toFiniteAdeleRing R K S⟩
 
 end FiniteSAdeleRing
 
