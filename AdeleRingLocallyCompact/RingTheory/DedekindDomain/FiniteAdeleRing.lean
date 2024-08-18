@@ -100,6 +100,18 @@ namespace FiniteAdeleRing
 
 variable {R}
 
+@[simp]
+theorem smul_apply (x : FiniteIntegralAdeles R K) (y : FiniteAdeleRing R K) :
+    (x • y) v = x v * y v := rfl
+
+@[simp]
+theorem add_apply (x : FiniteAdeleRing R K) (y : FiniteAdeleRing R K) :
+    (x + y) v = x v + y v := rfl
+
+@[simp]
+theorem mul_integer_apply (x : FiniteAdeleRing R K) (r : R) :
+    (x * algebraMap _ _ r) v = x v * algebraMap _ _ r := rfl
+
 /-- Sends a finite adele to a local place. -/
 def projection (v : HeightOneSpectrum R) : FiniteAdeleRing R K →+* v.adicCompletion K :=
   RingHom.comp (Pi.evalRingHom _ v) (FiniteAdeleRing.subalgebra R K).subtype
@@ -124,15 +136,51 @@ theorem projection_localInclusion_eq (v : HeightOneSpectrum R) (x : v.adicComple
     π v (ι v x) = x := by
   apply localInclusion_rfl v x
 
-variable (R K)
+theorem exists_nmem_of_finite_open_balls
+    (S : Finset (HeightOneSpectrum R))
+    (γ : (v : HeightOneSpectrum R) → (WithZero (Multiplicative ℤ))ˣ)
+    (y : FiniteAdeleRing R K) :
+    ∃ (x : FiniteAdeleRing R K), ∀ v ∈ S, Valued.v (x v - y v) > γ v := by
+  choose x hx using fun v => AdicCompletion.exists_nmem_of_open_ball (γ v) (y v)
+  let y : ProdAdicCompletions R K := fun v => if v ∈ S then x v else 1
+  have hy : y.IsFiniteAdele := by
+    refine y.isFiniteAdele_iff.2 <| Set.Finite.subset S.finite_toSet (fun v hv => ?_)
+    contrapose! hv
+    simp only [Finset.mem_coe] at hv
+    simp only [Set.mem_setOf_eq, y, hv, if_false, one_mem, not_not]
+  refine ⟨⟨y, hy⟩, fun v hv => ?_⟩
+  simp only [y, hv, if_true]
+  exact hx _
 
-/-- The generating set of the finite adele ring are all sets of the form `Πᵥ Vᵥ`, where
-each `Vᵥ` is open in `Kᵥ` and for all but finitely many `v` we have that `Vᵥ` is the `v`-adic
-ring of integers. -/
-def generatingSet : Set (Set (FiniteAdeleRing R K)) :=
-  Set.preimage (Subtype.val) '' (Set.pi Set.univ '' (
-    {V | (∀ v, IsOpen (V v)) ∧
-         (∀ᶠ v in Filter.cofinite, V v = v.adicCompletionIntegers K)}))
+theorem dvd_of_valued_lt {x : FiniteAdeleRing R K} {r : nonZeroDivisors R}
+    {S : Finset (HeightOneSpectrum R)}
+    (hS : ∀ v, v.asIdeal ∣ Ideal.span {r.val} → v ∈ S)
+    (h : ∀ v ∈ S, Valued.v (x v) < Valued.v (algebraMap _ (v.adicCompletion K) r.val))
+    (h' : ∀ v ∉ S, x v ∈ v.adicCompletionIntegers K) :
+    ∃ a : FiniteIntegralAdeles R K, a • (algebraMap _ _ r.val) = x := by
+  have : ∀ v : HeightOneSpectrum R, Valued.v (x v) ≤ Valued.v (algebraMap _ (v.adicCompletion K) r.val) := by
+    intro v
+    by_cases hv : v ∈ S
+    · exact le_of_lt <| h v hv
+    · have : Valued.v (algebraMap _ (v.adicCompletion K) r.val) = 1 := by
+        rw [v.valuedAdicCompletion_eq_valuation]
+        rw [v.valuation_eq_intValuationDef]
+        have := not_lt.1 <| (v.intValuation_lt_one_iff_dvd _).1.mt <| (hS v).mt hv
+        exact le_antisymm (v.intValuation_le_one _) this
+      rw [this]
+      exact h' v hv
+  have hr (v : HeightOneSpectrum R) : Valued.v ((algebraMap R (v.adicCompletion K)) r.val) ≠ 0 := by
+    rw [v.valuedAdicCompletion_eq_valuation]
+    simp only [ne_eq, map_eq_zero]
+    rw [IsFractionRing.to_map_eq_zero_iff]
+    exact nonZeroDivisors.coe_ne_zero _
+  choose a ha using fun v => AdicCompletion.dvd_of_valued_le (this v) ((map_ne_zero _).1 (hr v))
+  use a
+  ext
+  funext v
+  exact ha v
+
+variable (R K)
 
 /-- The element `(x)ᵥ` where `x ∈ K` is a finite adele.
 

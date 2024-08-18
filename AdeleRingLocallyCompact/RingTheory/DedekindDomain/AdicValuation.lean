@@ -65,9 +65,18 @@ variable {R : Type*} [CommRing R] [IsDomain R] [IsDedekindDomain R] {K : Type*} 
 
 namespace HeightOneSpectrum
 
+variable (K)
+
+theorem algebraMap_valuation_ne_zero (v : HeightOneSpectrum R) (r : nonZeroDivisors R) :
+    Valued.v (algebraMap _ (v.adicCompletion K) r.val) ≠ 0 := by
+  rw [v.valuedAdicCompletion_eq_valuation, ne_eq, map_eq_zero, IsFractionRing.to_map_eq_zero_iff]
+  exact nonZeroDivisors.coe_ne_zero _
+
 local notation "μᵥ" => @WithZero.unitsWithZeroEquiv (Multiplicative ℤ)
 
 namespace AdicCompletion
+
+variable {K}
 
 /-- An element `π ∈ v.adicCompletion K` is a uniformizer if it has valuation `ofAdd(-1)`.
 
@@ -125,6 +134,8 @@ theorem openBall_of_le_one_subset_adicCompletionIntegers (γ : (WithZero (Multip
   rw [openBall, Set.mem_setOf_eq] at hx
   exact le_of_lt (lt_of_lt_of_le hx hγ)
 
+variable {K v}
+
 /-- Open balls can be shrunk to radius `< 1` by multiplying by an appropriate
 power of a uniformizer. -/
 theorem mem_openBall_mul_uniformizer_pow (x π : v.adicCompletion K) (hx : x ∈ openBall K v γ)
@@ -142,10 +153,31 @@ theorem mem_openBall_mul_uniformizer_pow (x π : v.adicCompletion K) (hx : x ∈
   rw [h_val, ← WithZero.coe_inv, ← WithZero.coe_zpow, ← WithZero.coe_inv,
     WithZero.coe_le_coe, ← ofAdd_zsmul, smul_eq_mul, mul_one, ofAdd_toAdd]
 
-variable {K v}
+theorem exists_nmem_of_open_ball
+    (γ : (WithZero (Multiplicative ℤ))ˣ) (y : v.adicCompletion K) :
+    ∃ x : v.adicCompletion K, Valued.v (x - y) > γ := by
+  choose p hp using @valuation_exists_uniformizer R _ _ K _ _ _ v
+  use p ^ (- Multiplicative.toAdd (μᵥ γ) - 1) + y
+  have h_val : γ.val = (μᵥ γ : WithZero (Multiplicative ℤ)) := by
+    simp only [WithZero.unitsWithZeroEquiv, MulEquiv.coe_mk, Equiv.coe_fn_mk, WithZero.coe_unzero]
+  simp only [add_sub_cancel_right, h_val, map_zpow₀, Valued.valuedCompletion_apply,
+    v.adicValued_apply, hp, gt_iff_lt, ← WithZero.coe_zpow, WithZero.coe_lt_coe,
+    ← Multiplicative.toAdd_lt, ofAdd_neg, inv_zpow', neg_sub, sub_neg_eq_add, toAdd_zpow,
+    toAdd_ofAdd, smul_eq_mul, mul_one, lt_add_iff_pos_left, zero_lt_one]
 
 theorem ne_zero_iff_valuation_ne_zero (x : v.adicCompletion K) :
     x ≠ 0 ↔ Valued.v x ≠ 0 := by simp only [ne_eq, map_eq_zero]
+
+theorem dvd_of_valued_le
+    {x y : v.adicCompletion K} (h : Valued.v x ≤ Valued.v y) (hy : y ≠ 0):
+    ∃ r : v.adicCompletionIntegers K, r * y = x := by
+  have : Valued.v (x * y⁻¹) ≤ 1 := by
+    rw [Valued.v.map_mul]
+    simp
+    rw [mul_inv_le_iff₀ ((map_ne_zero _).2 hy), one_mul]
+    exact h
+  use ⟨x * y⁻¹, this⟩
+  rw [inv_mul_cancel_right₀ hy]
 
 end AdicCompletion
 
@@ -153,7 +185,7 @@ namespace AdicCompletionIntegers
 
 open AdicCompletion
 
-variable (K v)
+variable (v)
 
 /-- Uniformizers exist in the ring of `v`-adic integers.
 
@@ -526,7 +558,7 @@ end AdicCompletionIntegers
 open AdicCompletion
 open AdicCompletionIntegers
 
-variable (K v)
+variable (v)
 
 /-- Any open ball in the `v`-adic completion of `K` is compact. -/
 theorem openBall_isCompact (γ : (WithZero (Multiplicative ℤ))ˣ) : IsCompact (openBall K v γ) := by
@@ -547,7 +579,7 @@ theorem openBall_isCompact (γ : (WithZero (Multiplicative ℤ))ˣ) : IsCompact 
     have h_preimage_subset : f⁻¹' (openBall K v γ) ⊆ (v.adicCompletionIntegers K) := by
       intro x hx
       rw [SetLike.mem_coe, mem_adicCompletionIntegers]
-      have h_mul_π := mem_openBall_mul_uniformizer_pow K v (f x) π.val hx hπ
+      have h_mul_π := mem_openBall_mul_uniformizer_pow (f x) π.val hx hπ
       rw [← mul_assoc, ← zpow_add₀ hπ_ne_zero, add_right_neg, zpow_zero, one_mul] at h_mul_π
       exact le_of_lt h_mul_π
     have h_image_f_closed :=
