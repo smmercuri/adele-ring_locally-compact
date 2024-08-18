@@ -152,33 +152,25 @@ theorem exists_nmem_of_finite_open_balls
   simp only [y, hv, if_true]
   exact hx _
 
+open AdicCompletion in
 theorem dvd_of_valued_lt {x : FiniteAdeleRing R K} {r : nonZeroDivisors R}
     {S : Finset (HeightOneSpectrum R)}
     (hS : ∀ v, v.asIdeal ∣ Ideal.span {r.val} → v ∈ S)
-    (h : ∀ v ∈ S, Valued.v (x v) < Valued.v (algebraMap _ (v.adicCompletion K) r.val))
-    (h' : ∀ v ∉ S, x v ∈ v.adicCompletionIntegers K) :
+    (hvS : ∀ v ∈ S, Valued.v (x v) < Valued.v (algebraMap _ (v.adicCompletion K) r.val))
+    (hvnS : ∀ v ∉ S, x v ∈ v.adicCompletionIntegers K) :
     ∃ a : FiniteIntegralAdeles R K, a • (algebraMap _ _ r.val) = x := by
-  have : ∀ v : HeightOneSpectrum R, Valued.v (x v) ≤ Valued.v (algebraMap _ (v.adicCompletion K) r.val) := by
-    intro v
+  have (v : HeightOneSpectrum R) :
+      Valued.v (x v) ≤ Valued.v (algebraMap _ (v.adicCompletion K) r.val) := by
     by_cases hv : v ∈ S
-    · exact le_of_lt <| h v hv
+    · exact le_of_lt <| hvS v hv
     · have : Valued.v (algebraMap _ (v.adicCompletion K) r.val) = 1 := by
-        rw [v.valuedAdicCompletion_eq_valuation]
-        rw [v.valuation_eq_intValuationDef]
-        have := not_lt.1 <| (v.intValuation_lt_one_iff_dvd _).1.mt <| (hS v).mt hv
-        exact le_antisymm (v.intValuation_le_one _) this
-      rw [this]
-      exact h' v hv
-  have hr (v : HeightOneSpectrum R) : Valued.v ((algebraMap R (v.adicCompletion K)) r.val) ≠ 0 := by
-    rw [v.valuedAdicCompletion_eq_valuation]
-    simp only [ne_eq, map_eq_zero]
-    rw [IsFractionRing.to_map_eq_zero_iff]
-    exact nonZeroDivisors.coe_ne_zero _
-  choose a ha using fun v => AdicCompletion.dvd_of_valued_le (this v) ((map_ne_zero _).1 (hr v))
-  use a
-  ext
-  funext v
-  exact ha v
+        rw [v.valuedAdicCompletion_eq_valuation, v.valuation_eq_intValuationDef]
+        exact le_antisymm (v.intValuation_le_one _)
+          (not_lt.1 <| (v.intValuation_lt_one_iff_dvd _).1.mt <| (hS v).mt hv)
+      exact this ▸ hvnS v hv
+  choose a ha using fun v =>
+    dvd_of_valued_le (this v) <| (map_ne_zero _).1 (v.algebraMap_valuation_ne_zero K r)
+  exact ⟨a, FiniteAdeleRing.ext _ _ <| funext (fun v => ha v)⟩
 
 variable (R K)
 

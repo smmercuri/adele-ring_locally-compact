@@ -172,12 +172,8 @@ theorem dvd_of_valued_le
     {x y : v.adicCompletion K} (h : Valued.v x ≤ Valued.v y) (hy : y ≠ 0):
     ∃ r : v.adicCompletionIntegers K, r * y = x := by
   have : Valued.v (x * y⁻¹) ≤ 1 := by
-    rw [Valued.v.map_mul]
-    simp
-    rw [mul_inv_le_iff₀ ((map_ne_zero _).2 hy), one_mul]
-    exact h
-  use ⟨x * y⁻¹, this⟩
-  rw [inv_mul_cancel_right₀ hy]
+    rwa [Valued.v.map_mul, map_inv₀, mul_inv_le_iff₀ ((map_ne_zero _).2 hy), one_mul]
+  exact ⟨⟨x * y⁻¹, this⟩, by rw [inv_mul_cancel_right₀ hy]⟩
 
 end AdicCompletion
 
@@ -194,11 +190,8 @@ theorem exists_uniformizer :
     ∃ (π : v.adicCompletionIntegers K), IsUniformizer π.val := by
   obtain ⟨π, hπ⟩ := valuation_exists_uniformizer K v
   refine ⟨⟨π, ?_⟩, ?_⟩
-  · rw [mem_adicCompletionIntegers, valuedAdicCompletion_def]
-    simp only [Valued.extension_extends]
-    have h_le := (le_of_lt (Multiplicative.ofAdd_neg_one_lt_one))
-    rw [← hπ] at h_le
-    exact le_trans h_le le_rfl
+  · simp only [mem_adicCompletionIntegers, valuedAdicCompletion_def, Valued.extension_extends]
+    exact le_trans (hπ.symm ▸ (le_of_lt <| Multiplicative.ofAdd_neg_one_lt_one)) le_rfl
   · simp only [IsUniformizer, ← hπ, valuedAdicCompletion_def, Valued.extension_extends]
     rfl
 
@@ -216,9 +209,8 @@ theorem valuation_eq_one_of_isUnit {x : v.adicCompletionIntegers K} (hx : IsUnit
     Valued.v x.val = 1 := by
   obtain ⟨u, hu⟩ := hx
   apply le_antisymm ((v.mem_adicCompletionIntegers K).1 x.property)
-  rw [← @Valuation.map_one (v.adicCompletion K) (WithZero (Multiplicative ℤ)) _ _ Valued.v]
-  have h_one : (1 : v.adicCompletion K) = (1 : v.adicCompletionIntegers K) := rfl
-  rw [h_one, ← u.mul_inv, hu, Submonoid.coe_mul, Valued.v.map_mul]
+  rw [← @Valuation.map_one (v.adicCompletion K) (WithZero (Multiplicative ℤ)) _ _ Valued.v,
+    ← Submonoid.coe_one, ← u.mul_inv, hu, Submonoid.coe_mul, Valued.v.map_mul]
   nth_rewrite 2 [← mul_one (Valued.v x.val)]
   exact mul_le_mul_left' ((v.mem_adicCompletionIntegers K).1 (u⁻¹.val.property)) _
 
