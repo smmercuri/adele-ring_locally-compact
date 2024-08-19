@@ -67,9 +67,9 @@ instance : Nontrivial (InfiniteAdeleRing K) :=
 
 end DerivedInstances
 
-instance topologicalSpace : TopologicalSpace (InfiniteAdeleRing K) := Pi.topologicalSpace
+instance : TopologicalSpace (InfiniteAdeleRing K) := Pi.topologicalSpace
 
-instance topologicalRing : TopologicalRing (InfiniteAdeleRing K) := Pi.instTopologicalRing
+instance : TopologicalRing (InfiniteAdeleRing K) := Pi.instTopologicalRing
 
 instance : Algebra K (InfiniteAdeleRing K) := Pi.algebra _ _
 
@@ -78,7 +78,7 @@ sending `x ∈ K` to `(x)ᵥ`. -/
 abbrev globalEmbedding : K →+* InfiniteAdeleRing K := algebraMap K (InfiniteAdeleRing K)
 
 @[simp]
-theorem globalEmbedding_apply (x : K) : globalEmbedding K x v = (x : v.completion) := rfl
+theorem globalEmbedding_apply (x : K) : globalEmbedding K x v = x := rfl
 
 /-- The infinite adele ring is locally compact. -/
 instance locallyCompactSpace : LocallyCompactSpace (InfiniteAdeleRing K) :=

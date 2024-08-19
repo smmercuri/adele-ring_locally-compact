@@ -5,7 +5,9 @@ Authors: Salvatore Mercuri, María Inés de Frutos-Fernández
 -/
 import Mathlib
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
+import AdeleRingLocallyCompact.RingTheory.DedekindDomain.Factorization
 
+set_option linter.longLine false
 /-!
 # Finite adele ring
 
@@ -16,8 +18,6 @@ In this file we supplement the theory by defining some local maps and the topolo
 the finite adele ring.
 
 ## Main definitions
- - `DedekindDomain.FiniteAdeleRing.projection v` is the map sending a finite adele `x` to its
-   `v`th place `x v` in the `v`-adic completion of `K`.
  - `DedekindDomain.FiniteAdeleRing.localInclusion v` is the map sending an element `x` of the
    `v`-adic completion of `K` to the finite adele which has `x` in its `v`th place and `1`s
    everywhere else.
@@ -53,14 +53,12 @@ variable (R : Type*) [CommRing R] [IsDomain R] [IsDedekindDomain R] (K : Type*)
 namespace ProdAdicCompletions
 
 def globalEmbedding : K →+* ProdAdicCompletions R K :=
-  Pi.ringHom (fun v => AdicCompletion.coeRingHom K v)
+  algebraMap K (ProdAdicCompletions R K)
+
+@[simp]
+theorem globalEmbedding_apply (x : K) : globalEmbedding R K x v = x := rfl
 
 variable {R}
-
-/-- Sends an element of the product of all `adicCompletions` to a local place. -/
-def projection (v : HeightOneSpectrum R) :
-    ProdAdicCompletions R K →+* v.adicCompletion K :=
-  Pi.evalRingHom _ v
 
 /-- Sends a local element to the product of all `adicCompletions` filled with `1`s elsewhere. -/
 def localInclusion (v : HeightOneSpectrum R) :
@@ -75,24 +73,23 @@ def localInclusion (v : HeightOneSpectrum R) :
 variable {K}
 
 /-- The local inclusion of any element is a finite adele. -/
-theorem isFiniteAdele_localInclusion (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
+theorem localInclusion_isFiniteAdele (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
     (localInclusion K v x).IsFiniteAdele := by
   rw [ProdAdicCompletions.IsFiniteAdele, Filter.eventually_cofinite]
-  have h : {w | localInclusion K v x w ∉ w.adicCompletionIntegers K} ⊆ {v} := by
-    intro w hw
-    simp only [localInclusion, Set.mem_setOf_eq, Set.mem_singleton_iff] at hw ⊢
-    contrapose! hw
-    simp only [hw, ↓reduceDIte]
-    exact (w.adicCompletionIntegers K).one_mem'
-  exact Set.Finite.subset (Set.finite_singleton _) h
+  refine Set.Finite.subset (Set.finite_singleton v) (fun w hw => ?_)
+  simp only [localInclusion, Set.mem_setOf_eq, Set.mem_singleton_iff] at hw ⊢
+  contrapose! hw
+  simp only [hw, ↓reduceDIte]
+  exact (w.adicCompletionIntegers K).one_mem'
 
 /-- The `v`th place of the local inclusion is the original element. -/
-theorem localInclusion_rfl (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
+@[simp]
+theorem localInclusion_apply (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
     localInclusion K v x v = x := by simp only [localInclusion, dif_pos]
 
-/-- The projection and local inclusions are inverses on `ProdAdicCompletions`. -/
-theorem projection_localInclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-    projection K v (localInclusion K v x) = x := by convert localInclusion_rfl v x
+@[simp]
+theorem localInclusion_apply' {v w : HeightOneSpectrum R} (x : v.adicCompletion K) (h : w ≠ v) :
+    localInclusion K v x w = 1 := by simp only [localInclusion, h, ↓reduceDIte]
 
 end ProdAdicCompletions
 
@@ -112,29 +109,23 @@ theorem add_apply (x : FiniteAdeleRing R K) (y : FiniteAdeleRing R K) :
 theorem mul_integer_apply (x : FiniteAdeleRing R K) (r : R) :
     (x * algebraMap _ _ r) v = x v * algebraMap _ _ r := rfl
 
-/-- Sends a finite adele to a local place. -/
-def projection (v : HeightOneSpectrum R) : FiniteAdeleRing R K →+* v.adicCompletion K :=
-  RingHom.comp (Pi.evalRingHom _ v) (FiniteAdeleRing.subalgebra R K).subtype
-
 /-- Sends a local element to a finite adele filled with `1`s elsewhere. -/
 def localInclusion (v : HeightOneSpectrum R) : v.adicCompletion K → FiniteAdeleRing R K :=
   fun x => ⟨ProdAdicCompletions.localInclusion K v x,
-          ProdAdicCompletions.isFiniteAdele_localInclusion v x⟩
-
-local notation "π" => projection K
-local notation "ι" => localInclusion K
+          ProdAdicCompletions.localInclusion_isFiniteAdele v x⟩
 
 variable {K}
 
 /-- The `v`th place of the local inclusion is the original element. -/
-theorem localInclusion_rfl (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-    (ι v x).val v = x := by
-  simp only [localInclusion, ProdAdicCompletions.localInclusion_rfl]
+@[simp]
+theorem localInclusion_apply (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
+    (localInclusion K v x).val v = x := by
+  simp only [localInclusion, ProdAdicCompletions.localInclusion_apply]
 
-/-- The projection and local inclusions are inverses on the finite adele ring. -/
-theorem projection_localInclusion_eq (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-    π v (ι v x) = x := by
-  apply localInclusion_rfl v x
+@[simp]
+theorem localInclusion_apply' (v w : HeightOneSpectrum R) (x : v.adicCompletion K) (h : w ≠ v) :
+    (localInclusion K v x).val w = 1 := by
+  simp only [localInclusion, ProdAdicCompletions.localInclusion_apply' _ h]
 
 theorem exists_nmem_of_finite_open_balls
     (S : Finset (HeightOneSpectrum R))
@@ -147,7 +138,7 @@ theorem exists_nmem_of_finite_open_balls
     refine y.isFiniteAdele_iff.2 <| Set.Finite.subset S.finite_toSet (fun v hv => ?_)
     contrapose! hv
     simp only [Finset.mem_coe] at hv
-    simp only [Set.mem_setOf_eq, y, hv, if_false, one_mem, not_not]
+    simp only [Set.mem_setOf_eq, not_not, y, hv, if_false, (v.adicCompletionIntegers K).one_mem]
   refine ⟨⟨y, hy⟩, fun v hv => ?_⟩
   simp only [y, hv, if_true]
   exact hx _
@@ -174,59 +165,55 @@ theorem dvd_of_valued_lt {x : FiniteAdeleRing R K} {r : nonZeroDivisors R}
 
 variable (R K)
 
+open Valued ProdAdicCompletions in
 /-- The element `(x)ᵥ` where `x ∈ K` is a finite adele.
 
 [https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685)-/
 theorem globalEmbedding_isFiniteAdele (x : K) :
     ProdAdicCompletions.IsFiniteAdele (ProdAdicCompletions.globalEmbedding R K x) := by
-  set supp := setOf (fun (v : HeightOneSpectrum R) =>
-    (ProdAdicCompletions.globalEmbedding R K) x v ∉ adicCompletionIntegers K v
-  )
-  obtain ⟨r, ⟨d, hd⟩, hx⟩ := IsLocalization.mk'_surjective (nonZeroDivisors R) x
-  have hd_ne_zero : Ideal.span {d} ≠ (0 : Ideal R) := by
-
-    rw [Ideal.zero_eq_bot, Ne, Ideal.span_singleton_eq_bot]
-    exact nonZeroDivisors.ne_zero hd
-  have hsubset : supp ⊆ { v : HeightOneSpectrum R | v.asIdeal ∣ Ideal.span {d}} := by
+  let S := { v : HeightOneSpectrum R | (globalEmbedding R K) x v ∉ adicCompletionIntegers K v }
+  obtain ⟨r, d, hx⟩ := IsLocalization.mk'_surjective (nonZeroDivisors R) x
+  have hsubset : S ⊆ (Ideal.factorsFinset_of_nonZeroDivisor d).toSet := by
     intro v hv
-    simp only [supp, mem_adicCompletionIntegers, not_le, not_lt, Set.mem_setOf_eq] at hv
-    rw [Set.mem_setOf_eq, ← intValuation_lt_one_iff_dvd]
-    by_contra! h_one_le
+    simp only [S, mem_adicCompletionIntegers, not_le, not_lt, Set.mem_setOf_eq] at hv
+    rw [Set.Finite.coe_toFinset]
+    contrapose! hv
     simp only [IsFractionRing.mk'_eq_div] at hx
-    have h_val : Valued.v ((ProdAdicCompletions.globalEmbedding R K x v)) =
-      Valued.v (x : v.adicCompletion K) := by
-      have h : Pi.ringHom (λ v => AdicCompletion.coeRingHom K v) x v
-          = (x : v.adicCompletion K) := by
-        simp only [Pi.ringHom_apply]; rfl
-      rw [← h, Pi.ringHom_apply]
-      rfl
-    simp only [h_val, Valued.valuedCompletion_apply, adicValued_apply,
-      HeightOneSpectrum.valuation_def, ] at hv
-    simp only [← hx, map_div₀, Valuation.extendToLocalization_apply_map_apply] at hv
-    have h_val_d : intValuation v d = 1 :=
-      by rw [← le_antisymm (v.intValuation_le_one d) h_one_le]; rfl
-    rw [h_val_d, div_one] at hv
-    exact not_lt.2 (v.intValuation_le_one r) hv
-  exact Set.Finite.subset (Ideal.finite_factors hd_ne_zero) hsubset
+    simp only [globalEmbedding_apply, valuedCompletion_apply, adicValued_apply, ← hx, map_div₀]
+    have h_val_d : v.valuation (algebraMap R K d) = 1 := by
+      apply le_antisymm (v.valuation_le_one d)
+      contrapose! hv
+      exact (v.valuation_lt_one_iff_dvd _).1 hv
+    rw [h_val_d, div_one]
+    exact v.valuation_le_one _
+  exact Set.Finite.subset (Finset.finite_toSet _) hsubset
 
-/-- The global embedding sending an element `x ∈ K` to `(x)ᵥ` in the finite adele ring. -/
+/-- The global embedding sending an element `x ∈ K` to `(x)ᵥ` in the finite adele ring.
+
+TODO : this can be changed to algebraMap K (FiniteAdeleRing R K). -/
 def globalEmbedding : K →+* FiniteAdeleRing R K where
-  toFun := λ x => ⟨ProdAdicCompletions.globalEmbedding R K x, globalEmbedding_isFiniteAdele R K x⟩
+  toFun := fun x => ⟨ProdAdicCompletions.globalEmbedding R K x, globalEmbedding_isFiniteAdele R K x⟩
   map_one' := rfl
   map_zero' := rfl
   map_mul' x y := by simp only [map_mul]; rfl
   map_add' x y := by simp only [map_add]; rfl
 
+@[simp]
+theorem globalEmbedding_apply (x : K) : globalEmbedding R K x v = x := rfl
+
+variable {R K}
+
+theorem ext_iff {a₁ a₂ : FiniteAdeleRing R K} : a₁ = a₂ ↔ a₁.val = a₂.val :=
+  Subtype.ext_iff
+
+variable (R K)
+
+open ProdAdicCompletions in
 theorem nontrivial_of_nonEmpty [i : Nonempty (HeightOneSpectrum R)] :
     Nontrivial (FiniteAdeleRing R K) := by
   obtain v := (Classical.inhabited_of_nonempty i).default
-  use ⟨0, DedekindDomain.ProdAdicCompletions.IsFiniteAdele.zero⟩, ι v 1
-  simp only [localInclusion]
-  intro h
-  rw [Subtype.mk.injEq] at h
-  have h := congrFun h v
-  simp only [ProdAdicCompletions.localInclusion, dif_pos] at h
-  exact zero_ne_one h
+  exact ⟨⟨0, IsFiniteAdele.zero⟩, globalEmbedding R K 1, fun h =>
+    zero_ne_one (congrFun (ext_iff.1 h) v)⟩
 
 theorem globalEmbedding_injective [i : Nonempty (HeightOneSpectrum R)] :
     Function.Injective (globalEmbedding R K) := by

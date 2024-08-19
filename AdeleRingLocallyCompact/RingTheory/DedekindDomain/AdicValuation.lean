@@ -6,6 +6,7 @@ Authors: Salvatore Mercuri, María Inés de Frutos-Fernández, Filippo A. E. Nuc
 import Mathlib
 import AdeleRingLocallyCompact.Algebra.Group.WithOne.Defs
 
+set_option linter.longLine false
 /-!
 # Adic valuations on Dedekind domains
 

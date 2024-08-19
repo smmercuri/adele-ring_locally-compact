@@ -1,11 +1,13 @@
 import AdeleRingLocallyCompact.Algebra.Group.WithOne.Defs
+import AdeleRingLocallyCompact.Algebra.Order.GroupWithZero.Canonical
 import AdeleRingLocallyCompact.Algebra.Ring.Equiv
 import AdeleRingLocallyCompact.Analysis.NormedSpace.Completion
 import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
 import AdeleRingLocallyCompact.NumberTheory.NumberField.InfiniteAdeleRing
 import AdeleRingLocallyCompact.NumberTheory.NumberField.AdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
+import AdeleRingLocallyCompact.RingTheory.DedekindDomain.Factorization
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
-import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteSAdeleRing
+import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FinsetAdeleRing
 import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 import AdeleRingLocallyCompact.Topology.Instances.Real
