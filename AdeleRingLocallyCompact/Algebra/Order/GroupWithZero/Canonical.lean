@@ -18,9 +18,8 @@ theorem mul_inv_lt_iff₀ (hc : c ≠ 0) : a * c⁻¹ < b ↔ a < b * c := by
   have := mul_lt_mul_of_lt_of_le₀ le_rfl hc h
   rwa [mul_comm a c⁻¹, ← mul_assoc, mul_inv_cancel hc, one_mul, mul_comm c b] at this
 
-theorem inv_mul_lt_iff₀ (hc : c ≠ 0) : c⁻¹ * a < b ↔ a < b * c := by
-  rw [mul_comm c⁻¹ a]
-  exact mul_inv_lt_iff₀ hc
+theorem inv_mul_lt_iff₀ (hc : c ≠ 0) : c⁻¹ * a < b ↔ a < b * c :=
+  mul_comm c⁻¹ a ▸ mul_inv_lt_iff₀ hc
 
 theorem inv_mul_lt_one_iff₀ (hc : c ≠ 0) : c⁻¹ * a < 1 ↔ a < c := by
   nth_rewrite 2 [← one_mul c]

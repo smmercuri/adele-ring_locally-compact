@@ -21,8 +21,6 @@ the finite adele ring.
  - `DedekindDomain.FiniteAdeleRing.localInclusion v` is the map sending an element `x` of the
    `v`-adic completion of `K` to the finite adele which has `x` in its `v`th place and `1`s
    everywhere else.
- - `DedekindDomain.FiniteAdeleRing.generatingSet` is the generating set of the topology of
-   the finite adele ring.
 
 ## Main results
  - `DedekindDomain.FiniteAdeleRing.continuous_if_factors₂` : Any map on the product
@@ -127,6 +125,8 @@ theorem localInclusion_apply' (v w : HeightOneSpectrum R) (x : v.adicCompletion 
     (localInclusion K v x).val w = 1 := by
   simp only [localInclusion, ProdAdicCompletions.localInclusion_apply' _ h]
 
+/-- Given balls centred at `yᵥ` of radius `γᵥ` for a finite set of primes `v ∈ S`, we can find a
+finite adele  `x` for which `xᵥ` is outside each open ball for `v ∈ S`. -/
 theorem exists_nmem_of_finite_open_balls
     (S : Finset (HeightOneSpectrum R))
     (γ : (v : HeightOneSpectrum R) → (WithZero (Multiplicative ℤ))ˣ)
@@ -144,6 +144,11 @@ theorem exists_nmem_of_finite_open_balls
   exact hx _
 
 open AdicCompletion in
+/-- Let `x` be a finite adele and let `r` be a non-zero integral divisor. If, for some finite
+set of primes `v ∈ S` containing the factors of `r`, the valuation of `xᵥ` is less than the
+valuation of `r`, then `x` is an integral multiple of the global embedding of `r`.
+
+TODO : is this strong approximation? -/
 theorem dvd_of_valued_lt {x : FiniteAdeleRing R K} {r : nonZeroDivisors R}
     {S : Finset (HeightOneSpectrum R)}
     (hS : ∀ v, v.asIdeal ∣ Ideal.span {r.val} → v ∈ S)

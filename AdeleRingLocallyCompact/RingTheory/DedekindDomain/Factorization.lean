@@ -8,7 +8,7 @@ import Mathlib
 /-!
 # Factorization of ideals and fractional ideals of Dedekind domains
 
-We add some finset versions of ideal factors.
+This file includes finset versions of ideal factors.
 -/
 
 noncomputable section
@@ -18,8 +18,6 @@ open scoped Classical
 open IsDedekindDomain IsDedekindDomain.HeightOneSpectrum
 
 variable {R : Type*} [CommRing R] {K : Type*} [Field K] [Algebra R K] [IsFractionRing R K]
-
-/-! ### Factorization of ideals of Dedekind domains -/
 
 variable [IsDedekindDomain R] (v : HeightOneSpectrum R)
 

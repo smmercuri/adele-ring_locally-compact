@@ -154,6 +154,8 @@ theorem mem_openBall_mul_uniformizer_pow (x π : v.adicCompletion K) (hx : x ∈
   rw [h_val, ← WithZero.coe_inv, ← WithZero.coe_zpow, ← WithZero.coe_inv,
     WithZero.coe_le_coe, ← ofAdd_zsmul, smul_eq_mul, mul_one, ofAdd_toAdd]
 
+/-- Given an integer `γ` and some centre `y ∈ Kᵥ` we can always find an element `x ∈ Kᵥ`
+outide of the open ball at `y` of radius `γ`. -/
 theorem exists_nmem_of_open_ball
     (γ : (WithZero (Multiplicative ℤ))ˣ) (y : v.adicCompletion K) :
     ∃ x : v.adicCompletion K, Valued.v (x - y) > γ := by
@@ -169,6 +171,8 @@ theorem exists_nmem_of_open_ball
 theorem ne_zero_iff_valuation_ne_zero (x : v.adicCompletion K) :
     x ≠ 0 ↔ Valued.v x ≠ 0 := by simp only [ne_eq, map_eq_zero]
 
+/-- If `x ∈ Kᵥ` has valuation at most that of `y ∈ Kᵥ`, then `x` is an integral
+multiple of `y`. -/
 theorem dvd_of_valued_le
     {x y : v.adicCompletion K} (h : Valued.v x ≤ Valued.v y) (hy : y ≠ 0):
     ∃ r : v.adicCompletionIntegers K, r * y = x := by
@@ -399,11 +403,10 @@ theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K}
     (toFiniteCoeffs n hπ).Injective := by
   intro x y hxy
   simp only [toFiniteCoeffs] at hxy
-  set a := Classical.choose (finiteExpansion n (Quotient.out' x) hπ) with a_def
-  set b := Classical.choose (finiteExpansion n (Quotient.out' y) hπ)
+  let b := Classical.choose (finiteExpansion n (Quotient.out' y) hπ)
   have hx := Classical.choose_spec (finiteExpansion n (Quotient.out' x) hπ)
   have hy := Classical.choose_spec (finiteExpansion n (Quotient.out' y) hπ)
-  rw [← a_def, hxy] at hx
+  rw [hxy] at hx
   rw [← Quotient.out_eq' x, ← Quotient.out_eq' y,  ← sub_eq_zero]
   simp only [Submodule.Quotient.mk''_eq_mk, ← @Submodule.Quotient.mk_sub _ _ _ _ _
     (inferInstanceAs (AddCommGroup (v.adicCompletionIntegers K))), Submodule.Quotient.mk_eq_zero]
@@ -453,16 +456,16 @@ theorem hasFiniteSubcover_of_openBall_eq_one {γ : (WithZero (Multiplicative ℤ
       Set.Finite t ∧
       ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t,
         {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
-  set q := Ideal.Quotient.mk (maximalIdeal K v)
+  let q := Ideal.Quotient.mk (maximalIdeal K v)
   obtain ⟨π, hπ⟩ := exists_uniformizer K v
   have h := quotient_maximalIdeal_pow_finite 1 hπ
   rw [pow_one] at h
-  set T := Quotient.out' '' (h.elems.toSet)
+  let T := Quotient.out' '' (h.elems.toSet)
   use T, (Set.Finite.image Subtype.val (Set.Finite.image Quotient.out'
     (Finset.finite_toSet h.elems)))
   intro x hx
   simp only [Set.mem_iUnion]
-  set y := (Quotient.out' (q ⟨x, hx⟩))
+  let y := (Quotient.out' (q ⟨x, hx⟩))
   use y
   have h_out_mk_mem : Subtype.val (Quotient.out' (q ⟨x, hx⟩)) ∈ Subtype.val '' T :=
     ⟨y, Set.mem_image_of_mem Quotient.out' (Finset.mem_coe.2 (h.complete (q ⟨x, hx⟩))),
@@ -485,17 +488,17 @@ theorem hasFiniteSubcover_of_openBall_lt_one {γ : (WithZero (Multiplicative ℤ
       use μᵥ γ
       simp only [WithZero.unitsWithZeroEquiv, MulEquiv.coe_mk, Equiv.coe_fn_mk, WithZero.coe_unzero]
   obtain ⟨μ, hμ⟩ := ho
-  set M := (maximalIdeal K v)^((-Multiplicative.toAdd μ + 1).toNat)
-  set S := (v.adicCompletionIntegers K) ⧸ M
-  set q := Ideal.Quotient.mk M
+  let M := (maximalIdeal K v)^((-Multiplicative.toAdd μ + 1).toNat)
+  let S := (v.adicCompletionIntegers K) ⧸ M
+  let q := Ideal.Quotient.mk M
   obtain ⟨π, hπ⟩ := exists_uniformizer K v
   have h : Fintype S := quotient_maximalIdeal_pow_finite (-Multiplicative.toAdd μ + 1).toNat hπ
-  set T := Quotient.out' '' (h.elems.toSet)
+  let T := Quotient.out' '' (h.elems.toSet)
   use T, (Set.Finite.image Subtype.val (Set.Finite.image Quotient.out'
     (Finset.finite_toSet h.elems)))
   intro x hx
   simp only [Set.mem_iUnion]
-  set y := (Quotient.out' (q ⟨x, hx⟩))
+  let y := (Quotient.out' (q ⟨x, hx⟩))
   use y
   have h_out_mk_mem : Subtype.val (Quotient.out' (q ⟨x, hx⟩)) ∈ Subtype.val '' T :=
     ⟨y, ⟨Set.mem_image_of_mem _ (Finset.mem_coe.2 (h.complete _)), rfl⟩⟩
@@ -534,7 +537,7 @@ theorem isCompact : IsCompact (v.adicCompletionIntegers K : Set (v.adicCompletio
   isCompact_iff_totallyBounded_isComplete.2
     ⟨isTotallyBounded K v, IsClosed.isComplete (isClosed K v)⟩
 
-instance compactSpace : CompactSpace (v.adicCompletionIntegers K) :=
+instance : CompactSpace (v.adicCompletionIntegers K) :=
   CompactSpace.mk (isCompact_iff_isCompact_univ.1 (isCompact K v))
 
 instance : LocallyCompactSpace (v.adicCompletionIntegers K) := by
@@ -553,7 +556,7 @@ open AdicCompletionIntegers
 
 variable (v)
 
-/-- Any open ball in the `v`-adic completion of `K` is compact. -/
+/-- Any open ball of zero in the `v`-adic completion of `K` is compact. -/
 theorem openBall_isCompact (γ : (WithZero (Multiplicative ℤ))ˣ) : IsCompact (openBall K v γ) := by
   by_cases hγ : γ ≤ 1
   · exact IsCompact.of_isClosed_subset (isCompact K v) (openBall_isClosed K v γ)
@@ -589,7 +592,7 @@ theorem openBall_isCompact (γ : (WithZero (Multiplicative ℤ))ˣ) : IsCompact 
   /-- The `v`-adic completion of `K` is locally compact since the open balls give
   compact neighbourhoods. -/
   instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletion K) := by
-    refine LocallyCompactSpace.mk (λ x N hN => ?_)
+    refine LocallyCompactSpace.mk (fun x N hN => ?_)
     rw [Valued.mem_nhds] at hN
     obtain ⟨γ, hN⟩ := hN
     set f := λ y => y + x
