@@ -146,9 +146,7 @@ theorem exists_nmem_of_finite_open_balls
 open AdicCompletion in
 /-- Let `x` be a finite adele and let `r` be a non-zero integral divisor. If, for some finite
 set of primes `v ∈ S` containing the factors of `r`, the valuation of `xᵥ` is less than the
-valuation of `r`, then `x` is an integral multiple of the global embedding of `r`.
-
-TODO : is this strong approximation? -/
+valuation of `r`, then `x` is an integral multiple of the global embedding of `r`. -/
 theorem dvd_of_valued_lt {x : FiniteAdeleRing R K} {r : nonZeroDivisors R}
     {S : Finset (HeightOneSpectrum R)}
     (hS : ∀ v, v.asIdeal ∣ Ideal.span {r.val} → v ∈ S)
