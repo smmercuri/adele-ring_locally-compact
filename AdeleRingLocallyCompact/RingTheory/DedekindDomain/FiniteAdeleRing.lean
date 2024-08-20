@@ -12,22 +12,21 @@ set_option linter.longLine false
 # Finite adele ring
 
 Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions. The finite adele
-ring of `K` is defined in `Mathlib.RingTheory.DedekindDomain.finiteAdeleRing`
-[https://github.com/leanprover-community/mathlib4/blob/1c0ac885c9b8aa4daa1830acb56b755140a8059f/Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean#L274-L280](https://github.com/leanprover-community/mathlib4/blob/1c0ac885c9b8aa4daa1830acb56b755140a8059f/Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean#L274-L280).
-In this file we supplement the theory by defining some local maps and the topological space for
-the finite adele ring.
+ring of `K` is defined as a topological ring in `Mathlib.RingTheory.DedekindDomain.FiniteAdeleRing`.
+In this file we supplement the theory by defining some local and global maps, and helper results
+for working with the topological space of the the finite adele ring.
 
 ## Main definitions
  - `DedekindDomain.FiniteAdeleRing.localInclusion v` is the map sending an element `x` of the
    `v`-adic completion of `K` to the finite adele which has `x` in its `v`th place and `1`s
    everywhere else.
+ - `DedekindDomain.FiniteAdeleRing.globalEmbedding R K` is the map sending an element `x` of the
+   `v`-adic completion of `K` to the finite adele `(x)ᵥ`.
 
 ## Main results
- - `DedekindDomain.FiniteAdeleRing.continuous_if_factors₂` : Any map on the product
-   of the finite adele ring to the finite adele ring is continuous if it factors through
-   continuous maps at each place `v`, each of which preserve the integers.
- - `DedekindDomain.FiniteAdeleRing.topologicalRing` : the topological ring structure on the finite
-   adele ring.
+ - `DedekindDomain.FiniteAdeleRing.dvd_of_valued_lt` :  a finite adele is an `∏ v, Oᵥ` multiple of
+   an integer `r` if the valuation of `x v` is less than the valuation of `r` for every `v`
+   dividing `r`.
 
 ## References
  * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]

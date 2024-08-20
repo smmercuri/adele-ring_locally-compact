@@ -53,10 +53,6 @@ in [https://github.com/mariainesdff/local_fields_journal/](https://github.com/ma
 
 ## Tags
 dedekind domain, dedekind ring, adic valuation
-
-## TODO
- - Incorporate the proof that the `v`-adic ring of integers has finite residue field.
- - Use `UniformSpace.ball` instead of `openBall`.
 -/
 
 noncomputable section
@@ -413,15 +409,12 @@ theorem isClosed : IsClosed (v.adicCompletionIntegers K : Set (v.adicCompletion 
 /-- There is a finite covering of the `v`-adic integers of open balls of radius larger than one,
 namely the single open ball centred at `0`. -/
 theorem finite_subcover_of_zero_ball_one_lt {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : 1 < γ.val) :
-    ∃ t : Set (v.adicCompletion K),
-      Set.Finite t ∧
+    ∃ t : Set (v.adicCompletion K), Set.Finite t ∧
       ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t,
         {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
-  use {0}
-  simp only [Set.finite_singleton, Set.mem_singleton_iff, Set.mem_setOf_eq,
-    Set.iUnion_iUnion_eq_left, zero_sub, Valuation.map_neg, true_and]
-  intro x hx
-  rw [SetLike.mem_coe, mem_adicCompletionIntegers] at hx
+  refine ⟨{0}, Set.finite_singleton _, fun x hx => ?_⟩
+  simp only [Set.mem_singleton_iff, Set.mem_setOf_eq, Set.iUnion_iUnion_eq_left, zero_sub,
+    Valuation.map_neg]
   exact lt_of_le_of_lt hx hγ
 
 open WithZero in
@@ -429,8 +422,7 @@ open WithZero in
 obtained by using the finite representatives in the quotient of the `v`-adic integers by an
 appropriate power of the maximal ideal. -/
 theorem finite_subcover_of_zero_ball_le_one {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ.val ≤ 1) :
-    ∃ t : Set (v.adicCompletion K),
-      Set.Finite t ∧
+    ∃ t : Set (v.adicCompletion K), Set.Finite t ∧
       ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t,
         {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
   let μ := μᵥ γ

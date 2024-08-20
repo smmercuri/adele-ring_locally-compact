@@ -28,14 +28,14 @@ locally compact.
    the product of the `v`-adic ring of integers over all `v ∉ S`.
  - `DedekindDomain.FinsetIntegralAdeles.Subtype R K S` is
    `DedekindDomain.FinsetIntegralAdeles R K S` as a subtype of `DedekindDomain.FinsetProd R K S`.
- - `DedekindDomain.FinsetAdeleRing` is the subring of `ProdAdicCompletions R K` of all finite
+ - `DedekindDomain.FinsetAdeleRing R K S` is the subring of `ProdAdicCompletions R K` of all finite
    S-adeles.
  - `DedekindDomain.FinsetAdeleRing.toFiniteAdeleRing` is the map embedding the finite S-adele
    ring into the finite adele ring.
 
 ## Main results
  - `DedekindDomain.FinsetAdeleRing.homeomorph_subtype` : the finite S-adele ring is
-   subring_homeomorphic to `DedekindDomain.FiniteIntegralAdeles.Subtype`.
+   homeomorphic to `DedekindDomain.FiniteIntegralAdeles.Subtype`.
  - `DedekindDomain.FinsetAdeleRing.algebraMap_inducing` : the map sending finite S-adeles to
    finite adeles is inducing; equivalently, the topology of the finite S-adele ring when viewed as
    a subspace of the finite adele ring is equal to the topology when viewed as a subspace of
