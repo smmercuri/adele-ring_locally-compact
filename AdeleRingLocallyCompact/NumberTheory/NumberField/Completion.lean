@@ -232,7 +232,8 @@ theorem abs_eq_comp :
 
 -- use norm_embedding_of_isReal for this after updating
 theorem abs_of_isReal_eq_comp {v : InfinitePlace K} (hv : IsReal v) :
-    v.1 = (IsAbsoluteValue.toAbsoluteValue (norm : ℝ → ℝ)).comp (v.embedding_of_isReal hv).injective := by
+    v.1 = (IsAbsoluteValue.toAbsoluteValue (norm : ℝ → ℝ)).comp
+      (v.embedding_of_isReal hv).injective := by
   ext x
   suffices : v x =
     (IsAbsoluteValue.toAbsoluteValue (norm : ℝ → ℝ)).comp (v.embedding_of_isReal hv).injective x

@@ -34,9 +34,9 @@ locally compact.
    ring into the finite adele ring.
 
 ## Main results
- - `DedekindDomain.FinsetAdeleRing.homeomorph_piSubtypeProd` : the finite S-adele ring is
+ - `DedekindDomain.FinsetAdeleRing.homeomorph_subtype` : the finite S-adele ring is
    subring_homeomorphic to `DedekindDomain.FiniteIntegralAdeles.Subtype`.
- - `DedekindDomain.FinsetAdeleRing.inducing_algebraMap` : the map sending finite S-adeles to
+ - `DedekindDomain.FinsetAdeleRing.algebraMap_inducing` : the map sending finite S-adeles to
    finite adeles is inducing; equivalently, the topology of the finite S-adele ring when viewed as
    a subspace of the finite adele ring is equal to the topology when viewed as a subspace of
    `ProdAdicCompletions R K`.
@@ -231,14 +231,14 @@ lemma ext {x y : FinsetAdeleRing R K S} (h : x.val = y.val) : x = y :=
   Subtype.ext h
 
 /-- The finite S-adele ring is homeomorphic to `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
-def homeomorph_piSubtypeProd :
+def homeomorph_subtype :
     FinsetAdeleRing R K S ≃ₜ FinsetIntegralAdeles.Subtype R K S :=
   Homeomorph.subtype (Homeomorph.piEquivPiSubtypeProd _ _) <| fun _ =>
     ⟨fun hx v => hx v.1 v.2, fun hx v hv => hx ⟨v, hv⟩⟩
 
 /-- The finite S-adele ring is locally compact. -/
 theorem locallyCompactSpace : LocallyCompactSpace (FinsetAdeleRing R K S) :=
-  (Homeomorph.locallyCompactSpace_iff (homeomorph_piSubtypeProd R K S)).2 inferInstance
+  (Homeomorph.locallyCompactSpace_iff (homeomorph_subtype R K S)).2 inferInstance
 
 variable {R K S}
 
@@ -254,7 +254,7 @@ theorem isFiniteAdele (x : FinsetAdeleRing R K S) :
 open FiniteAdeleRing in
 /-- If `x` is a `v`-adic integer, then the local inclusion of `x` at any place `v` is a
 finite S-adele. -/
-theorem IsFinsetAdele_localInclusion (v : HeightOneSpectrum R) {x : v.adicCompletion K}
+theorem isFinsetAdele_localInclusion (v : HeightOneSpectrum R) {x : v.adicCompletion K}
     (hx : x ∈ v.adicCompletionIntegers K) :
     IsFinsetAdele S (localInclusion K v x).val := by
   intros w _
@@ -269,7 +269,7 @@ theorem IsFinsetAdele_localInclusion (v : HeightOneSpectrum R) {x : v.adicComple
 open FiniteAdeleRing in
 /-- If `v ∈ S` then the local inclusion of any `x` in the `v`-adic completion of `K` is a
 finite S-adele. -/
-theorem IsFinsetAdele_localInclusion_of_mem {v : HeightOneSpectrum R}
+theorem isFinsetAdele_localInclusion_of_mem {v : HeightOneSpectrum R}
     (x : v.adicCompletion K) (h : v ∈ S) :
     IsFinsetAdele S (localInclusion K v x).val := by
   intros w hw
@@ -296,23 +296,23 @@ instance : Algebra (FinsetAdeleRing R K S) (FiniteAdeleRing R K) where
 local notation "e" => fun S => algebraMap (FinsetAdeleRing R K S) (FiniteAdeleRing R K)
 
 /-- The map sending finite S-adeles to finite adeles is injective. -/
-theorem injective_algebraMap : Function.Injective (e S) := by
+theorem algebraMap_injective : Function.Injective (e S) := by
   intro x y hxy
   simp only [algebraMap, Algebra.toRingHom, toFiniteAdeleRing, RingHom.coe_mk, MonoidHom.coe_mk,
     OneHom.coe_mk] at hxy
   rwa [Subtype.mk.injEq, Subtype.val_inj] at hxy
 
-theorem range_algebraMap :
+theorem algebraMap_range :
     Set.range (e S) = {x : FiniteAdeleRing R K | IsFinsetAdele S x.val} :=
   (Set.range_eq_iff _ _).2 ⟨λ x => x.2, fun x hx => by {use ⟨x, hx⟩; rfl}⟩
 
 /-- The finite S-adele ring is open in the finite adele ring. -/
-theorem isOpen_range_algebraMap : IsOpen (Set.range (e S)) := by
+theorem isOpen_algebraMap_range : IsOpen (Set.range (e S)) := by
   refine isOpen_iff_mem_nhds.2 (fun x hx => ?_)
   simp only [Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds _ _), true_and]
   choose a b hab using FiniteAdeleRing.mul_nonZeroDivisor_mem_finiteIntegralAdeles x
   refine ⟨a, fun y hy => ?_⟩
-  rw [range_algebraMap] at hx ⊢
+  rw [algebraMap_range] at hx ⊢
   intro v hv
   rw [Set.mem_setOf_eq, Submodule.mem_toAddSubgroup, Submodule.mem_span_singleton] at hy
   obtain ⟨c, hc⟩ := hy
@@ -339,7 +339,7 @@ theorem nhds_iff {x : FinsetAdeleRing R K S} {U : Set (FinsetAdeleRing R K S)} :
 
 open FiniteAdeleRing in
 /-- The embedding of the finite S-adele ring into the finite adele ring preserves neighbourhoods. -/
-theorem image_algebraMap_mem_nhds (x : FinsetAdeleRing R K S)
+theorem algebraMap_image_mem_nhds (x : FinsetAdeleRing R K S)
     {U : Set (FinsetAdeleRing R K S)} (h : U ∈ nhds x) :
     (e S) '' U ∈ nhds (e S x) := by
   simp only [Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds _ _), true_and,
@@ -353,11 +353,11 @@ theorem image_algebraMap_mem_nhds (x : FinsetAdeleRing R K S)
   refine ⟨r₁ * r₂, mul_mem_nonZeroDivisors.2 ⟨r₁.2, r₂.2⟩, fun z hz => ?_⟩
   simp only [Submodule.mem_toAddSubgroup, Submodule.mem_span_singleton] at hz
   rw [subtype_val_embedding, Set.preimage_comp,
-    ← Set.image_subset_image_iff (injective_algebraMap R K S)] at hVU
+    ← Set.image_subset_image_iff (algebraMap_injective R K S)] at hVU
   apply hVU
   simp only [Set.image_preimage_eq_inter_range]
   obtain ⟨b, hb⟩ := hz
-  rw [← add_eq_of_eq_sub hb, range_algebraMap]
+  rw [← add_eq_of_eq_sub hb, algebraMap_range]
   refine ⟨fun v hv => hγ v ?_, ?_⟩
   · simp only [Set.mem_setOf_eq, smul_apply, Valued.v.map_mul]
     rw [subtype_val_embedding, Function.comp_apply]
@@ -403,16 +403,15 @@ variable (R K S)
 
 /-- The topologies of the finite S-adele ring when viewed as a subspace of
 `ProdAdicCompletions R K` and as a subspace of the finite adele ring coincide. -/
-theorem inducing_algebraMap : Inducing (e S) := by
+theorem algebraMap_inducing : Inducing (e S) := by
   refine inducing_iff_nhds.2 (fun x => Filter.ext (fun U => ⟨fun hU => ⟨e S '' U,  ?_⟩,
     mem_nhds_comap_algebraMap x⟩))
-  exact ⟨image_algebraMap_mem_nhds x hU,
-    by rw [(injective_algebraMap R K S).preimage_image]⟩
+  exact ⟨algebraMap_image_mem_nhds x hU,
+    by rw [(algebraMap_injective R K S).preimage_image]⟩
 
 /-- The map sending finite S-adeles to finite adeles is open and injective. -/
 theorem algebraMap_openEmbedding : OpenEmbedding (e S) :=
-  ⟨⟨inducing_algebraMap R K S, injective_algebraMap R K S⟩,
-    isOpen_range_algebraMap R K S⟩
+  ⟨⟨algebraMap_inducing R K S, algebraMap_injective R K S⟩, isOpen_algebraMap_range R K S⟩
 
 end FinsetAdeleRing
 
@@ -425,7 +424,7 @@ local notation "e" => toFiniteAdeleRing R K
 /-- The finite adele ring is locally compact. -/
 theorem locallyCompactSpace : LocallyCompactSpace (FiniteAdeleRing R K) := by
   refine LocallyCompactSpace.mk (fun x N hN => ?_)
-  set S := (Filter.eventually_cofinite.1 x.2).toFinset
+  let S := (Filter.eventually_cofinite.1 x.2).toFinset
   have hx : IsFinsetAdele S x.1 :=
     fun v hv => by rwa [Set.Finite.mem_toFinset, Set.nmem_setOf_iff, not_not] at hv
   obtain ⟨U, hU₀, hU₁, hU₂⟩ := mem_nhds_iff.1 hN
