@@ -20,7 +20,7 @@ used to define a `NormedField` instance, and therefore a uniform structure. We c
 at `v` using the `UniformSpace.Completion` functor with respect to this uniform structure to
 obtain `v.completion`.
 
-The embedding `v.embedding : K →+* ℂ` associated to an infinite place enjoys useful properties
+The embedding `v.embedding : K →+* ℂ` associated to an infinite place has useful properties
 within the uniform structure defined by `v`; namely, it is a uniform embedding and an isometry.
 This is because the absolute value associated to `v` factors through `v.embedding`. This allows
 us to show that the completion of `K` at an infinite place is locally compact. Moreover, we can

@@ -207,8 +207,8 @@ namespace FinsetAdeleRing
 
 /-- The finite S-adele ring regarded as a subring of the product of local completions of K.
 
-Note that the finite S-adele ring is not a subalgebra of the product of `∏ Kᵥ`, but it is a
-subalgebra of `∏ (v ∈ S), Kᵥ × ∏ (v ∉ S), Oᵥ`.
+Note that the finite S-adele ring is not a `K`-subalgebra of the product of `∏ Kᵥ`, but it is a
+`K_S`-subalgebra, where `K_S` denotes the `S`-integers.
 -/
 def subring : Subring (ProdAdicCompletions R K) where
   carrier := {x | IsFinsetAdele S x}
@@ -406,8 +406,7 @@ variable (R K S)
 theorem algebraMap_inducing : Inducing (e S) := by
   refine inducing_iff_nhds.2 (fun x => Filter.ext (fun U => ⟨fun hU => ⟨e S '' U,  ?_⟩,
     mem_nhds_comap_algebraMap x⟩))
-  exact ⟨algebraMap_image_mem_nhds x hU,
-    by rw [(algebraMap_injective R K S).preimage_image]⟩
+  exact ⟨algebraMap_image_mem_nhds x hU, by rw [(algebraMap_injective R K S).preimage_image]⟩
 
 /-- The map sending finite S-adeles to finite adeles is open and injective. -/
 theorem algebraMap_openEmbedding : OpenEmbedding (e S) :=
