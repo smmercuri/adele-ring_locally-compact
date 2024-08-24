@@ -219,11 +219,6 @@ open AbsoluteValue.Completion
 
 variable {K : Type*} [Field K] [NumberField K] (v : InfinitePlace K)
 
-/-- The normed field structure of a number field coming from the absolute value associated to
-an infinite place. -/
-def normedField : NormedField K :=
-  inferInstanceAs (NormedField (WithAbs v.1))
-
 /-- The absolute value of an infinite place factors through the embedding associated to
 an infinite place. -/
 theorem abs_eq_comp :

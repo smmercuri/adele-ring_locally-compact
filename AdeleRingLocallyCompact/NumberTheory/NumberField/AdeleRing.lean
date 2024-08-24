@@ -6,6 +6,7 @@ Authors: Salvatore Mercuri
 import Mathlib
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FinsetAdeleRing
 import AdeleRingLocallyCompact.NumberTheory.NumberField.InfiniteAdeleRing
+import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
 
 set_option linter.longLine false
 /-!
@@ -83,9 +84,18 @@ def principalSubgroup : AddSubgroup (AdeleRing K) := (globalEmbedding K).range.t
 
 instance : ContinuousSMul (FiniteIntegralAdeles (𝓞 K) K) (FiniteAdeleRing (𝓞 K) K) := sorry
 
-instance : CompactSpace (FiniteIntegralAdeles (𝓞 K) K) := sorry
+instance : CompactSpace (FiniteIntegralAdeles (𝓞 K) K) := Pi.compactSpace
 
-instance (v : InfinitePlace K) : ProperSpace (v.completion) := sorry
+open NumberField in
+instance (v : InfinitePlace K) : NontriviallyNormedField (v.completion) where
+  toNormedField := InfinitePlace.Completion.instNormedFieldCompletion v
+  non_trivial := by
+    use 2
+    have : norm (2 : v.completion) = norm (2 : ℂ) := sorry
+    sorry
+
+instance (v : InfinitePlace K) : ProperSpace (v.completion) :=
+  ProperSpace.of_locallyCompactSpace v.completion
 
 open IsDedekindDomain in
 theorem FiniteAdeleRing.sub_mem_finiteIntegralAdeles (a : FiniteAdeleRing (𝓞 K) K) :
