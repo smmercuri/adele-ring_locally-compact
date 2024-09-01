@@ -8,6 +8,9 @@ import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FinsetAdeleRing
 import AdeleRingLocallyCompact.NumberTheory.NumberField.InfiniteAdeleRing
 import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
 
+open scoped TensorProduct
+open scoped Classical
+
 set_option linter.longLine false
 /-!
 # Adele Ring
@@ -82,17 +85,44 @@ theorem locallyCompactSpace : LocallyCompactSpace (AdeleRing K) := by
 /-- The subgroup of principal adeles `(x)ᵥ` where `x ∈ K`. -/
 def principalSubgroup : AddSubgroup (AdeleRing K) := (globalEmbedding K).range.toAddSubgroup
 
-instance : ContinuousSMul (FiniteIntegralAdeles (𝓞 K) K) (FiniteAdeleRing (𝓞 K) K) := sorry
+variable (L : Type*) [Field L] [Algebra K L] [FiniteDimensional K L]
 
-instance : CompactSpace (FiniteIntegralAdeles (𝓞 K) K) := Pi.compactSpace
+--def tensorProduct_equiv_pi : AdeleRing K ⊗[K] L ≃ₗ[K] (Fin (FiniteDimensional.finrank K L) → AdeleRing K) :=
+--  LinearEquiv.trans
+--    (TensorProduct.congr (LinearEquiv.refl _ _) (FiniteDimensional.finBasis K L).equivFun)
+--    (TensorProduct.piScalarRight _ K _ _)
+
+--instance : TopologicalSpace (AdeleRing K ⊗[K] L) :=
+--  TopologicalSpace.induced (tensorProduct_equiv_pi K L) inferInstance
+
+variable (G H : Type*) [AddGroup G] [AddGroup H] [TopologicalSpace G] [TopologicalSpace H]
+def Homeomorph.quotientCongr (G' : AddSubgroup G) (H' : AddSubgroup H) [G'.Normal] [H'.Normal]
+    (e : G ≃ₜ H) (h : e '' G' = H') : G ⧸ G' ≃ₜ H ⧸ H' := sorry
+
+variable {ι : Type*} {G : ι → Type*} [(i : ι) → AddGroup (G i)] [(i : ι) → TopologicalSpace (G i)]
+  [Fintype ι] (p : (i : ι) → AddSubgroup (G i))
+def Homeomorph.quotientPi : ((i : ι) → G i) ⧸ AddSubgroup.pi Set.univ p ≃ₜ ((i : ι) → G i ⧸ p i) :=
+  sorry
+
+def baseChange [NumberField L] :
+    (Fin (FiniteDimensional.finrank K L) → AdeleRing K) ≃ₜ AdeleRing L :=
+  sorry
+
+def baseChange_quotient [NumberField L] :
+    (Fin (FiniteDimensional.finrank K L) → AdeleRing K ⧸ principalSubgroup K) ≃ₜ AdeleRing L ⧸ principalSubgroup L := by
+  apply Homeomorph.trans (Homeomorph.quotientPi _).symm
+  apply Homeomorph.quotientCongr _ _ _ _ (baseChange K L)
+  sorry
 
 open NumberField in
 instance (v : InfinitePlace K) : NontriviallyNormedField (v.completion) where
   toNormedField := InfinitePlace.Completion.instNormedFieldCompletion v
   non_trivial := by
+    simp only [← dist_zero_right]
+    have h := InfinitePlace.Completion.isometry_extensionEmbedding v |>.dist_eq
     use 2
-    have : norm (2 : v.completion) = norm (2 : ℂ) := sorry
-    sorry
+    rw [← h 2 0]
+    simp only [map_ofNat, map_zero, dist_zero_right, RCLike.norm_ofNat, Nat.one_lt_ofNat]
 
 instance (v : InfinitePlace K) : ProperSpace (v.completion) :=
   ProperSpace.of_locallyCompactSpace v.completion
@@ -102,19 +132,65 @@ theorem FiniteAdeleRing.sub_mem_finiteIntegralAdeles (a : FiniteAdeleRing (𝓞 
   ∃ (x : K) (y : FiniteIntegralAdeles (𝓞 K) K),
     a - algebraMap K (FiniteAdeleRing (𝓞 K) K) x = algebraMap _ _ y := sorry
 
-open Metric in
-theorem InfiniteAdeleRing.sub_mem_closedBalls (a : InfiniteAdeleRing K) :
-  ∃ (x : 𝓞 K), ∀ v, norm ((a - algebraMap K _ x) v) ≤ 1 := sorry
+variable {K}
+theorem InfinitePlace.card_eq_one_of_finrank_eq_one (h : FiniteDimensional.finrank ℚ K = 1) :
+    Fintype.card (NumberField.InfinitePlace K) = 1 := by
+  rw [InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces,
+    InfinitePlace.nrRealPlaces_eq_one_of_finrank_eq_one h,
+    InfinitePlace.nrComplexPlaces_eq_zero_of_finrank_eq_one h]
+
+theorem InfinitePlace.isReal_of_nrComplexPlaces_eq_zero (h : InfinitePlace.NrComplexPlaces K = 0)
+    (v : InfinitePlace K) : v.IsReal := by
+  simp only [Fintype.card_eq_zero_iff, isEmpty_subtype, InfinitePlace.not_isComplex_iff_isReal] at h
+  exact h v
+
+theorem InfinitePlace.isComplex_of_nrRealPlaces_eq_zero (h : InfinitePlace.NrRealPlaces K = 0)
+    (v : InfinitePlace K) : v.IsComplex := by
+  simp only [Fintype.card_eq_zero_iff, isEmpty_subtype, InfinitePlace.not_isReal_iff_isComplex] at h
+  exact h v
+
+open Metric NumberField.InfinitePlace in
+theorem InfiniteAdeleRing.sub_mem_closedBalls (a : InfiniteAdeleRing ℚ) :
+    ∃ (x : 𝓞 ℚ), ∀ v, norm ((a - algebraMap ℚ _ x) v) ≤ 1 := by
+  have hr := InfinitePlace.isReal_of_nrComplexPlaces_eq_zero <|
+    nrComplexPlaces_eq_zero_of_finrank_eq_one <| FiniteDimensional.finrank_self _
+  obtain ⟨inf, h_inf⟩ := Fintype.card_eq_one_iff.1 <|
+    InfinitePlace.card_eq_one_of_finrank_eq_one (FiniteDimensional.finrank_self _)
+  let f := Completion.extensionEmbedding_of_isReal <| hr inf
+  let x := ⌊f (a inf)⌋
+  have h := (Completion.isometry_extensionEmbedding_of_isReal <| hr inf).dist_eq
+  specialize h (a inf) x
+  simp only [map_intCast, MulHom.toFun_eq_coe, AbsoluteValue.coe_toMulHom] at h
+  use x
+  intro v
+  rw [h_inf v]
+  rw [dist_eq_norm] at h
+  rw [dist_eq_norm] at h
+  simp only [map_intCast]
+  have : (a - x) inf = a inf - x := rfl
+  rw [this]
+  rw [← h]
+  simp only [Int.self_sub_floor, Real.norm_eq_abs, ge_iff_le, x]
+  rw [Int.abs_fract]
+  exact le_of_lt (Int.fract_lt_one _)
+
+variable (K)
 
 open DedekindDomain IsDedekindDomain Metric in
 theorem isCompact_quotient_principal :
     IsCompact (Set.univ : Set <| AdeleRing K ⧸ principalSubgroup K) := by
-  let W_inf : Set (InfiniteAdeleRing K) := Set.pi Set.univ <|
-    fun (v : InfinitePlace K) => closedBall 0 1
-  let W_fin : Set (FiniteAdeleRing (RingOfIntegers K) K) :=
-    algebraMap _ _ '' (Set.univ : Set (FiniteIntegralAdeles (RingOfIntegers K) K))
-  let W : Set (AdeleRing K) := W_inf.prod W_fin
-  let f : AdeleRing K → AdeleRing K ⧸ principalSubgroup K := QuotientAddGroup.mk' _
+  suffices h : IsCompact (Set.univ : Set <| AdeleRing ℚ ⧸ principalSubgroup ℚ) by
+    let n := FiniteDimensional.finrank ℚ K
+    haveI : CompactSpace (Fin n → AdeleRing ℚ ⧸ principalSubgroup ℚ) :=
+      haveI : CompactSpace (AdeleRing ℚ ⧸ principalSubgroup ℚ) := isCompact_univ_iff.1 h
+      Pi.compactSpace
+    exact isCompact_univ_iff.2 <| Homeomorph.compactSpace (baseChange_quotient ℚ K)
+  let W_inf : Set (InfiniteAdeleRing ℚ) := Set.pi Set.univ <|
+    fun (v : InfinitePlace ℚ) => closedBall 0 1
+  let W_fin : Set (FiniteAdeleRing (𝓞 ℚ) ℚ) :=
+    algebraMap _ _ '' (Set.univ : Set (FiniteIntegralAdeles (𝓞 ℚ) ℚ))
+  let W : Set (AdeleRing ℚ) := W_inf.prod W_fin
+  let f : AdeleRing ℚ → AdeleRing ℚ ⧸ principalSubgroup ℚ := QuotientAddGroup.mk' _
   have h_W_compact : IsCompact W := by
     refine IsCompact.prod (isCompact_univ_pi (fun v => ?_))
       (IsCompact.image CompactSpace.isCompact_univ <| continuous_algebraMap _ _)
@@ -124,9 +200,9 @@ theorem isCompact_quotient_principal :
     intro x
     let a := Quotient.out' x
     rw [Set.mem_image]
-    choose xf yf hf using FiniteAdeleRing.sub_mem_finiteIntegralAdeles K a.2
-    choose xi hi using InfiniteAdeleRing.sub_mem_closedBalls K (a.1 - algebraMap _ _ xf)
-    let c := globalEmbedding K <| xi + xf
+    choose xf yf hf using FiniteAdeleRing.sub_mem_finiteIntegralAdeles ℚ a.2
+    choose xi hi using InfiniteAdeleRing.sub_mem_closedBalls (a.1 - algebraMap _ _ xf)
+    let c := globalEmbedding ℚ <| xi + xf
     let b := a - c
     have hb : b ∈ W := by
       simp only [W, Set.prod, W_inf, W_fin]
@@ -138,7 +214,7 @@ theorem isCompact_quotient_principal :
           FiniteAdeleRing.exists_finiteIntegralAdele_iff]
         intro v
         simp only [b, c, map_add, add_comm, ← sub_sub]
-        exact (v.adicCompletionIntegers K).sub_mem
+        exact (v.adicCompletionIntegers _).sub_mem
           ((FiniteAdeleRing.exists_finiteIntegralAdele_iff _).1 ⟨_, hf⟩ v)
             (v.coe_mem_adicCompletionIntegers _)
     refine ⟨b, hb, ?_⟩

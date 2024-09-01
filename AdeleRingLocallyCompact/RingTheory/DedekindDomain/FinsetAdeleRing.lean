@@ -150,6 +150,21 @@ def subtype_homeomorph :
     refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
     exact Continuous.snd  ({ isOpen_preimage := fun s a => a })
 
+def piEmpty_homeomorph :
+    ((v : {v : HeightOneSpectrum R // v ∈ (∅ : Finset (HeightOneSpectrum R))}) → v.1.adicCompletion K) ≃ₜ
+    ((v : {v : HeightOneSpectrum R // v ∈ (∅ : Finset (HeightOneSpectrum R))}) → v.1.adicCompletionIntegers K) := by
+  have h : ((v : {v : HeightOneSpectrum R // v ∈ (∅ : Finset (HeightOneSpectrum R))}) → v.1.adicCompletion K) ≃ₜ Unit := by
+    sorry
+  have h' : ((v : {v : HeightOneSpectrum R // v ∈ (∅ : Finset (HeightOneSpectrum R))}) → v.1.adicCompletionIntegers K) ≃ₜ Unit := sorry
+  exact Homeomorph.trans h h'.symm
+
+def empty_homeomorph :
+    FinsetIntegralAdeles R K ∅ ≃ₜ FiniteIntegralAdeles R K :=
+  Homeomorph.trans
+    (Homeomorph.prodCongr (piEmpty_homeomorph R K) (Homeomorph.refl _))
+    (Homeomorph.piEquivPiSubtypeProd _
+      (fun v : HeightOneSpectrum R => v.adicCompletionIntegers K)).symm
+
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact. -/
 instance : LocallyCompactSpace (FinsetIntegralAdeles R K S) :=
   @Prod.locallyCompactSpace _ _ _ _ Pi.locallyCompactSpace_of_finite Pi.locallyCompactSpace
@@ -235,6 +250,12 @@ def homeomorph_subtype :
     FinsetAdeleRing R K S ≃ₜ FinsetIntegralAdeles.Subtype R K S :=
   Homeomorph.subtype (Homeomorph.piEquivPiSubtypeProd _ _) <| fun _ =>
     ⟨fun hx v => hx v.1 v.2, fun hx v hv => hx ⟨v, hv⟩⟩
+
+def empty_homeomorph :
+    FinsetAdeleRing R K ∅ ≃ₜ FiniteIntegralAdeles R K :=
+  Homeomorph.trans
+    (Homeomorph.trans (homeomorph_subtype R K _) (FinsetIntegralAdeles.subtype_homeomorph R K _))
+    (FinsetIntegralAdeles.empty_homeomorph R K)
 
 /-- The finite S-adele ring is locally compact. -/
 theorem locallyCompactSpace : LocallyCompactSpace (FinsetAdeleRing R K S) :=
@@ -413,6 +434,27 @@ theorem algebraMap_openEmbedding : OpenEmbedding (e S) :=
   ⟨⟨algebraMap_inducing R K S, algebraMap_injective R K S⟩, isOpen_algebraMap_range R K S⟩
 
 end FinsetAdeleRing
+
+namespace FiniteIntegralAdeles
+
+theorem algebraMap_factors : (algebraMap (FiniteIntegralAdeles R K) (FiniteAdeleRing R K)) =
+  (algebraMap (FinsetAdeleRing R K ∅) (FiniteAdeleRing R K)) ∘
+    (FinsetAdeleRing.empty_homeomorph R K).symm :=
+  funext (fun _ => rfl)
+
+theorem algebraMap_inducing :
+    Inducing <| algebraMap (FiniteIntegralAdeles R K) (FiniteAdeleRing R K) :=
+  algebraMap_factors R K ▸ Inducing.comp (FinsetAdeleRing.algebraMap_inducing _ _ _)
+    (Homeomorph.inducing _)
+
+instance : ContinuousSMul (FiniteIntegralAdeles R K) (FiniteAdeleRing R K) := by
+  apply inducing_id.continuousSMul (algebraMap_inducing _ _).continuous
+  intro _ _
+  rfl
+
+instance : CompactSpace (FiniteIntegralAdeles R K) := Pi.compactSpace
+
+end FiniteIntegralAdeles
 
 namespace FiniteAdeleRing
 
