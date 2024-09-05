@@ -4,10 +4,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
 import Mathlib
+import AdeleRingLocallyCompact.Algebra.Order.GroupWithZero.Canonical
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.Factorization
-import AdeleRingLocallyCompact.Algebra.Order.GroupWithZero.Canonical
+import AdeleRingLocallyCompact.Topology.Homeomorph
 
 /-!
 # Finite S-adele ring
@@ -78,6 +79,12 @@ namespace ProdAdicCompletions
 def FinsetProd :=
   ((v : S) → v.val.adicCompletion K) × ((v : {v // v ∉ S}) → v.val.adicCompletion K)
 
+private def IsIntegralAt : (v : {v // v ∉ S}) → v.val.adicCompletion K → Prop :=
+  fun v x => x ∈ v.val.adicCompletionIntegers K
+
+private def IsFinsetIntegralProd : ((v : {v // v ∉ S}) → v.val.adicCompletion K) → Prop :=
+  fun x => ∀ v, x v ∈ v.val.adicCompletionIntegers K
+
 section DerivedInstances
 
 instance : TopologicalSpace (FinsetProd R K S) := instTopologicalSpaceProd
@@ -101,10 +108,11 @@ open ProdAdicCompletions
 
 /-- The subtype of `DedekindDomain.FinsetProd` whose second product ranges over
 `v`-adic rings of integers. -/
-def Subtype := {x : FinsetProd R K S // ∀ v : {v // v ∉ S}, x.2 v ∈ v.val.adicCompletionIntegers K}
+def Subtype :=
+  {x : FinsetProd R K S // ∀ v : {v // v ∉ S}, x.2 v ∈ v.val.adicCompletionIntegers K}
 
 instance : Coe (FinsetIntegralAdeles R K S) (FinsetProd R K S) where
-  coe := fun x => (λ (v : S) => x.1 v, λ (v : {v // v ∉ S}) => (x.2 v : v.val.adicCompletion K))
+  coe := fun x => (fun (v : S) => x.1 v, fun (v : {v // v ∉ S}) => (x.2 v : v.val.adicCompletion K))
 
 theorem coe_injective :
     (Coe.coe : FinsetIntegralAdeles R K S → FinsetProd R K S).Injective := by
@@ -125,43 +133,16 @@ instance : Inhabited (FinsetIntegralAdeles R K S) := instInhabitedProd
 
 end DerivedInstances
 
-/-- The type equivalence between the two formalisations of `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
-def subtype_equiv :
-    Subtype R K S ≃ FinsetIntegralAdeles R K S where
-  toFun x := (x.val.1 , fun v => ⟨x.val.2 v, x.property v⟩)
-  invFun x := ⟨x, fun v => SetLike.coe_mem (x.2 v)⟩
-  left_inv _ := rfl
-  right_inv _ := rfl
-
 /-- The homeomorphism between the two formalisations of `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
-def subtype_homeomorph :
-    Subtype R K S ≃ₜ FinsetIntegralAdeles R K S where
-  toEquiv := subtype_equiv R K S
-  continuous_toFun := by
-    refine Continuous.prod_mk (Continuous.fst (Continuous.subtype_val
-      ({ isOpen_preimage := fun s a => a }) )) ?_
-    refine continuous_pi (fun v => Continuous.subtype_mk ?_ _)
-    refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
-    exact (Continuous.snd (Continuous.subtype_val ({ isOpen_preimage := fun s a => a }) ))
-  continuous_invFun := by
-    refine Continuous.subtype_mk (Continuous.prod_mk
-      (Continuous.fst { isOpen_preimage := fun s a => a }) ?_) _
-    refine continuous_pi (fun v => Continuous.subtype_val ?_)
-    refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
-    exact Continuous.snd  ({ isOpen_preimage := fun s a => a })
-
-def piEmpty_homeomorph :
-    ((v : {v : HeightOneSpectrum R // v ∈ (∅ : Finset (HeightOneSpectrum R))}) → v.1.adicCompletion K) ≃ₜ
-    ((v : {v : HeightOneSpectrum R // v ∈ (∅ : Finset (HeightOneSpectrum R))}) → v.1.adicCompletionIntegers K) := by
-  have h : ((v : {v : HeightOneSpectrum R // v ∈ (∅ : Finset (HeightOneSpectrum R))}) → v.1.adicCompletion K) ≃ₜ Unit := by
-    sorry
-  have h' : ((v : {v : HeightOneSpectrum R // v ∈ (∅ : Finset (HeightOneSpectrum R))}) → v.1.adicCompletionIntegers K) ≃ₜ Unit := sorry
-  exact Homeomorph.trans h h'.symm
+def subtype_homeomorph : Subtype R K S ≃ₜ FinsetIntegralAdeles R K S :=
+  Homeomorph.trans (Homeomorph.prodSubtypeSndEquivSubtypeProd <| IsFinsetIntegralProd R K S)
+    (Homeomorph.prodCongr (Homeomorph.refl _)
+      (@Homeomorph.subtypePiEquivPi _ _ _ (IsIntegralAt R K S)))
 
 def empty_homeomorph :
     FinsetIntegralAdeles R K ∅ ≃ₜ FiniteIntegralAdeles R K :=
   Homeomorph.trans
-    (Homeomorph.prodCongr (piEmpty_homeomorph R K) (Homeomorph.refl _))
+    (Homeomorph.prodCongr (Homeomorph.homeomorphOfUnique _ _) (Homeomorph.refl _))
     (Homeomorph.piEquivPiSubtypeProd _
       (fun v : HeightOneSpectrum R => v.adicCompletionIntegers K)).symm
 

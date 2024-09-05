@@ -20,7 +20,7 @@ of `K` and the finite adele ring of `K`. We show that the adele ring of `K` is a
 locally compact space.
 
 ## Main definitions
- - `NumberField.adeleRing K` is the adele ring of a number field `K`.
+ - `NumberField.AdeleRing K` is the adele ring of a number field `K`.
  - `NumberField.AdeleRing.globalEmbedding K` is the map sending `x ∈ K` to `(x)ᵥ`.
  - `NumberField.AdeleRing.principalSubgroup K` is the subgroup of principal adeles `(x)ᵥ`.
 
@@ -95,23 +95,72 @@ variable (L : Type*) [Field L] [Algebra K L] [FiniteDimensional K L]
 --instance : TopologicalSpace (AdeleRing K ⊗[K] L) :=
 --  TopologicalSpace.induced (tensorProduct_equiv_pi K L) inferInstance
 
-variable (G H : Type*) [AddGroup G] [AddGroup H] [TopologicalSpace G] [TopologicalSpace H]
-def Homeomorph.quotientCongr (G' : AddSubgroup G) (H' : AddSubgroup H) [G'.Normal] [H'.Normal]
-    (e : G ≃ₜ H) (h : e '' G' = H') : G ⧸ G' ≃ₜ H ⧸ H' := sorry
+variable {R : Type*} [Ring R] (G H : Type*) [AddCommGroup G] [Module R G] [AddCommGroup H]
+  [Module R H] [TopologicalSpace G] [TopologicalSpace H] (G' : Submodule R G) (H' : Submodule R H)
+  (e : G ≃ₗ[R] H) (h : Submodule.map e G' = H') (he : Continuous e.toFun) (hes: Continuous e.invFun)
+def Submodule.Quotient.continuousLinearEquiv : (G ⧸ G') ≃L[R] (H ⧸ H') where
+  toLinearEquiv := Submodule.Quotient.equiv G' H' e h
+  continuous_toFun := by
+    apply continuous_quot_lift
+    simp only [LinearMap.toAddMonoidHom_coe, LinearMap.coe_comp]
+    exact Continuous.comp continuous_quot_mk he
+  continuous_invFun := by
+    apply continuous_quot_lift
+    simp only [LinearMap.toAddMonoidHom_coe, LinearMap.coe_comp]
+    exact Continuous.comp continuous_quot_mk hes
 
-variable {ι : Type*} {G : ι → Type*} [(i : ι) → AddGroup (G i)] [(i : ι) → TopologicalSpace (G i)]
-  [Fintype ι] (p : (i : ι) → AddSubgroup (G i))
+variable (G H : Type*) [AddCommGroup G] [AddCommGroup H] [TopologicalSpace G] [TopologicalSpace H]
+def QuotientAddGroup.homeomorph (G' : AddSubgroup G) (H' : AddSubgroup H) [G'.Normal] [H'.Normal]
+    (e : G ≃+ H) (he : Continuous e) (he_inv : Continuous e.symm)
+    (h : AddSubgroup.map e G' = H') : G ⧸ G' ≃ₜ H ⧸ H' :=
+  (Submodule.Quotient.continuousLinearEquiv _ _ (AddSubgroup.toIntSubmodule G')
+    (AddSubgroup.toIntSubmodule H') e.toIntLinearEquiv (congrArg AddSubgroup.toIntSubmodule h)
+      he he_inv).toHomeomorph
+
+variable {R : Type*} [CommRing R] {G : ι → Type*} [(i : ι) → AddCommGroup (G i)]
+  [(i : ι) → Module R (G i)] [(i : ι) → TopologicalSpace (G i)]
+  [(i : ι) → TopologicalAddGroup (G i)] [Fintype ι] [DecidableEq ι]
+  (p : (i : ι) → Submodule R (G i))
+def Submodule.quotientPi_continuousLinearEquiv:
+    (((i : ι) → G i) ⧸ Submodule.pi Set.univ p) ≃L[R] ((i : ι) → G i ⧸ p i) where
+  toLinearEquiv := Submodule.quotientPi p
+  continuous_toFun := by
+    apply Continuous.quotient_lift
+    exact continuous_pi (fun i => Continuous.comp continuous_quot_mk (continuous_apply _))
+  continuous_invFun := by
+    simp only [Submodule.quotientPi, Submodule.quotientPi_aux.invFun, Submodule.piQuotientLift]
+    simp only [LinearMap.lsum_apply, LinearMap.coeFn_sum, LinearMap.coe_comp, LinearMap.coe_proj]
+    let f : ι → ((i : ι) → G i ⧸ p i) → (((i : ι) → G i) ⧸ Submodule.pi Set.univ p) := fun i x =>
+      (p i).mapQ (Submodule.pi Set.univ p) (LinearMap.single i) (Submodule.quotientPi_aux.invFun.proof_1 p i) (x i)
+    have hf : ∀ i ∈ Finset.univ, Continuous (f i) := by
+      intro i _
+      apply Continuous.comp ?_ (continuous_apply _)
+      apply Continuous.quotient_lift <| Continuous.comp (continuous_quot_mk) (continuous_single _)
+    convert @continuous_finset_sum ι _ _ _ _ _ _ f Finset.univ hf
+    simp only [Finset.sum_apply, Function.comp_apply, Function.eval]
+
+variable {ι : Type*} {G : ι → Type*} [(i : ι) → AddCommGroup (G i)] [(i : ι) → TopologicalSpace (G i)]
+  [(i : ι) → TopologicalAddGroup (G i)]
+  [Fintype ι] (p : (i : ι) → AddSubgroup (G i)) [DecidableEq ι]
 def Homeomorph.quotientPi : ((i : ι) → G i) ⧸ AddSubgroup.pi Set.univ p ≃ₜ ((i : ι) → G i ⧸ p i) :=
-  sorry
+  (Submodule.quotientPi_continuousLinearEquiv
+    (fun (i : ι) => AddSubgroup.toIntSubmodule (p i))).toHomeomorph
 
 def baseChange [NumberField L] :
-    (Fin (FiniteDimensional.finrank K L) → AdeleRing K) ≃ₜ AdeleRing L :=
+    (Fin (FiniteDimensional.finrank K L) → AdeleRing K) ≃+ AdeleRing L :=
   sorry
+
+def baseChange_homeomorph [NumberField L] :
+    (Fin (FiniteDimensional.finrank K L) → AdeleRing K) ≃ₜ AdeleRing L where
+  toEquiv := baseChange K L
+  continuous_toFun := sorry
+  continuous_invFun := sorry
 
 def baseChange_quotient [NumberField L] :
     (Fin (FiniteDimensional.finrank K L) → AdeleRing K ⧸ principalSubgroup K) ≃ₜ AdeleRing L ⧸ principalSubgroup L := by
   apply Homeomorph.trans (Homeomorph.quotientPi _).symm
-  apply Homeomorph.quotientCongr _ _ _ _ (baseChange K L)
+  apply QuotientAddGroup.homeomorph _ _ _ _ (baseChange K L)
+    (baseChange_homeomorph K L).continuous_toFun (baseChange_homeomorph K L).continuous_invFun
   sorry
 
 open NumberField in
@@ -121,8 +170,7 @@ instance (v : InfinitePlace K) : NontriviallyNormedField (v.completion) where
     simp only [← dist_zero_right]
     have h := InfinitePlace.Completion.isometry_extensionEmbedding v |>.dist_eq
     use 2
-    rw [← h 2 0]
-    simp only [map_ofNat, map_zero, dist_zero_right, RCLike.norm_ofNat, Nat.one_lt_ofNat]
+    simp only [← h 2 0, map_ofNat, map_zero, dist_zero_right, RCLike.norm_ofNat, Nat.one_lt_ofNat]
 
 instance (v : InfinitePlace K) : ProperSpace (v.completion) :=
   ProperSpace.of_locallyCompactSpace v.completion
