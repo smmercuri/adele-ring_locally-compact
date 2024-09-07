@@ -157,7 +157,8 @@ def baseChange_homeomorph [NumberField L] :
   continuous_invFun := sorry
 
 def baseChange_quotient [NumberField L] :
-    (Fin (FiniteDimensional.finrank K L) → AdeleRing K ⧸ principalSubgroup K) ≃ₜ AdeleRing L ⧸ principalSubgroup L := by
+    (Fin (FiniteDimensional.finrank K L) → AdeleRing K ⧸ principalSubgroup K) ≃ₜ
+      AdeleRing L ⧸ principalSubgroup L := by
   apply Homeomorph.trans (Homeomorph.quotientPi _).symm
   apply QuotientAddGroup.homeomorph _ _ _ _ (baseChange K L)
     (baseChange_homeomorph K L).continuous_toFun (baseChange_homeomorph K L).continuous_invFun

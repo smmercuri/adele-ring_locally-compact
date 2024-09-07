@@ -24,7 +24,7 @@ def piEquivPiSubtypeProd (p : ι → Prop) [DecidablePred p] (Y : ι → Type*)
   map_add' _ _ := rfl
 
 @[simps!]
-def prodMap {R R' S S' : Type*} [Add R] [Add R'] [Mul R] [Mul R'] [Add S] [Add S'] [Mul S] [Mul S']
+def prodCongr {R R' S S' : Type*} [Add R] [Add R'] [Mul R] [Mul R'] [Add S] [Add S'] [Mul S] [Mul S']
     (f : R ≃+* R') (g : S ≃+* S') :
     R × S ≃+* R' × S' where
   toEquiv := Equiv.prodCongr f g
@@ -40,9 +40,9 @@ def prodMap {R R' S S' : Type*} [Add R] [Add R'] [Mul R] [Mul R'] [Add S] [Add S
     rfl
 
 @[simp]
-theorem coe_prodMap {R R' S S' : Type*} [Add R] [Add R'] [Mul R] [Mul R'] [Add S] [Add S'] [Mul S]
+theorem coe_prodCongr {R R' S S' : Type*} [Add R] [Add R'] [Mul R] [Mul R'] [Add S] [Add S'] [Mul S]
     [Mul S'] (f : R ≃+* R') (g : S ≃+* S') :
-    ⇑(RingEquiv.prodMap f g) = Prod.map f g :=
+    ⇑(RingEquiv.prodCongr f g) = Prod.map f g :=
   rfl
 
 @[simps!]
@@ -63,5 +63,13 @@ def piCongrLeft (B : β → Type*) (e : α ≃ β)
     [∀ b, Add (B b)] [∀ b, Mul (B b)] :
     ((a : α) → B (e a)) ≃+* ((b : β) → B b) :=
   (RingEquiv.piCongrLeft' B e.symm).symm
+
+@[simps!]
+def piCurry {Y : ι → Type*} (α : (i : ι) → Y i → Type*) [(i : ι) → (y : Y i) → Add (α i y)]
+    [(i : ι) → (y : Y i) → Mul (α i y)] :
+    ((i : Sigma Y) → α i.1 i.2) ≃+* ((i : ι) → (y : Y i) → α i y) where
+  toEquiv := Equiv.piCurry α
+  map_mul' _ _ := rfl
+  map_add' _ _ := rfl
 
 end RingEquiv

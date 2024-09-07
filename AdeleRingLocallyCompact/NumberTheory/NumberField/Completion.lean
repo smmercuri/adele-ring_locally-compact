@@ -329,6 +329,11 @@ def equiv_complex_of_isComplex {v : InfinitePlace K} (hv : IsComplex v) :
     v.completion ≃+* ℂ :=
   RingEquiv.ofBijective _ (bijective_extensionEmbedding_of_isComplex hv)
 
+def isometryEquiv_complex_of_isComplex {v : InfinitePlace K} (hv : IsComplex v) :
+    v.completion ≃ᵢ ℂ where
+  toEquiv := equiv_complex_of_isComplex hv
+  isometry_toFun := isometry_extensionEmbedding v
+
 /-- If `v` is a real infinite place, then the embedding `v.completion →+* ℝ` is surjective. -/
 theorem surjective_extensionEmbedding_of_isReal {v : InfinitePlace K} (hv : IsReal v) :
     Function.Surjective (extensionEmbedding_of_isReal hv) := by
@@ -344,5 +349,9 @@ theorem bijective_extensionEmbedding_of_isReal {v : InfinitePlace K} (hv : IsRea
 `v.completion →+* ℝ`. -/
 def equiv_real_of_isReal {v : InfinitePlace K} (hv : IsReal v) : v.completion ≃+* ℝ :=
   RingEquiv.ofBijective _ (bijective_extensionEmbedding_of_isReal hv)
+
+def isometryEquiv_real_of_isReal {v : InfinitePlace K} (hv : IsReal v) : v.completion ≃ᵢ ℝ where
+  toEquiv := equiv_real_of_isReal hv
+  isometry_toFun := isometry_extensionEmbedding_of_isReal hv
 
 end NumberField.InfinitePlace.Completion
