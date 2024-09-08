@@ -43,4 +43,30 @@ def subtypePiEquivPi :
     Continuous.subtype_mk (continuous_pi
       (fun x => Continuous.comp continuous_subtype_val (continuous_apply _))) _
 
+def piCurry {α : Type*} {β : α → Type*} (γ : (a : α) → β a → Type*)
+    [t : (a : α) → (b : β a) → TopologicalSpace (γ a b)] :
+    ((x : (i : α) × β i) → γ x.1 x.2) ≃ₜ ((a : α) → (b : β a) → γ a b) where
+  toEquiv := Equiv.piCurry _
+  continuous_toFun := by
+    exact continuous_pi (fun _ => continuous_pi <| fun _ => continuous_apply _)
+  continuous_invFun := by
+    refine continuous_pi (fun ⟨x, y⟩ => ?_)
+    simp [Equiv.piCurry, Sigma.uncurry]
+    exact Continuous.comp' (continuous_apply _) (continuous_apply _)
+
+variable (α β γ : Type*) [TopologicalSpace γ]
+set_option trace.Meta.Tactic.fun_prop true in
+def sumArrowEquivProdArrow : (α ⊕ β → γ) ≃ₜ (α → γ) × (β → γ) where
+  toEquiv := Equiv.sumArrowEquivProdArrow _ _ _
+  continuous_toFun := by
+    apply Continuous.prod_mk <;> (exact continuous_pi (fun _ => continuous_apply _))
+  continuous_invFun := by
+    simp only [Equiv.sumArrowEquivProdArrow]
+    refine continuous_pi <| fun i => ?_
+    cases i with
+    | inl val =>
+      exact Continuous.comp (continuous_apply _) (Continuous.fst continuous_id)
+    | inr val =>
+      exact Continuous.comp (continuous_apply _) (Continuous.snd continuous_id)
+
 end Homeomorph
