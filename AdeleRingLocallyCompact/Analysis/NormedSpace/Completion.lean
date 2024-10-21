@@ -16,7 +16,7 @@ namespace UniformSpace.Completion
 
 variable (A : Type*) [NormedField A] [CompletableTopField A]
 
-noncomputable instance instNormedField :
+noncomputable instance instNormedFieldOfCompletableTopField :
     NormedField (UniformSpace.Completion A) where
   toField := UniformSpace.Completion.instField
   dist_eq := fun x y => by
