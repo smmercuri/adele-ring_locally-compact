@@ -152,7 +152,7 @@ def subtype_homeomorph :
 
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact. -/
 instance : LocallyCompactSpace (FinsetIntegralAdeles R K S) :=
-  @Prod.locallyCompactSpace _ _ _ _ Pi.locallyCompactSpace_of_finite Pi.locallyCompactSpace
+  Prod.locallyCompactSpace _ _
 
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact. -/
 instance : LocallyCompactSpace (Subtype R K S) :=
@@ -237,7 +237,7 @@ def homeomorph_subtype :
     ⟨fun hx v => hx v.1 v.2, fun hx v hv => hx ⟨v, hv⟩⟩
 
 /-- The finite S-adele ring is locally compact. -/
-theorem locallyCompactSpace : LocallyCompactSpace (FinsetAdeleRing R K S) :=
+instance locallyCompactSpace : LocallyCompactSpace (FinsetAdeleRing R K S) :=
   (Homeomorph.locallyCompactSpace_iff (homeomorph_subtype R K S)).2 inferInstance
 
 variable {R K S}
@@ -321,7 +321,7 @@ theorem isOpen_algebraMap_range : IsOpen (Set.range (e S)) := by
 
 /-- `Subtype.val` of the finite S-adele ring factors through the embedding into the
 finite adele ring. -/
-theorem subtype_val_embedding :
+theorem subtype_val_algebraMap :
     (Subtype.val : FinsetAdeleRing R K S → ProdAdicCompletions R K) = Subtype.val ∘ e S := rfl
 
 variable {R K S}
@@ -331,7 +331,7 @@ theorem nhds_iff {x : FinsetAdeleRing R K S} {U : Set (FinsetAdeleRing R K S)} :
     ∃ (V : (v: HeightOneSpectrum R) → Set (v.adicCompletion K)) (I : Finset (HeightOneSpectrum R)),
       (∀ v, V v ∈ nhds (x.val v)) ∧
         Subtype.val ⁻¹' Set.pi (I.toSet) V ⊆ U := by
-  rw [nhds_induced (Subtype.val : FinsetAdeleRing R K S → _), Filter.mem_comap, nhds_pi]
+  rw [nhds_induced, Filter.mem_comap, nhds_pi]
   refine ⟨fun ⟨t, ht, h⟩ => ?_, fun ⟨V, I, hV, hVU⟩ => ?_⟩
   · obtain ⟨I, V, hV⟩ := Filter.mem_pi'.1 ht
     exact ⟨V, I, ⟨hV.1, Set.Subset.trans (fun _ hx => hV.2 hx) h⟩⟩
@@ -345,14 +345,13 @@ theorem algebraMap_image_mem_nhds (x : FinsetAdeleRing R K S)
   simp only [Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds _ _), true_and,
     Submodule.coe_toAddSubgroup, Subtype.exists, exists_prop]
   obtain ⟨V, I, hV, hVU⟩ := nhds_iff.1 h
-  simp only [Valued.mem_nhds] at hV
-  choose γ hγ using hV
+  choose γ hγ using fun v => Valued.mem_nhds.1 <| hV v
   choose y hy using exists_nmem_of_finite_open_balls I (fun v => (γ v)⁻¹) (e S x)
   choose r₁ s₁ hrs₁ using mul_nonZeroDivisor_mem_finiteIntegralAdeles y
   choose r₂ s₂ hrs₂ using mul_nonZeroDivisor_mem_finiteIntegralAdeles (e S x)
   refine ⟨r₁ * r₂, mul_mem_nonZeroDivisors.2 ⟨r₁.2, r₂.2⟩, fun z hz => ?_⟩
   simp only [Submodule.mem_toAddSubgroup, Submodule.mem_span_singleton] at hz
-  rw [subtype_val_embedding, Set.preimage_comp,
+  rw [subtype_val_algebraMap, Set.preimage_comp,
     ← Set.image_subset_image_iff (algebraMap_injective R K S)] at hVU
   apply hVU
   simp only [Set.image_preimage_eq_inter_range]
@@ -360,14 +359,14 @@ theorem algebraMap_image_mem_nhds (x : FinsetAdeleRing R K S)
   rw [← add_eq_of_eq_sub hb, algebraMap_range]
   refine ⟨fun v hv => hγ v ?_, ?_⟩
   · simp only [Set.mem_setOf_eq, smul_apply, Valued.v.map_mul]
-    rw [subtype_val_embedding, Function.comp_apply]
+    rw [subtype_val_algebraMap, Function.comp_apply]
     simp only [add_apply, smul_apply, Valued.v.map_mul, add_sub_cancel_right]
     apply lt_of_le_of_lt <| mul_le_mul_right' ((v.mem_adicCompletionIntegers R K).1 (b v).2)
       (Valued.v (algebraMap _ _ (r₁ * r₂).val))
     rw [one_mul, ← inv_mul_lt_one_iff₀ (Units.ne_zero _), ← Units.val_inv_eq_inv_val]
     apply lt_of_lt_of_le (mul_lt_right₀ _ (hy v hv) (v.algebraMap_valuation_ne_zero K (r₁ * r₂)))
     rw [← Valued.v.map_mul, sub_mul, Submonoid.coe_mul, map_mul, ← mul_assoc, ← mul_integer_apply,
-      congrArg (fun x => x v) hrs₁, ← mem_adicCompletionIntegers R K v]
+      congrArg (fun x => x v) hrs₁]
     nth_rewrite 3 [mul_comm]
     refine sub_mem (mul_mem (SetLike.coe_mem _) (v.coe_mem_adicCompletionIntegers r₂)) ?_
     rw [← mul_assoc, ← mul_integer_apply, congrArg (fun x => x v) hrs₂]
@@ -381,7 +380,7 @@ finite S-adele ring. -/
 theorem mem_nhds_comap_algebraMap (x : FinsetAdeleRing R K S)
     {U : Set (FinsetAdeleRing R K S)} (h : U ∈ Filter.comap (e S) (nhds (e S x))) :
     U ∈ nhds x := by
-  simp only [nhds_iff, subtype_val_embedding, Valued.mem_nhds]
+  simp only [nhds_iff, subtype_val_algebraMap, Valued.mem_nhds]
   simp only [Filter.mem_comap, Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds _ _),
     true_and] at h
   obtain ⟨t, ⟨r, hrt⟩, htU⟩ := h
@@ -419,7 +418,7 @@ namespace FiniteAdeleRing
 
 open FinsetAdeleRing
 
-local notation "e" => toFiniteAdeleRing R K
+local notation "e" => fun S => algebraMap (FinsetAdeleRing R K S) (FiniteAdeleRing R K)
 
 /-- The finite adele ring is locally compact. -/
 theorem locallyCompactSpace : LocallyCompactSpace (FiniteAdeleRing R K) := by

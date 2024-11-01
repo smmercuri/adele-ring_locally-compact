@@ -73,12 +73,8 @@ instance : TopologicalRing (InfiniteAdeleRing K) := Pi.instTopologicalRing
 
 instance : Algebra K (InfiniteAdeleRing K) := Pi.algebra _ _
 
-/-- The global embedding of a number field into its infinite adele ring,
-sending `x ∈ K` to `(x)ᵥ`. -/
-abbrev globalEmbedding : K →+* InfiniteAdeleRing K := algebraMap K (InfiniteAdeleRing K)
-
 @[simp]
-theorem globalEmbedding_apply (x : K) : globalEmbedding K x v = x := rfl
+theorem algebraMap_apply (x : K) : algebraMap K (InfiniteAdeleRing K) x v = x := rfl
 
 /-- The infinite adele ring is locally compact. -/
 instance locallyCompactSpace : LocallyCompactSpace (InfiniteAdeleRing K) :=
@@ -113,16 +109,16 @@ theorem equiv_mixedSpace_apply (x : InfiniteAdeleRing K) :
 ring to the mixed embedding `x ↦ (φᵢ(x))ᵢ` of `K` into the space `ℝ ^ r₁ × ℂ ^ r₂`, where
 `(r₁, r₂)` is the signature of `K` and `φᵢ` are the complex embeddings of `K`. -/
 theorem mixedEmbedding_eq_globalEmbedding_comp {x : K} :
-    mixedEmbedding K x = equiv_mixedSpace K (globalEmbedding K x) := by
-  ext ⟨v, hv⟩ <;> simp only [equiv_mixedSpace_apply, globalEmbedding_apply,
+    mixedEmbedding K x = equiv_mixedSpace K (algebraMap K (InfiniteAdeleRing K) x) := by
+  ext ⟨v, hv⟩ <;> simp only [equiv_mixedSpace_apply, algebraMap_apply,
     ringEquiv_real_of_isReal, ringEquiv_complex_of_isComplex, extensionEmbedding,
     extensionEmbedding_of_isReal, extensionEmbedding_of_comp, RingEquiv.coe_ofBijective,
     RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, UniformSpace.Completion.extensionHom]
   · rw [UniformSpace.Completion.extension_coe
-      (WithAbs.uniformInducing_of_comp <| abs_of_isReal_eq_comp hv).uniformContinuous x]
+      (WithAbs.uniformInducing_of_comp <| v.norm_embedding_of_isReal hv).uniformContinuous x]
     rfl
   · rw [UniformSpace.Completion.extension_coe
-      (WithAbs.uniformInducing_of_comp <| abs_eq_comp v).uniformContinuous x]
+      (WithAbs.uniformInducing_of_comp <| v.norm_embedding_eq).uniformContinuous x]
     rfl
 
 end InfiniteAdeleRing
