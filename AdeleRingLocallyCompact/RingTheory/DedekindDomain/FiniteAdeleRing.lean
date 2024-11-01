@@ -131,7 +131,7 @@ theorem exists_nmem_of_finite_open_balls
     (γ : (v : HeightOneSpectrum R) → (WithZero (Multiplicative ℤ))ˣ)
     (y : FiniteAdeleRing R K) :
     ∃ (x : FiniteAdeleRing R K), ∀ v ∈ S, Valued.v (x v - y v) > γ v := by
-  choose x hx using fun v => AdicCompletion.exists_nmem_of_open_ball (γ v) (y v)
+  choose x hx using fun v => AdicCompletion.exists_not_mem_of_nhds_zero (γ v) (y v)
   let y : ProdAdicCompletions R K := fun v => if v ∈ S then x v else 1
   have hy : y.IsFiniteAdele := by
     refine y.isFiniteAdele_iff.2 <| Set.Finite.subset S.finite_toSet (fun v hv => ?_)
