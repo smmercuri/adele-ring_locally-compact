@@ -309,7 +309,8 @@ instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletionIntegers K) 
 
 end AdicCompletionIntegers
 
-open AdicCompletion
+namespace AdicCompletion
+
 open AdicCompletionIntegers
 
 variable (v)
@@ -326,4 +327,4 @@ instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletion K) :=
   LocallyCompactSpace.of_hasBasis_nhds_zero (hasBasis_nhds_zero K v)
     (fun _ hγ => isCompact_nhds_zero K v hγ)
 
-  end IsDedekindDomain.HeightOneSpectrum
+  end IsDedekindDomain.HeightOneSpectrum.AdicCompletion
