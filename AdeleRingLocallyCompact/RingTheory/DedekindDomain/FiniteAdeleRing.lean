@@ -103,6 +103,10 @@ theorem add_apply (x : FiniteAdeleRing R K) (y : FiniteAdeleRing R K) :
     (x + y) v = x v + y v := rfl
 
 @[simp]
+theorem sub_apply (x : FiniteAdeleRing R K) (y : FiniteAdeleRing R K) :
+    (x - y) v = x v - y v := rfl
+
+@[simp]
 theorem mul_integer_apply (x : FiniteAdeleRing R K) (r : R) :
     (x * algebraMap _ _ r) v = x v * algebraMap _ _ r := rfl
 
@@ -124,23 +128,35 @@ theorem localInclusion_apply' (v w : HeightOneSpectrum R) (x : v.adicCompletion 
     (localInclusion K v x).val w = 1 := by
   simp only [localInclusion, ProdAdicCompletions.localInclusion_apply' _ h]
 
+def support (x : FiniteAdeleRing R K) := (Filter.eventually_cofinite.1 x.2).toFinset
+
 /-- Given balls centred at `yᵥ` of radius `γᵥ` for a finite set of primes `v ∈ S`, we can find a
 finite adele  `x` for which `xᵥ` is outside each open ball for `v ∈ S`. -/
-theorem exists_nmem_of_finite_open_balls
+theorem exists_not_mem_of_finite_nhds
     (S : Finset (HeightOneSpectrum R))
     (γ : (v : HeightOneSpectrum R) → (WithZero (Multiplicative ℤ))ˣ)
     (y : FiniteAdeleRing R K) :
     ∃ (x : FiniteAdeleRing R K), ∀ v ∈ S, Valued.v (x v - y v) > γ v := by
-  choose x hx using fun v => AdicCompletion.exists_not_mem_of_nhds_zero (γ v) (y v)
+  choose x hx using fun v => AdicCompletion.exists_not_mem_of_nhds (γ v) (y v)
   let y : ProdAdicCompletions R K := fun v => if v ∈ S then x v else 1
   have hy : y.IsFiniteAdele := by
     refine y.isFiniteAdele_iff.2 <| Set.Finite.subset S.finite_toSet (fun v hv => ?_)
     contrapose! hv
     simp only [Finset.mem_coe] at hv
     simp only [Set.mem_setOf_eq, not_not, y, hv, if_false, (v.adicCompletionIntegers K).one_mem]
-  refine ⟨⟨y, hy⟩, fun v hv => ?_⟩
-  simp only [y, hv, if_true]
-  exact hx _
+  exact ⟨⟨y, hy⟩, fun v hv => by simp only [y, hv]; exact hx _⟩
+
+theorem sub_mul_nonZeroDivisor_mem_finiteIntegralAdeles
+    (x y : FiniteAdeleRing R K) :
+    ∃ (r : nonZeroDivisors R) (z : FiniteIntegralAdeles R K),
+      (y - x) * algebraMap _ _ r.1 = algebraMap _ _ z := by
+  choose r₁ s₁ hrs₁ using mul_nonZeroDivisor_mem_finiteIntegralAdeles y
+  choose r₂ s₂ hrs₂ using mul_nonZeroDivisor_mem_finiteIntegralAdeles x
+  refine ⟨r₁ * r₂, s₁ * algebraMap _ _ r₂.1 - s₂ * algebraMap _ _ r₁.1, ?_⟩
+  rw [sub_mul, Submonoid.coe_mul, map_mul, ← mul_assoc, hrs₁]
+  nth_rw 3 [mul_comm]
+  rw [← mul_assoc, hrs₂]
+  rfl
 
 open AdicCompletion in
 /-- Let `x` be a finite adele and let `r` be a non-zero integral divisor. If, for some finite

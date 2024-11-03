@@ -114,7 +114,7 @@ variable {K v}
 open WithZero in
 /-- Given an integer `γ` and some centre `y ∈ Kᵥ` we can always find an element `x ∈ Kᵥ`
 outide of the open ball at `y` of radius `γ`. -/
-theorem exists_not_mem_of_nhds_zero
+theorem exists_not_mem_of_nhds
     (γ : (WithZero (Multiplicative ℤ))ˣ) (y : v.adicCompletion K) :
     ∃ x : v.adicCompletion K, Valued.v (x - y) > γ := by
   choose p hp using @valuation_exists_uniformizer R _ _ K _ _ _ v

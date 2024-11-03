@@ -8,7 +8,7 @@ import Mathlib
 /-!
 # Linearly ordered commutative groups and monoids with a zero element adjoined
 
-In this file we provide a basic inequality result.
+In this file we provide some basic inequality results.
 -/
 
 variable {α : Type*} [LinearOrderedCommGroupWithZero α] {a b c d : α} {m n : ℕ}

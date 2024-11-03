@@ -18,21 +18,9 @@ variable (A : Type*) [NormedField A] [CompletableTopField A]
 
 noncomputable instance instNormedFieldOfCompletableTopField :
     NormedField (UniformSpace.Completion A) where
-  toField := UniformSpace.Completion.instField
-  dist_eq := fun x y => by
-      refine Completion.induction_on₂ x y ?_ ?_ <;> clear x y
-      · refine isClosed_eq (Completion.uniformContinuous_extension₂ _).continuous ?_
-        exact Continuous.comp Completion.continuous_extension continuous_sub
-      · intro x y
-        rw [← Completion.coe_sub, norm_coe, Completion.dist_eq, dist_eq_norm]
-  norm_mul' := fun x y => by
-      refine Completion.induction_on₂ x y ?_ ?_ <;> clear x y
-      · exact
-          isClosed_eq (Continuous.comp continuous_norm continuous_mul)
-            (Continuous.comp _root_.continuous_mul
-              (Continuous.prod_map continuous_norm continuous_norm))
-      · intro x y
-        simp only [← coe_mul, norm_coe]
-        exact norm_mul x y
+  dist_eq x y := by
+    refine induction_on₂ x y ?_ (by simp [← coe_sub, dist_eq_norm])
+    exact isClosed_eq (uniformContinuous_extension₂ _).continuous (by fun_prop)
+  norm_mul' x y := induction_on₂ x y (isClosed_eq (by fun_prop) (by fun_prop)) (by simp [← coe_mul])
 
 end UniformSpace.Completion
