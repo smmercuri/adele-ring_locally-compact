@@ -43,6 +43,8 @@ dedekind domain, dedekind ring, adic valuation
 
 noncomputable section
 
+open scoped Classical
+
 namespace IsDedekindDomain
 
 variable {R : Type*} [CommRing R] [IsDomain R] [IsDedekindDomain R] {K : Type*} [Field K]
@@ -57,7 +59,7 @@ theorem algebraMap_valuation_ne_zero (v : HeightOneSpectrum R) (r : nonZeroDivis
   rw [v.valuedAdicCompletion_eq_valuation, ne_eq, map_eq_zero, IsFractionRing.to_map_eq_zero_iff]
   exact nonZeroDivisors.coe_ne_zero _
 
-local notation "μᵥ" => @WithZero.unitsWithZeroEquiv (Multiplicative ℤ)
+local notation "μ" => @WithZero.unitsWithZeroEquiv (Multiplicative ℤ)
 
 namespace AdicCompletion
 
@@ -117,10 +119,10 @@ outide of the open ball at `y` of radius `γ`. -/
 theorem exists_not_mem_of_nhds
     (γ : (WithZero (Multiplicative ℤ))ˣ) (y : v.adicCompletion K) :
     ∃ x : v.adicCompletion K, Valued.v (x - y) > γ := by
-  choose p hp using @valuation_exists_uniformizer R _ _ K _ _ _ v
-  use p ^ (- Multiplicative.toAdd (μᵥ γ) - 1) + y
+  choose π hπ using @valuation_exists_uniformizer R _ _ K _ _ _ v
+  use π ^ (- Multiplicative.toAdd (μ γ) - 1) + y
   simp only [add_sub_cancel_right, unitsWithZeroEquiv_units_val, map_zpow₀,
-    Valued.valuedCompletion_apply, v.adicValued_apply, hp, gt_iff_lt, ← coe_zpow, coe_lt_coe,
+    Valued.valuedCompletion_apply, v.adicValued_apply, hπ, gt_iff_lt, ← coe_zpow, coe_lt_coe,
     ← Multiplicative.toAdd_lt, ofAdd_neg, inv_zpow', neg_sub, sub_neg_eq_add, toAdd_zpow,
     toAdd_ofAdd, smul_eq_mul, mul_one, lt_add_iff_pos_left, zero_lt_one]
 
@@ -247,39 +249,28 @@ theorem isClosed : IsClosed (v.adicCompletionIntegers K : Set (v.adicCompletion 
   rw [SetLike.mem_coe, mem_adicCompletionIntegers] at hy₂
   exact (not_lt_of_le <| hy₂) <| hy₁.symm ▸ hx
 
-open WithZero in
+open WithZero Multiplicative Ideal in
 /-- There is a finite covering of the `v`-adic integers of open balls of radius less than one,
 obtained by using the finite representatives in the quotient of the `v`-adic integers by an
 appropriate power of the maximal ideal. -/
 theorem finite_subcover_of_uniformity_basis {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ.val ≤ 1) :
     ∃ t : Set (v.adicCompletion K), Set.Finite t ∧
       ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t,
-        {x | (x, y) ∈ {p | Valued.v (p.2 - p.1) < γ.val}} := by
-  let μ := μᵥ γ
-  have hμ : γ.val = (μ : WithZero (Multiplicative ℤ)) := by
-    simp only [μ, unitsWithZeroEquiv, MulEquiv.coe_mk, Equiv.coe_fn_mk, coe_unzero]
-  let M := (Valued.maximalIdeal (v.adicCompletion K))^((-Multiplicative.toAdd μ + 1).toNat)
-  let S := (v.adicCompletionIntegers K) ⧸ M
-  let q := Ideal.Quotient.mk M
+        { x | (x, y) ∈ { p | Valued.v (p.2 - p.1) < γ.val } } := by
+  let M := (Valued.maximalIdeal (v.adicCompletion K)) ^ (- toAdd (μ γ) + 1).toNat
   obtain ⟨π, hπ⟩ := exists_uniformizer K v
-  letI := quotient_maximalIdeal_pow_finite (-Multiplicative.toAdd μ + 1).toNat hπ
-  have h : Fintype S := Fintype.ofFinite _
-  let T := Quotient.out' '' (h.elems.toSet)
-  refine ⟨T, (Set.Finite.image Subtype.val (Set.Finite.image Quotient.out'
-    (Finset.finite_toSet h.elems))), fun x hx => ?_⟩
+  letI := quotient_maximalIdeal_pow_finite (-toAdd (μ γ) + 1).toNat hπ
+  have h : Fintype ((v.adicCompletionIntegers K) ⧸ M) := Fintype.ofFinite _
+  let T := h.elems.image Quotient.out'
+  refine ⟨T.toSet, (Set.Finite.image _ (Finset.finite_toSet _)), fun x hx => ?_⟩
   simp only [Set.mem_iUnion]
-  let y := (Quotient.out' (q ⟨x, hx⟩))
-  have h_out_mk_mem : Subtype.val (Quotient.out' (q ⟨x, hx⟩)) ∈ Subtype.val '' T :=
-    ⟨y, ⟨Set.mem_image_of_mem _ (Finset.mem_coe.2 (h.complete _)), rfl⟩⟩
-  have h_sub_zero : y - ⟨x, hx⟩ ∈ M := by
-    rw [← Ideal.Quotient.eq, Ideal.Quotient.mk_out']
-  refine ⟨y, h_out_mk_mem, lt_of_le_of_lt (valuation_le_pow_of_maximalIdeal _ h_sub_zero) ?_⟩
-  rw [hμ, coe_lt_coe, ← ofAdd_toAdd μ, Multiplicative.ofAdd_lt, ofAdd_toAdd]
-  have h_nonneg : 0 ≤ - (Multiplicative.toAdd μ) + 1 := by
-    rw [le_neg_add_iff_add_le, add_zero]
-    exact Multiplicative.toAdd_le_one_of_units_val_le hγ
-  rw [Int.toNat_of_nonneg h_nonneg, neg_add, neg_neg, add_lt_iff_neg_left, Left.neg_neg_iff]
-  exact zero_lt_one
+  let y := Quotient.out' <| Ideal.Quotient.mk M ⟨x, hx⟩
+  have h_mem : (Ideal.Quotient.mk M ⟨x, hx⟩).out' ∈ T := Finset.mem_image_of_mem _ (h.complete _)
+  refine ⟨y, Set.mem_image_of_mem _ h_mem,
+    lt_of_le_of_lt (valuation_le_pow_of_maximalIdeal _ (Ideal.Quotient.out_sub M _)) ?_⟩
+  rw [unitsWithZeroEquiv_units_val, coe_lt_coe, ← ofAdd_toAdd (μ γ), ofAdd_lt, ofAdd_toAdd,
+    Int.toNat_of_nonneg (units_toAdd_neg_add_one hγ)]
+  linarith
 
 /-- The `v`-adic integers is a totally bounded set since they afford a finite subcover of
 open balls, obtained by using the finite representatives of the quotient of the `v`-adic
@@ -300,12 +291,19 @@ theorem isCompact : IsCompact (v.adicCompletionIntegers K : Set (v.adicCompletio
 instance compactSpace : CompactSpace (v.adicCompletionIntegers K) :=
   CompactSpace.mk (isCompact_iff_isCompact_univ.1 (isCompact K v))
 
-instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletionIntegers K) := by
-  letI : WeaklyLocallyCompactSpace (v.adicCompletionIntegers K) :=
-    instWeaklyLocallyCompactSpaceOfCompactSpace
-  letI : RegularSpace (v.adicCompletionIntegers K) := TopologicalAddGroup.regularSpace _
-  letI : R1Space (v.adicCompletionIntegers K) := instR1Space
-  exact WeaklyLocallyCompactSpace.locallyCompactSpace
+instance : TopologicalAddGroup (v.adicCompletion K) :=
+  UniformAddGroup.to_topologicalAddGroup
+
+example : R1Space (v.adicCompletion K) :=
+  letI := TopologicalAddGroup.regularSpace <| v.adicCompletion K
+  instR1Space
+
+instance r1Space : R1Space (v.adicCompletionIntegers K) :=
+  letI := TopologicalAddGroup.regularSpace <| v.adicCompletionIntegers K
+  instR1Space
+
+instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletionIntegers K) :=
+  instWeaklyLocallyCompactSpaceOfCompactSpace.locallyCompactSpace
 
 end AdicCompletionIntegers
 
@@ -315,6 +313,9 @@ open AdicCompletionIntegers
 
 variable (v)
 
+instance : TopologicalAddGroup (v.adicCompletion K) :=
+  (inferInstanceAs (UniformAddGroup (v.adicCompletion K))).to_topologicalAddGroup
+
 /-- Any open ball centred at zero in the `v`-adic completion of `K` is compact. -/
 theorem isCompact_nhds_zero {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ ≤ 1) :
     IsCompact { y : v.adicCompletion K | Valued.v y < γ } :=
@@ -323,7 +324,6 @@ theorem isCompact_nhds_zero {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ �
 
 /-- The `v`-adic completion of `K` is locally compact. -/
 instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletion K) :=
-  letI := (inferInstanceAs (UniformAddGroup (v.adicCompletion K))).to_topologicalAddGroup
   LocallyCompactSpace.of_hasBasis_nhds_zero (hasBasis_nhds_zero K v)
     (fun _ hγ => isCompact_nhds_zero K v hγ)
 

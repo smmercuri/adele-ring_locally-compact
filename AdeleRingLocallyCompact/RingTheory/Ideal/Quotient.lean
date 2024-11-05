@@ -18,4 +18,8 @@ theorem Quotient.mk_out' {R : Type*} [CommRing R] {I : Ideal R} {x : R ⧸ I} :
     Ideal.Quotient.mk I (Quotient.out' x) = x := by
   rw [← Ideal.Quotient.mk_eq_mk, ← Submodule.Quotient.mk''_eq_mk, Quotient.out_eq']
 
+theorem Quotient.out_sub {R : Type*} [CommRing R] (I : Ideal R) (x : R) :
+    (Ideal.Quotient.mk I x).out' - x ∈ I := by
+  rw [← Ideal.Quotient.eq, Ideal.Quotient.mk_out']
+
 end Ideal

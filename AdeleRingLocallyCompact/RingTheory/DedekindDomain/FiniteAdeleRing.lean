@@ -82,11 +82,13 @@ theorem localInclusion_isFiniteAdele (v : HeightOneSpectrum R) (x : v.adicComple
 /-- The `v`th place of the local inclusion is the original element. -/
 @[simp]
 theorem localInclusion_apply (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-    localInclusion K v x v = x := by simp only [localInclusion, dif_pos]
+    localInclusion K v x v = x := by
+  simp only [localInclusion, dif_pos]
 
 @[simp]
 theorem localInclusion_apply' {v w : HeightOneSpectrum R} (x : v.adicCompletion K) (h : w ≠ v) :
-    localInclusion K v x w = 1 := by simp only [localInclusion, h, ↓reduceDIte]
+    localInclusion K v x w = 1 := by
+  simp only [localInclusion, h, ↓reduceDIte]
 
 end ProdAdicCompletions
 

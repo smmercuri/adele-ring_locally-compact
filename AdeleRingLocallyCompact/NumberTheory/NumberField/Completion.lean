@@ -242,7 +242,7 @@ theorem isometry_extensionEmbedding_of_isReal {v : InfinitePlace K} (hv : IsReal
   Isometry.of_dist_eq (extensionEmbedding_dist_eq_of_comp <| v.norm_embedding_of_isReal hv)
 
 /-- The completion of a number field at an infinite place is locally compact. -/
-instance locallyCompactSpace : LocallyCompactSpace (v.completion) :=
+instance locallyCompactSpace : LocallyCompactSpace v.completion :=
   AbsoluteValue.Completion.locallyCompactSpace v.norm_embedding_eq
 
 /-- The embedding `v.completion →+* ℂ` has closed image inside `ℂ`. -/
