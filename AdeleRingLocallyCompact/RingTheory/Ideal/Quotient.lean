@@ -22,4 +22,9 @@ theorem Quotient.out_sub {R : Type*} [CommRing R] (I : Ideal R) (x : R) :
     (Ideal.Quotient.mk I x).out' - x ∈ I := by
   rw [← Ideal.Quotient.eq, Ideal.Quotient.mk_out']
 
+theorem Quotient.out_sub_dvd {R : Type*} [CommRing R] {I : Ideal R} {y : R} (x : R)
+    (hI : I = Ideal.span {y}) :
+    y ∣ (Ideal.Quotient.mk I x).out' - x := by
+  rw [← Ideal.mem_span_singleton, ← Ideal.Quotient.eq, hI, Ideal.Quotient.mk_out']
+
 end Ideal

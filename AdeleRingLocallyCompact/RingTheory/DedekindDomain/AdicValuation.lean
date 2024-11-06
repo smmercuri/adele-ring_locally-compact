@@ -73,7 +73,7 @@ theorem isClosed_nhds_zero (γ : (WithZero (Multiplicative ℤ))ˣ) :
   simp only [Set.mem_setOf_eq] at hx ⊢
   contrapose! hx
   have h : Valued.v x ≠ 0 := by contrapose! hx; simp only [hx, Units.zero_lt]
-  refine ⟨{y | Valued.v y = Valued.v x}, loc_const h, subset_empty_iff.1 fun y hy => ?_⟩
+  refine ⟨{ y | Valued.v y = Valued.v x }, loc_const h, subset_empty_iff.1 fun y hy => ?_⟩
   exact (not_le_of_lt <| mem_setOf.1 hy.2) <| hy.1.symm ▸ hx
 
 /-- There is a basis of neighbourhoods of zero in `Kᵥ` that are contained inside `Oᵥ`.
@@ -119,7 +119,7 @@ outide of the open ball at `y` of radius `γ`. -/
 theorem exists_not_mem_of_nhds
     (γ : (WithZero (Multiplicative ℤ))ˣ) (y : v.adicCompletion K) :
     ∃ x : v.adicCompletion K, Valued.v (x - y) > γ := by
-  choose π hπ using @valuation_exists_uniformizer R _ _ K _ _ _ v
+  choose π hπ using valuation_exists_uniformizer K v
   use π ^ (- Multiplicative.toAdd (μ γ) - 1) + y
   simp only [add_sub_cancel_right, unitsWithZeroEquiv_units_val, map_zpow₀,
     Valued.valuedCompletion_apply, v.adicValued_apply, hπ, gt_iff_lt, ← coe_zpow, coe_lt_coe,
@@ -148,22 +148,13 @@ valuation less than or equal to `-n`. -/
 theorem valuation_le_pow_of_maximalIdeal {x : v.adicCompletionIntegers K} (n : ℕ)
     (hx : x ∈ Valued.maximalIdeal (v.adicCompletion K) ^ n) :
     Valued.v (x : v.adicCompletion K) ≤ Multiplicative.ofAdd (-n : ℤ) := by
-  by_cases hn : n = 0
-  · simp only [hn, pow_zero, Ideal.one_eq_top, Submodule.mem_top, CharP.cast_eq_zero, neg_zero,
-      ofAdd_zero, WithZero.coe_one, forall_true_left];
-    exact x.property
-  · obtain ⟨π, hπ⟩ := exists_uniformizer K v
-    rw [isUniformizer_is_generator hπ, Ideal.span_singleton_pow, Ideal.mem_span_singleton] at hx
-    obtain ⟨y, hxy⟩ := hx
-    rw [hxy, Subring.coe_mul, Valued.v.map_mul, Subring.coe_pow, Valued.v.map_pow]
-    have h_mul_le_mul :
-      Valued.v (π : v.adicCompletion K) ^ n * Valued.v (y : v.adicCompletion K)
-        ≤ Valued.v (π : v.adicCompletion K) ^ n * 1 := by
-      apply (mul_le_mul_left₀ _).2 ((v.mem_adicCompletionIntegers _ _).1 y.2)
-      exact (pow_ne_zero_iff hn).2 <| Valued.v.ne_zero_iff.2 <| isUniformizer_ne_zero' hπ
-    apply le_trans h_mul_le_mul
-    rw [mul_one, hπ, ← WithZero.coe_pow, WithZero.coe_le_coe, ofAdd_neg, ofAdd_neg, inv_pow,
-      inv_le_inv_iff, ← one_mul (n : ℤ), Int.ofAdd_mul, zpow_natCast]
+  obtain ⟨π, hπ⟩ := exists_uniformizer K v
+  rw [isUniformizer_is_generator hπ, Ideal.span_singleton_pow, Ideal.mem_span_singleton] at hx
+  obtain ⟨y, hxy⟩ := hx
+  rw [hxy, Subring.coe_mul, Valued.v.map_mul, Subring.coe_pow, Valued.v.map_pow]
+  apply le_trans <| mul_le_of_le_one_right' <| (v.mem_adicCompletionIntegers _ _).1 y.2
+  rw [hπ, ← WithZero.coe_pow, WithZero.coe_le_coe, ofAdd_neg, ofAdd_neg, inv_pow,
+    inv_le_inv_iff, ← one_mul (n : ℤ), Int.ofAdd_mul, zpow_natCast]
 
 /-- Takes an `n`-tuple `(a₁, ..., aₙ)` and creates a `v`-adic integer using the `n`-tuple as
 coefficients in a finite `v`-adic expansion in some fixed `v`-adic integer `π` as
@@ -187,22 +178,15 @@ theorem finite_expansion {π : v.adicCompletionIntegers K} (n : ℕ) (x : v.adic
   | succ d hd =>
     obtain ⟨b, hbx⟩ := hd
     rw [isUniformizer_is_generator hπ, Ideal.span_singleton_pow] at hbx ⊢
-    rw [Ideal.mem_span_singleton'] at hbx
-    obtain ⟨⟨z, h_int⟩, hz⟩ := hbx
-    rw [mem_adicCompletionIntegers] at h_int
-    set w : Valued.integer (v.adicCompletion K) := ⟨z, h_int⟩
-    use Fin.snoc b (Ideal.Quotient.mk _ w)
-    rw [List.ofFn_succ']
-    simp only [Fin.snoc_castSucc, Fin.snoc_last, List.concat_eq_append,
+    obtain ⟨z, hz⟩ := Ideal.mem_span_singleton'.1 hbx
+    use Fin.snoc b (Ideal.Quotient.mk (Valued.maximalIdeal (v.adicCompletion K)) z)
+    simp only [List.ofFn_succ', Fin.snoc_castSucc, Fin.snoc_last, List.concat_eq_append,
       List.mapIdx_append, List.length_ofFn, List.mapIdx_cons, zero_add, List.mapIdx_nil,
       List.sum_append, List.sum_cons, List.sum_nil, add_zero]
-    rw [← @sub_sub _ (inferInstanceAs (SubtractionCommMonoid (v.adicCompletionIntegers K))),
+    rw [← @sub_sub _ (inferInstanceAs <| SubtractionCommMonoid (v.adicCompletionIntegers K)),
       ← hz, ← sub_mul, Ideal.mem_span_singleton, pow_succ, mul_comm]
-    have h : π ∣ w - Quotient.out' (Ideal.Quotient.mk (Valued.maximalIdeal (v.adicCompletion K)) w) := by
-      rw [← Ideal.Quotient.eq_zero_iff_dvd, Ideal.Quotient.eq_zero_iff_mem, ← Ideal.Quotient.eq,
-        isUniformizer_is_generator hπ, Ideal.Quotient.mk_out']
-      rfl
-    exact mul_dvd_mul_right h (π ^ d)
+    apply mul_dvd_mul_right
+    exact dvd_sub_comm.2 <| Ideal.Quotient.out_sub_dvd z (isUniformizer_is_generator hπ)
 
 /-- Given a uniformizer `π` of the `v`-adic integers and a `v`-adic integer `x` modulo a power of
 the maximal ideal, gives the coefficients of `x` in the finite `v`-adic expansion in `π` as an
@@ -218,15 +202,13 @@ theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K}
     (toFiniteCoeffs n hπ).Injective := by
   intro x y hxy
   simp only [toFiniteCoeffs] at hxy
-  let b := Classical.choose (finite_expansion n (Quotient.out' y) hπ)
   have hx := Classical.choose_spec (finite_expansion n (Quotient.out' x) hπ)
   have hy := Classical.choose_spec (finite_expansion n (Quotient.out' y) hπ)
   rw [hxy] at hx
   rw [← Quotient.out_eq' x, ← Quotient.out_eq' y,  ← sub_eq_zero]
   simp only [Submodule.Quotient.mk''_eq_mk, ← @Submodule.Quotient.mk_sub _ _ _ _ _
     (inferInstanceAs (AddCommGroup (v.adicCompletionIntegers K))), Submodule.Quotient.mk_eq_zero]
-  rw [← sub_sub_sub_cancel_right _ _
-      (List.sum (List.mapIdx (fun i j => Quotient.out' j * π ^ i) (List.ofFn b)))]
+  rw [← sub_sub_sub_cancel_right]
   exact Ideal.sub_mem _ hx hy
 
 /-- The quotient of the `v`-adic integers with a power of the maximal ideal is finite. -/
@@ -241,8 +223,7 @@ open Set Valued in
 /-- The `v`-adic integers are closed in the `v`-adic completion of `K`. -/
 theorem isClosed : IsClosed (v.adicCompletionIntegers K : Set (v.adicCompletion K)) := by
   refine isClosed_iff_nhds.2 fun x hx => ?_
-  simp only [isClosed_iff_nhds, SetLike.mem_coe, HeightOneSpectrum.mem_adicCompletionIntegers,
-    not_le] at hx ⊢
+  simp only [isClosed_iff_nhds, SetLike.mem_coe, mem_adicCompletionIntegers, not_le] at hx ⊢
   contrapose! hx
   refine ⟨{y | Valued.v y = Valued.v x}, loc_const (ne_zero_of_lt hx),
     subset_empty_iff.1 fun y ⟨hy₁, hy₂⟩ => ?_⟩
@@ -290,13 +271,6 @@ theorem isCompact : IsCompact (v.adicCompletionIntegers K : Set (v.adicCompletio
 
 instance compactSpace : CompactSpace (v.adicCompletionIntegers K) :=
   CompactSpace.mk (isCompact_iff_isCompact_univ.1 (isCompact K v))
-
-instance : TopologicalAddGroup (v.adicCompletion K) :=
-  UniformAddGroup.to_topologicalAddGroup
-
-example : R1Space (v.adicCompletion K) :=
-  letI := TopologicalAddGroup.regularSpace <| v.adicCompletion K
-  instR1Space
 
 instance r1Space : R1Space (v.adicCompletionIntegers K) :=
   letI := TopologicalAddGroup.regularSpace <| v.adicCompletionIntegers K
