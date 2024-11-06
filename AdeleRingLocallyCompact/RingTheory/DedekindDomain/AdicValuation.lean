@@ -6,7 +6,6 @@ Authors: Salvatore Mercuri
 import Mathlib
 import AdeleRingLocallyCompact.Algebra.Order.GroupWithZero.WithZero
 import AdeleRingLocallyCompact.RingTheory.Ideal.Quotient
-import AdeleRingLocallyCompact.Topology.Compactness.LocallyCompact
 import AdeleRingLocallyCompact.FromLocalClassFieldTheory.LocalClassFieldTheory
 
 set_option linter.longLine false
@@ -298,7 +297,8 @@ theorem isCompact_nhds_zero {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ �
 
 /-- The `v`-adic completion of `K` is locally compact. -/
 instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletion K) :=
-  LocallyCompactSpace.of_hasBasis_nhds_zero (hasBasis_nhds_zero K v)
-    (fun _ hγ => isCompact_nhds_zero K v hγ)
+  IsCompact.locallyCompactSpace_of_mem_nhds_of_addGroup (isCompact_nhds_zero K v (le_refl 1))
+    <| (hasBasis_nhds_zero K v).mem_of_mem (le_refl 1)
+
 
   end IsDedekindDomain.HeightOneSpectrum.AdicCompletion

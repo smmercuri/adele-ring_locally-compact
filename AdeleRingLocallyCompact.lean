@@ -13,6 +13,5 @@ import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FinsetAdeleRing
 import AdeleRingLocallyCompact.RingTheory.Ideal.Quotient
 import AdeleRingLocallyCompact.Topology.Algebra.UniformRing
-import AdeleRingLocallyCompact.Topology.Compactness.LocallyCompact
 import AdeleRingLocallyCompact.Topology.Instances.Real
 import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
