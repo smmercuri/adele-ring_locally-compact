@@ -99,7 +99,7 @@ open ProdAdicCompletions
 
 /-- The subtype of `DedekindDomain.FinsetProd` whose second product ranges over
 `v`-adic rings of integers. -/
-def Subtype := {x : FinsetProd R K S // ∀ v : {v // v ∉ S}, x.2 v ∈ v.val.adicCompletionIntegers K}
+def Subtype := {x : FinsetProd R K S // ∀ v, x.2 v ∈ v.val.adicCompletionIntegers K}
 
 instance : Coe (FinsetIntegralAdeles R K S) (FinsetProd R K S) where
   coe := fun x => (λ (v : S) => x.1 v, λ (v : {v // v ∉ S}) => (x.2 v : v.val.adicCompletion K))
@@ -232,7 +232,7 @@ def homeomorph_subtype :
 
 /-- The finite S-adele ring is locally compact. -/
 instance locallyCompactSpace : LocallyCompactSpace (FinsetAdeleRing R K S) :=
-  (Homeomorph.locallyCompactSpace_iff (homeomorph_subtype R K S)).2 inferInstance
+  (homeomorph_subtype R K S).locallyCompactSpace_iff.2 inferInstance
 
 variable {R K S}
 
@@ -428,8 +428,8 @@ theorem locallyCompactSpace : LocallyCompactSpace (FiniteAdeleRing R K) := by
     (ofFiniteAdele_support x) _ (h ▸ Filter.preimage_mem_comap hN)
   refine ⟨ι(S) '' M, ?_, Set.image_subset_iff.2 hM.2.1,
     (algebraMap_inducing R K S).isCompact_iff.1 hM.2.2⟩
-  have := algebraMap_range_mem_nhds (ofFiniteAdele_support x)
-  exact (algebraMap_inducing R K S).map_nhds_of_mem _ this ▸ Filter.image_mem_map hM.1
+  have h := algebraMap_range_mem_nhds (ofFiniteAdele_support x)
+  exact (algebraMap_inducing R K S).map_nhds_of_mem _ h ▸ Filter.image_mem_map hM.1
 
 end FiniteAdeleRing
 

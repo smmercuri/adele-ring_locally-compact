@@ -82,7 +82,7 @@ instance locallyCompactSpace : LocallyCompactSpace (InfiniteAdeleRing K) :=
 
 /-- The ring isomorphism between the infinite adele ring of a number field and the
 space `ℝ ^ r₁ × ℂ ^ r₂`, where `(r₁, r₂)` is the signature of the number field. -/
-abbrev equiv_mixedSpace :
+def ringEquiv_mixedSpace :
     InfiniteAdeleRing K ≃+*
       ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ) :=
   RingEquiv.trans
@@ -97,28 +97,28 @@ abbrev equiv_mixedSpace :
           Equiv.subtypeEquivRight (fun _ => not_isReal_iff_isComplex))))
 
 @[simp]
-theorem equiv_mixedSpace_apply (x : InfiniteAdeleRing K) :
-    equiv_mixedSpace K x =
+theorem ringEquiv_mixedSpace_apply (x : InfiniteAdeleRing K) :
+    ringEquiv_mixedSpace K x =
       (fun (v : {w : InfinitePlace K // IsReal w}) =>
         ringEquiv_real_of_isReal v.2 (x v),
       fun (v : {w : InfinitePlace K // IsComplex w}) =>
-        ringEquiv_complex_of_isComplex v.2 (x v)) := by
+        ringEquiv_complex_of_isComplex v.2 (x v)) :=
   rfl
 
 /-- Transfers the global embedding of `x ↦ (x)ᵥ` of the number field `K` into its infinite adele
 ring to the mixed embedding `x ↦ (φᵢ(x))ᵢ` of `K` into the space `ℝ ^ r₁ × ℂ ^ r₂`, where
 `(r₁, r₂)` is the signature of `K` and `φᵢ` are the complex embeddings of `K`. -/
-theorem mixedEmbedding_eq_globalEmbedding_comp {x : K} :
-    mixedEmbedding K x = equiv_mixedSpace K (algebraMap K (InfiniteAdeleRing K) x) := by
-  ext ⟨v, hv⟩ <;> simp only [equiv_mixedSpace_apply, algebraMap_apply,
-    ringEquiv_real_of_isReal, ringEquiv_complex_of_isComplex, extensionEmbedding,
-    extensionEmbedding_of_isReal, extensionEmbedding_of_comp, RingEquiv.coe_ofBijective,
-    RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, UniformSpace.Completion.extensionHom]
+theorem mixedEmbedding_eq_algebraMap_comp {x : K} :
+    mixedEmbedding K x = ringEquiv_mixedSpace K (algebraMap K (InfiniteAdeleRing K) x) := by
+  ext v <;> simp only [ringEquiv_mixedSpace_apply, algebraMap_apply, ringEquiv_real_of_isReal,
+    ringEquiv_complex_of_isComplex, extensionEmbedding, extensionEmbedding_of_isReal,
+    extensionEmbedding_of_comp, RingEquiv.coe_ofBijective, RingHom.coe_mk, MonoidHom.coe_mk,
+    OneHom.coe_mk, UniformSpace.Completion.extensionHom]
   · rw [UniformSpace.Completion.extension_coe
-      (WithAbs.uniformInducing_of_comp <| v.norm_embedding_of_isReal hv).uniformContinuous x]
+      (WithAbs.uniformInducing_of_comp <| v.1.norm_embedding_of_isReal v.2).uniformContinuous x]
     rfl
   · rw [UniformSpace.Completion.extension_coe
-      (WithAbs.uniformInducing_of_comp <| v.norm_embedding_eq).uniformContinuous x]
+      (WithAbs.uniformInducing_of_comp <| v.1.norm_embedding_eq).uniformContinuous x]
     rfl
 
 end InfiniteAdeleRing

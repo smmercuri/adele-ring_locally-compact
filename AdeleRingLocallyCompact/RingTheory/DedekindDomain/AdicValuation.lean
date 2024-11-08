@@ -197,8 +197,7 @@ def toFiniteCoeffs {π : v.adicCompletionIntegers K} (n : ℕ) (hπ : IsUniformi
   fun x => (Classical.choose (finite_expansion n (Quotient.out' x) hπ))
 
 theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K}
-    (n : ℕ) (hπ : IsUniformizer π.val) :
-    (toFiniteCoeffs n hπ).Injective := by
+    (n : ℕ) (hπ : IsUniformizer π.val) : (toFiniteCoeffs n hπ).Injective := by
   intro x y hxy
   simp only [toFiniteCoeffs] at hxy
   have hx := Classical.choose_spec (finite_expansion n (Quotient.out' x) hπ)
@@ -255,8 +254,7 @@ theorem finite_subcover_of_uniformity_basis {γ : (WithZero (Multiplicative ℤ)
 /-- The `v`-adic integers is a totally bounded set since they afford a finite subcover of
 open balls, obtained by using the finite representatives of the quotient of the `v`-adic
 integers by a power of the maximal ideal. -/
-theorem totallyBounded :
-    TotallyBounded (v.adicCompletionIntegers K : Set (v.adicCompletion K)) :=
+theorem totallyBounded : TotallyBounded (v.adicCompletionIntegers K).carrier :=
   (hasBasis_uniformity K v).totallyBounded_iff.2 <| fun _ hγ =>
     finite_subcover_of_uniformity_basis K v hγ
 
@@ -264,12 +262,12 @@ instance : CompleteSpace (v.adicCompletionIntegers K) :=
   IsClosed.completeSpace_coe (isClosed K v)
 
 /-- The `v`-adic integers is compact. -/
-theorem isCompact : IsCompact (v.adicCompletionIntegers K : Set (v.adicCompletion K)) :=
+theorem isCompact : IsCompact (v.adicCompletionIntegers K).carrier :=
   isCompact_iff_totallyBounded_isComplete.2
     ⟨totallyBounded K v, IsClosed.isComplete (isClosed K v)⟩
 
 instance compactSpace : CompactSpace (v.adicCompletionIntegers K) :=
-  CompactSpace.mk (isCompact_iff_isCompact_univ.1 (isCompact K v))
+  CompactSpace.mk (isCompact_iff_isCompact_univ.1 <| isCompact K v)
 
 instance r1Space : R1Space (v.adicCompletionIntegers K) :=
   letI := TopologicalAddGroup.regularSpace <| v.adicCompletionIntegers K
@@ -297,8 +295,8 @@ theorem isCompact_nhds_zero {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ �
 
 /-- The `v`-adic completion of `K` is locally compact. -/
 instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletion K) :=
-  IsCompact.locallyCompactSpace_of_mem_nhds_of_addGroup (isCompact_nhds_zero K v (le_refl 1))
-    <| (hasBasis_nhds_zero K v).mem_of_mem (le_refl 1)
+  IsCompact.locallyCompactSpace_of_mem_nhds_of_addGroup (isCompact_nhds_zero K v le_rfl)
+    <| (hasBasis_nhds_zero K v).mem_of_mem le_rfl
 
 
   end IsDedekindDomain.HeightOneSpectrum.AdicCompletion

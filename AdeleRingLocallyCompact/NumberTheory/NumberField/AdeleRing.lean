@@ -72,7 +72,8 @@ instance locallyCompactSpace : LocallyCompactSpace (AdeleRing K) := by
   exact Prod.locallyCompactSpace _ _
 
 /-- The subgroup of principal adeles `(x)ᵥ` where `x ∈ K`. -/
-def principalSubgroup : AddSubgroup (AdeleRing K) := (algebraMap K (AdeleRing K)).range.toAddSubgroup
+def principalSubgroup : AddSubgroup (AdeleRing K) :=
+  (algebraMap K (AdeleRing K)).range.toAddSubgroup
 
 end AdeleRing
 
