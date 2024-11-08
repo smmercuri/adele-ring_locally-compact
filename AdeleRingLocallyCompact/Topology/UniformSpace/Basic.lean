@@ -22,10 +22,8 @@ variable {α β : Type*} [Field β] [b : UniformSpace β] [CompletableTopField �
 
 /-- The pullback of a completable topological field along a uniform inducing
 ring homomorphism is a completable topological field. -/
-theorem UniformInducing.completableTopField
-    [UniformSpace α] [T0Space α]
-    {f : α →+* β} (hf : UniformInducing f) :
-    CompletableTopField α := by
+theorem UniformInducing.completableTopField [UniformSpace α] [T0Space α] {f : α →+* β}
+    (hf : UniformInducing f) : CompletableTopField α := by
   refine CompletableTopField.mk (fun F F_cau inf_F => ?_)
   rw [← UniformInducing.cauchy_map_iff hf] at F_cau ⊢
   have h_comm : (f ∘ fun x => x⁻¹) = (fun x => x⁻¹) ∘ f := by

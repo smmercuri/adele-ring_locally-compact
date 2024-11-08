@@ -4,9 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
 import Mathlib
-import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteSAdeleRing
+import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FinsetAdeleRing
 import AdeleRingLocallyCompact.NumberTheory.NumberField.InfiniteAdeleRing
 
+set_option linter.longLine false
 /-!
 # Adele Ring
 
@@ -16,7 +17,6 @@ locally compact space.
 
 ## Main definitions
  - `NumberField.adeleRing K` is the adele ring of a number field `K`.
- - `NumberField.AdeleRing.globalEmbedding K` is the map sending `x ∈ K` to `(x)ᵥ`.
  - `NumberField.AdeleRing.principalSubgroup K` is the subgroup of principal adeles `(x)ᵥ`.
 
 ## Main results
@@ -39,39 +39,41 @@ namespace NumberField
 variable (K : Type*) [Field K] [NumberField K]
 
 /-- The adele ring of a number field. -/
-def adeleRing := infiniteAdeleRing K × finiteAdeleRing (ringOfIntegers K) K
+def AdeleRing := InfiniteAdeleRing K × FiniteAdeleRing (RingOfIntegers K) K
 
 namespace AdeleRing
 
 section DerivedInstances
 
-instance : CommRing (adeleRing K) := Prod.instCommRing
+instance : CommRing (AdeleRing K) := Prod.instCommRing
 
-instance : Inhabited (adeleRing K) := ⟨0⟩
+instance : Inhabited (AdeleRing K) := ⟨0⟩
 
-instance topologicalSpace : TopologicalSpace (adeleRing K) :=
-  instTopologicalSpaceProd
+instance : TopologicalSpace (AdeleRing K) := instTopologicalSpaceProd
 
-instance topologicalRing : TopologicalRing (adeleRing K) :=
-  instTopologicalRingProdInstTopologicalSpaceProdInstNonUnitalNonAssocRing
+instance : TopologicalRing (AdeleRing K) := instTopologicalRingProd
+
+instance : Algebra K (AdeleRing K) := Prod.algebra _ _ _
 
 end DerivedInstances
 
-/-- The global embedding sending `x ∈ K` to `(x)ᵥ`. -/
-def globalEmbedding : K →+* adeleRing K :=
-  RingHom.prod (InfiniteAdeleRing.globalEmbedding K) (FiniteAdeleRing.globalEmbedding _ _)
+@[simp]
+theorem algebraMap_fst_apply (x : K) : (algebraMap K (AdeleRing K) x).1 v = x := rfl
 
-theorem globalEmbedding_injective : Function.Injective (globalEmbedding K) :=
-  fun _ _ hxy => (InfiniteAdeleRing.globalEmbedding K).injective (Prod.ext_iff.1 hxy).1
+@[simp]
+theorem algebraMap_snd_apply (x : K) : (algebraMap K (AdeleRing K) x).2 v = x := rfl
+
+theorem algebraMap_injective : Function.Injective (algebraMap K (AdeleRing K)) :=
+  fun _ _ hxy => (algebraMap K (InfiniteAdeleRing K)).injective (Prod.ext_iff.1 hxy).1
 
 /-- The adele ring of a number field is a locally compact space. -/
-theorem locallyCompactSpace : LocallyCompactSpace (adeleRing K) := by
-  haveI := InfiniteAdeleRing.locallyCompactSpace K
-  haveI := FiniteAdeleRing.locallyCompactSpace (ringOfIntegers K) K
+instance locallyCompactSpace : LocallyCompactSpace (AdeleRing K) := by
+  letI := FiniteAdeleRing.locallyCompactSpace (RingOfIntegers K) K
   exact Prod.locallyCompactSpace _ _
 
 /-- The subgroup of principal adeles `(x)ᵥ` where `x ∈ K`. -/
-def principalSubgroup : AddSubgroup (adeleRing K) := (globalEmbedding K).range.toAddSubgroup
+def principalSubgroup : AddSubgroup (AdeleRing K) :=
+  (algebraMap K (AdeleRing K)).range.toAddSubgroup
 
 end AdeleRing
 
