@@ -162,13 +162,14 @@ def ofFiniteCoeffs (π : v.adicCompletionIntegers K) (n : ℕ) :
     (Fin n → v.adicCompletionIntegers K) → v.adicCompletionIntegers K :=
   fun x => ((List.ofFn x).mapIdx (fun i j => j * π^i)).sum
 
+set_option synthInstance.maxHeartbeats 40000 in
 /-- Given a uniformizer `π` of the `v`-adic integers and a `v`-adic integer `x`, there exists
 an `n`-tuple of representatives in the residue field of the `v`-adic integers such that `x` can
 be written as a finite `v`-adic expansion in `π` with coefficients given by the `n`-tuple. -/
 theorem finite_expansion {π : v.adicCompletionIntegers K} (n : ℕ) (x : v.adicCompletionIntegers K)
     (hπ : IsUniformizer π.val) :
-    ∃ (a : Fin n → Valued.ResidueField (v.adicCompletion K)),
-      x - ((List.ofFn a).mapIdx (fun i j => (Quotient.out' j) * π^i)).sum ∈
+    ∃ (a : Fin n → Valued.ResidueField _),
+      x - ((List.ofFn a).mapIdx fun i j => j.out' * π ^ i).sum ∈
         Valued.maximalIdeal (v.adicCompletion K) ^ n := by
   induction n with
   | zero =>
@@ -182,8 +183,7 @@ theorem finite_expansion {π : v.adicCompletionIntegers K} (n : ℕ) (x : v.adic
     simp only [List.ofFn_succ', Fin.snoc_castSucc, Fin.snoc_last, List.concat_eq_append,
       List.mapIdx_append, List.length_ofFn, List.mapIdx_cons, zero_add, List.mapIdx_nil,
       List.sum_append, List.sum_cons, List.sum_nil, add_zero]
-    rw [← @sub_sub _ (inferInstanceAs <| SubtractionCommMonoid (v.adicCompletionIntegers K)),
-      ← hz, ← sub_mul, Ideal.mem_span_singleton, pow_succ, mul_comm]
+    rw [← sub_sub, ← hz, ← sub_mul, Ideal.mem_span_singleton, pow_succ, mul_comm]
     apply mul_dvd_mul_right
     exact dvd_sub_comm.2 <| Ideal.Quotient.out_sub_dvd z (isUniformizer_is_generator hπ)
 
@@ -194,7 +194,7 @@ the maximal ideal, gives the coefficients of `x` in the finite `v`-adic expansio
 def toFiniteCoeffs {π : v.adicCompletionIntegers K} (n : ℕ) (hπ : IsUniformizer π.val) :
     v.adicCompletionIntegers K ⧸ (Valued.maximalIdeal (v.adicCompletion K)) ^ n
       → (Fin n → Valued.ResidueField (v.adicCompletion K)) :=
-  fun x => (Classical.choose (finite_expansion n (Quotient.out' x) hπ))
+  fun x => Classical.choose (finite_expansion n x.out' hπ)
 
 theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K}
     (n : ℕ) (hπ : IsUniformizer π.val) : (toFiniteCoeffs n hπ).Injective := by
@@ -202,12 +202,9 @@ theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K}
   simp only [toFiniteCoeffs] at hxy
   have hx := Classical.choose_spec (finite_expansion n (Quotient.out' x) hπ)
   have hy := Classical.choose_spec (finite_expansion n (Quotient.out' y) hπ)
-  rw [hxy] at hx
-  rw [← Quotient.out_eq' x, ← Quotient.out_eq' y,  ← sub_eq_zero]
-  simp only [Submodule.Quotient.mk''_eq_mk, ← @Submodule.Quotient.mk_sub _ _ _ _ _
-    (inferInstanceAs (AddCommGroup (v.adicCompletionIntegers K))), Submodule.Quotient.mk_eq_zero]
-  rw [← sub_sub_sub_cancel_right]
-  exact Ideal.sub_mem _ hx hy
+  rw [← Ideal.Quotient.mk_out' x, ← Ideal.Quotient.mk_out' y, Ideal.Quotient.eq,
+    ← sub_sub_sub_cancel_right]
+  exact Ideal.sub_mem _ hx (hxy ▸ hy)
 
 /-- The quotient of the `v`-adic integers with a power of the maximal ideal is finite. -/
 instance quotient_maximalIdeal_pow_finite {π : v.adicCompletionIntegers K} (n : ℕ)
@@ -269,13 +266,6 @@ theorem isCompact : IsCompact (v.adicCompletionIntegers K).carrier :=
 instance compactSpace : CompactSpace (v.adicCompletionIntegers K) :=
   CompactSpace.mk (isCompact_iff_isCompact_univ.1 <| isCompact K v)
 
-instance r1Space : R1Space (v.adicCompletionIntegers K) :=
-  letI := TopologicalAddGroup.regularSpace <| v.adicCompletionIntegers K
-  instR1Space
-
-instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletionIntegers K) :=
-  instWeaklyLocallyCompactSpaceOfCompactSpace.locallyCompactSpace
-
 end AdicCompletionIntegers
 
 namespace AdicCompletion
@@ -284,16 +274,15 @@ open AdicCompletionIntegers
 
 variable (v)
 
-instance : TopologicalAddGroup (v.adicCompletion K) :=
-  (inferInstanceAs (UniformAddGroup (v.adicCompletion K))).to_topologicalAddGroup
-
 /-- Any open ball centred at zero in the `v`-adic completion of `K` is compact. -/
 theorem isCompact_nhds_zero {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ ≤ 1) :
     IsCompact { y : v.adicCompletion K | Valued.v y < γ } :=
   IsCompact.of_isClosed_subset (isCompact K v) (isClosed_nhds_zero K v γ)
       <| fun _ hx => le_of_lt (lt_of_lt_of_le (Set.mem_setOf.1 hx) hγ)
 
-/-- The `v`-adic completion of `K` is locally compact. -/
+set_option synthInstance.maxHeartbeats 80000 in
+/-- The `v`-adic completion of `K` is locally compact.
+Note: slow search for `TopologicalAddGroup` instance of `v.adicCompletion K`. -/
 instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletion K) :=
   IsCompact.locallyCompactSpace_of_mem_nhds_of_addGroup (isCompact_nhds_zero K v le_rfl)
     <| (hasBasis_nhds_zero K v).mem_of_mem le_rfl

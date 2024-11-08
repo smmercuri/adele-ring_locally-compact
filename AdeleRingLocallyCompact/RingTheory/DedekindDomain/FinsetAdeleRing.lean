@@ -144,7 +144,10 @@ def subtype_homeomorph :
     refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
     exact Continuous.snd  ({ isOpen_preimage := fun s a => a })
 
-/-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact. -/
+set_option synthInstance.maxHeartbeats 80000 in
+/-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact.
+Note: instance search is slow because of the same issues for adicCompletionIntegers that we had
+with RingOfIntegers when it was a subring. -/
 instance : LocallyCompactSpace (FinsetIntegralAdeles R K S) := Prod.locallyCompactSpace _ _
 
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` as a subtype is locally compact. -/
@@ -169,7 +172,7 @@ theorem mul {x y : ProdAdicCompletions R K} (hx : IsFinsetAdele S x) (hy : IsFin
   exact mul_le_one' (hx v hv) (hy v hv)
 
 theorem one : IsFinsetAdele S (1 : ProdAdicCompletions R K) :=
-  fun v _ => by rw [mem_adicCompletionIntegers]; exact le_of_eq (Valued.v.map_one')
+  fun v _ => by rw [mem_adicCompletionIntegers]; exact le_of_eq Valued.v.map_one'
 
 theorem add {x y : ProdAdicCompletions R K} (hx : IsFinsetAdele S x) (hy : IsFinsetAdele S y) :
     IsFinsetAdele S (x + y) := by
