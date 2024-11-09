@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
 import Mathlib
+import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
+import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 
 /-!
 # The completion of a number field at an infinite place
@@ -73,11 +75,6 @@ abbrev completion₀ :=
   letI := v.normedField₀
   UniformSpace.Completion K
 
-instance : Field (v.completion₀) :=
-  letI := v.normedField₀ -- Requires signalling to find uniform space
-  letI : CompletableTopField K := sorry
-  UniformSpace.Completion.instField
-
 end AbsoluteValue
 
 namespace NumberField.InfinitePlace
@@ -85,6 +82,16 @@ namespace NumberField.InfinitePlace
 variable {K : Type*} [Field K] (v : InfinitePlace K)
 
 abbrev completion₀ := v.1.completion₀
+
+theorem uniformInducing_embedding₀ :
+    letI := v.1.normedField₀ -- Requires signalling to find uniform space
+    UniformInducing v.embedding :=
+  WithAbs.uniformInducing_of_comp v.norm_embedding_eq
+
+instance : Field (v.completion₀) :=
+  letI := v.1.normedField₀ -- Requires signalling to find uniform space
+  letI : CompletableTopField K := v.uniformInducing_embedding₀.completableTopField
+  UniformSpace.Completion.instField
 
 namespace Completion
 
@@ -109,11 +116,6 @@ abbrev completion₁ :=
   letI := WithAbsReal.mk v
   UniformSpace.Completion K
 
-instance : Field (v.completion₁) :=
-  letI := WithAbsReal.mk v -- Requires signalling to find uniform space
-  letI : CompletableTopField K := sorry
-  UniformSpace.Completion.instField
-
 end AbsoluteValue
 
 namespace NumberField.InfinitePlace
@@ -123,6 +125,16 @@ open AbsoluteValue
 variable {K : Type*} [Field K] (v : InfinitePlace K)
 
 abbrev completion₁ := v.1.completion₁
+
+theorem uniformInducing_embedding₁ :
+    letI := WithAbsReal.mk v.1 -- Requires signalling to find uniform space
+    UniformInducing v.embedding :=
+  WithAbs.uniformInducing_of_comp v.norm_embedding_eq
+
+instance : Field (v.completion₁) :=
+  letI := WithAbsReal.mk v.1 -- Requires signalling to find uniform space
+  letI : CompletableTopField K := v.uniformInducing_embedding₁.completableTopField
+  UniformSpace.Completion.instField
 
 namespace Completion
 
@@ -136,65 +148,58 @@ end NumberField.InfinitePlace.Completion
 
 namespace NumberField.InfinitePlace
 
-variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
+variable {K : Type*} [Field K] [NumberField K] (v : InfinitePlace K)
 
 /-- The embedding of K as a subfield in ℂ using the embedding associated to the infinite place
 `v`. -/
-def subfield (v : InfinitePlace K) : Subfield ℂ where
+def subfield : Subfield ℂ where
   toSubring := v.embedding.range
-  inv_mem' _ := by intro ⟨y, hy⟩; exact ⟨y⁻¹, by simp only [map_inv₀, hy]⟩
+  inv_mem' _ :=  fun ⟨y, hy⟩ => ⟨y⁻¹, by simp only [map_inv₀, hy]⟩
 
 /-- The embedding sending a number field to its subfield in ℂ.-/
-def toSubfield : K →+* v.subfield K where
+def toSubfield : K →+* v.subfield where
   toFun := fun x => ⟨v.embedding x, Set.mem_range_self x⟩
   map_one' := by simp only [map_one, Submonoid.mk_eq_one]
   map_mul' x y := by simp only [v.embedding.map_mul' x y, map_mul]; rfl
   map_zero' := by simp only [map_zero]; rfl
   map_add' x y := by simp only [v.embedding.map_add' x y, map_add]; rfl
 
-theorem toSubfield_injective : Function.Injective (v.toSubfield K) := (v.toSubfield K).injective
-
-theorem toSubfield_surjective : Function.Surjective (v.toSubfield K) := by
+theorem toSubfield_surjective : Function.Surjective v.toSubfield := by
   rw [← RingHom.range_top_iff_surjective, Subring.eq_top_iff']
-  exact λ ⟨_, ⟨y, hy⟩⟩ => ⟨y, Subtype.val_inj.1 hy⟩
+  exact fun ⟨_, ⟨y, hy⟩⟩ => ⟨y, Subtype.val_inj.1 hy⟩
 
-def subfieldEquiv : K ≃+* v.subfield K :=
-  RingEquiv.ofBijective _ ⟨toSubfield_injective K v, toSubfield_surjective K v⟩
+def subfieldEquiv : K ≃+* v.subfield :=
+  RingEquiv.ofBijective _ ⟨v.toSubfield.injective, v.toSubfield_surjective⟩
 
-instance subfield_uniformSpace : UniformSpace (v.subfield K) := inferInstance
-
-variable {K}
-
-/-- The completion of a number field at an Archimedean place. -/
-abbrev completion₂ := (subfield_uniformSpace K v).Completion
+/-- The completion of a number field's image within ℂ at an infinite place. -/
+abbrev completion₂ := UniformSpace.Completion v.subfield
 
 namespace Completion
 
-instance : NormedField (subfield K v) :=
-  NormedField.induced _ _ (Subfield.subtype (subfield K v)) Subtype.val_injective
+instance : NormedField v.subfield :=
+  NormedField.induced _ _ v.subfield.subtype Subtype.val_injective
 
-instance : Field v.completion₂ := UniformSpace.Completion.instField
+instance : Field v.completion₂ := inferInstance
 
-instance : Inhabited v.completion₂ :=
-  ⟨0⟩
+instance : Inhabited v.completion₂ := ⟨0⟩
 
 instance : Coe K v.completion₂ where
-  coe := (UniformSpace.Completion.coe' _) ∘ v.toSubfield K
+  coe := (UniformSpace.Completion.coe' v.subfield) ∘ v.toSubfield
 
 def coeRingHom₂ : K →+* v.completion₂ :=
-  RingHom.comp UniformSpace.Completion.coeRingHom (v.toSubfield K)
+  RingHom.comp UniformSpace.Completion.coeRingHom v.toSubfield
 
-/-- The embedding `v.completion' K → ℂ` of a completion of a number field at an Archimedean
+/-- The embedding `v.completion₂ : K →+* ℂ` of a completion of a number field at an infinite
 place into `ℂ`. -/
 def extensionEmbedding₂ :=
-  UniformSpace.Completion.extensionHom (Subfield.subtype (subfield K v)) continuous_subtype_val
+  UniformSpace.Completion.extensionHom v.subfield.subtype continuous_subtype_val
 
 theorem extensionEmbedding_injective₂ : Function.Injective (extensionEmbedding₂ v) :=
   (extensionEmbedding₂ v).injective
 
 variable {v}
 
-/-- The embedding `v.completion' K → ℂ` preserves distances. -/
+/-- The embedding `v.completion₂ : K →+* ℂ` preserves distances. -/
 theorem extensionEmbedding_dist_eq₂ (x y : v.completion₂) :
     dist (extensionEmbedding₂ v x) (extensionEmbedding₂ v y) =
       dist x y := by
@@ -204,7 +209,7 @@ theorem extensionEmbedding_dist_eq₂ (x y : v.completion₂) :
     · exact continuous_dist
   · simp only [extensionEmbedding₂, UniformSpace.Completion.extensionHom, Subfield.coe_subtype,
       RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, UniformSpace.Completion.dist_eq]
-    have h_val : UniformContinuous (subfield K v).subtype := uniformContinuous_subtype_val
+    have h_val : UniformContinuous v.subfield.subtype := uniformContinuous_subtype_val
     have h_val_ext := UniformSpace.Completion.extension_coe h_val
     simp only [Subfield.coe_subtype] at h_val_ext
     rw [h_val_ext x, h_val_ext y]
@@ -212,15 +217,15 @@ theorem extensionEmbedding_dist_eq₂ (x y : v.completion₂) :
 
 variable (v)
 
-/-- The embedding `v.completion' K → ℂ` is an isometry. -/
+/-- The embedding `v.completion₂ : K →+* ℂ` is an isometry. -/
 theorem isometry_extensionEmbedding₂ : Isometry (extensionEmbedding₂ v) :=
   Isometry.of_dist_eq extensionEmbedding_dist_eq₂
 
-/-- The embedding `v.completion' K → ℂ` is a closed embedding. -/
+/-- The embedding `v.completion₂ : K →+* ℂ` is a closed embedding. -/
 theorem closedEmbedding_extensionEmbedding₂ : ClosedEmbedding (extensionEmbedding₂ v) :=
   (isometry_extensionEmbedding₂ v).closedEmbedding
 
-/-- The indirect completion of a number field at an Archimedean place is locally compact. -/
+/-- The indirect completion of a number field at an infinite place is locally compact. -/
 instance locallyCompactSpace₂ : LocallyCompactSpace v.completion₂ :=
   (closedEmbedding_extensionEmbedding₂ v).locallyCompactSpace
 
