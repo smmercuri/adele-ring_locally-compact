@@ -94,6 +94,8 @@ end ProdAdicCompletions
 
 namespace FiniteAdeleRing
 
+local notation "ℤₘ₀" => WithZero (Multiplicative ℤ)
+
 variable {R}
 
 @[simp]
@@ -136,7 +138,7 @@ def support (x : FiniteAdeleRing R K) := (Filter.eventually_cofinite.1 x.2).toFi
 finite adele  `x` for which `xᵥ` is outside each open ball for `v ∈ S`. -/
 theorem exists_not_mem_of_finite_nhds
     (S : Finset (HeightOneSpectrum R))
-    (γ : (v : HeightOneSpectrum R) → (WithZero (Multiplicative ℤ))ˣ)
+    (γ : (v : HeightOneSpectrum R) → ℤₘ₀ˣ)
     (y : FiniteAdeleRing R K) :
     ∃ (x : FiniteAdeleRing R K), ∀ v ∈ S, Valued.v (x v - y v) > γ v := by
   choose x hx using fun v => AdicCompletion.exists_not_mem_of_nhds (γ v) (y v)
@@ -183,48 +185,10 @@ theorem dvd_of_valued_lt {x : FiniteAdeleRing R K} {r : nonZeroDivisors R}
     dvd_of_valued_le (this v) <| (map_ne_zero _).1 (v.algebraMap_valuation_ne_zero K r)
   exact ⟨a, FiniteAdeleRing.ext _ _ <| funext (fun v => ha v)⟩
 
-variable (R K)
-
-open Valued ProdAdicCompletions in
-/-- The element `(x)ᵥ` where `x ∈ K` is a finite adele.
-
-[https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685)-/
-theorem globalEmbedding_isFiniteAdele (x : K) :
-    ProdAdicCompletions.IsFiniteAdele (ProdAdicCompletions.globalEmbedding R K x) := by
-  let S := { v : HeightOneSpectrum R | (globalEmbedding R K) x v ∉ adicCompletionIntegers K v }
-  obtain ⟨r, d, hx⟩ := IsLocalization.mk'_surjective (nonZeroDivisors R) x
-  have hsubset : S ⊆ (Ideal.factorsFinset_of_nonZeroDivisor d).toSet := by
-    intro v hv
-    simp only [S, mem_adicCompletionIntegers, not_le, not_lt, Set.mem_setOf_eq] at hv
-    rw [Set.Finite.coe_toFinset]
-    contrapose! hv
-    simp only [IsFractionRing.mk'_eq_div] at hx
-    simp only [globalEmbedding_apply, valuedCompletion_apply, adicValued_apply, ← hx, map_div₀]
-    have h_val_d : v.valuation (algebraMap R K d) = 1 := by
-      apply le_antisymm (v.valuation_le_one d)
-      contrapose! hv
-      exact (v.valuation_lt_one_iff_dvd _).1 hv
-    rw [h_val_d, div_one]
-    exact v.valuation_le_one _
-  exact Set.Finite.subset (Finset.finite_toSet _) hsubset
-
-/-- The global embedding sending an element `x ∈ K` to `(x)ᵥ` in the finite adele ring.
-
-TODO : this can be changed to algebraMap K (FiniteAdeleRing R K). -/
-def globalEmbedding : K →+* FiniteAdeleRing R K where
-  toFun := fun x => ⟨ProdAdicCompletions.globalEmbedding R K x, globalEmbedding_isFiniteAdele R K x⟩
-  map_one' := rfl
-  map_zero' := rfl
-  map_mul' x y := by simp only [map_mul]; rfl
-  map_add' x y := by simp only [map_add]; rfl
-
 @[simp]
-theorem globalEmbedding_apply (x : K) : globalEmbedding R K x v = x := rfl
+theorem algebraMap_apply (x : K) : algebraMap K (FiniteAdeleRing R K) x v = x := rfl
 
-variable {R K}
-
-theorem ext_iff {a₁ a₂ : FiniteAdeleRing R K} : a₁ = a₂ ↔ a₁.val = a₂.val :=
-  Subtype.ext_iff
+theorem ext_iff {a₁ a₂ : FiniteAdeleRing R K} : a₁ = a₂ ↔ a₁.val = a₂.val := Subtype.ext_iff
 
 variable (R K)
 
@@ -232,13 +196,12 @@ open ProdAdicCompletions in
 theorem nontrivial_of_nonEmpty [i : Nonempty (HeightOneSpectrum R)] :
     Nontrivial (FiniteAdeleRing R K) := by
   obtain v := (Classical.inhabited_of_nonempty i).default
-  exact ⟨⟨0, IsFiniteAdele.zero⟩, globalEmbedding R K 1, fun h =>
-    zero_ne_one (congrFun (ext_iff.1 h) v)⟩
+  exact ⟨0, algebraMap K _ 1, fun h => zero_ne_one (congrFun (ext_iff.1 h) v)⟩
 
-theorem globalEmbedding_injective [i : Nonempty (HeightOneSpectrum R)] :
-    Function.Injective (globalEmbedding R K) := by
-  letI := nontrivial_of_nonEmpty
-  exact (globalEmbedding R K).injective
+theorem algebraMap_injective [i : Nonempty (HeightOneSpectrum R)] :
+    Function.Injective (algebraMap K (FiniteAdeleRing R K)) := by
+  letI := nontrivial_of_nonEmpty R K
+  exact (algebraMap K _).injective
 
 end FiniteAdeleRing
 

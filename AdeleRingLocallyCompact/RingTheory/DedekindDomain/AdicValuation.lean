@@ -59,6 +59,7 @@ theorem algebraMap_valuation_ne_zero (v : HeightOneSpectrum R) (r : nonZeroDivis
   exact nonZeroDivisors.coe_ne_zero _
 
 local notation "μ" => @WithZero.unitsWithZeroEquiv (Multiplicative ℤ)
+local notation "ℤₘ₀" => WithZero (Multiplicative ℤ)
 
 namespace AdicCompletion
 
@@ -66,7 +67,7 @@ variable (v)
 
 open Valued Set in
 /-- Open balls at zero are closed in the `v`-adic completion of `K`. -/
-theorem isClosed_nhds_zero (γ : (WithZero (Multiplicative ℤ))ˣ) :
+theorem isClosed_nhds_zero (γ : ℤₘ₀ˣ) :
     IsClosed ({ y : v.adicCompletion K | Valued.v y < γ }) := by
   refine isClosed_iff_nhds.2 fun x hx => ?_
   simp only [Set.mem_setOf_eq] at hx ⊢
@@ -78,10 +79,9 @@ theorem isClosed_nhds_zero (γ : (WithZero (Multiplicative ℤ))ˣ) :
 /-- There is a basis of neighbourhoods of zero in `Kᵥ` that are contained inside `Oᵥ`.
 Note: this is true of any DVR (but not of any `Valued`). -/
 theorem hasBasis_nhds_zero : (nhds (0 : v.adicCompletion K)).HasBasis
-    (fun (γ : (WithZero (Multiplicative ℤ))ˣ) => γ ≤ 1)
-    (fun γ => { x : v.adicCompletion K | Valued.v x < γ }) := by
-  have hq : ∀ (γ : (WithZero (Multiplicative ℤ))ˣ), True →
-    ∃ (γ' : (WithZero (Multiplicative ℤ))ˣ), True ∧ γ' ≤ 1 ∧
+    (fun (γ : ℤₘ₀ˣ) => γ ≤ 1) (fun γ => { x : v.adicCompletion K | Valued.v x < γ }) := by
+  have hq : ∀ (γ : ℤₘ₀ˣ), True →
+    ∃ (γ' : ℤₘ₀ˣ), True ∧ γ' ≤ 1 ∧
       { x : v.adicCompletion K | Valued.v x < γ' } ⊆
         { x : v.adicCompletion K | Valued.v x < γ } := by
     intro γ _
@@ -94,12 +94,10 @@ theorem hasBasis_nhds_zero : (nhds (0 : v.adicCompletion K)).HasBasis
 
 /-- There is a basis of uniformity of `Kᵥ` with radii less than or equal to one.
 Note: this is true of any DVR. -/
-theorem hasBasis_uniformity :
-    (uniformity (v.adicCompletion K)).HasBasis
-    (fun (γ : (WithZero (Multiplicative ℤ))ˣ) => γ ≤ 1)
-    (fun (γ : (WithZero (Multiplicative ℤ))ˣ) => { p | Valued.v (p.2 - p.1) < γ }) := by
-  have hq : ∀ (γ : (WithZero (Multiplicative ℤ))ˣ), True →
-    ∃ (γ' : (WithZero (Multiplicative ℤ))ˣ), True ∧ γ' ≤ 1 ∧
+theorem hasBasis_uniformity : (uniformity (v.adicCompletion K)).HasBasis
+    (fun (γ : ℤₘ₀ˣ) => γ ≤ 1) (fun (γ : ℤₘ₀ˣ) => { p | Valued.v (p.2 - p.1) < γ }) := by
+  have hq : ∀ (γ : ℤₘ₀ˣ), True →
+    ∃ (γ' : ℤₘ₀ˣ), True ∧ γ' ≤ 1 ∧
       { p : v.adicCompletion K × _ | Valued.v (p.2 - p.1) < γ' } ⊆
         { p | Valued.v (p.2 - p.1) < γ } := by
     intro γ _
@@ -115,8 +113,7 @@ variable {K v}
 open WithZero in
 /-- Given an integer `γ` and some centre `y ∈ Kᵥ` we can always find an element `x ∈ Kᵥ`
 outide of the open ball at `y` of radius `γ`. -/
-theorem exists_not_mem_of_nhds
-    (γ : (WithZero (Multiplicative ℤ))ˣ) (y : v.adicCompletion K) :
+theorem exists_not_mem_of_nhds (γ : ℤₘ₀ˣ) (y : v.adicCompletion K) :
     ∃ x : v.adicCompletion K, Valued.v (x - y) > γ := by
   choose π hπ using valuation_exists_uniformizer K v
   use π ^ (- Multiplicative.toAdd (μ γ) - 1) + y
@@ -229,7 +226,7 @@ open WithZero Multiplicative Ideal in
 /-- There is a finite covering of the `v`-adic integers of open balls of radius less than one,
 obtained by using the finite representatives in the quotient of the `v`-adic integers by an
 appropriate power of the maximal ideal. -/
-theorem finite_subcover_of_uniformity_basis {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ.val ≤ 1) :
+theorem finite_subcover_of_uniformity_basis {γ : ℤₘ₀ˣ} (hγ : γ.val ≤ 1) :
     ∃ t : Set (v.adicCompletion K), Set.Finite t ∧
       ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t,
         { x | (x, y) ∈ { p | Valued.v (p.2 - p.1) < γ.val } } := by
@@ -275,7 +272,7 @@ open AdicCompletionIntegers
 variable (v)
 
 /-- Any open ball centred at zero in the `v`-adic completion of `K` is compact. -/
-theorem isCompact_nhds_zero {γ : (WithZero (Multiplicative ℤ))ˣ} (hγ : γ ≤ 1) :
+theorem isCompact_nhds_zero {γ : ℤₘ₀ˣ} (hγ : γ ≤ 1) :
     IsCompact { y : v.adicCompletion K | Valued.v y < γ } :=
   IsCompact.of_isClosed_subset (isCompact K v) (isClosed_nhds_zero K v γ)
       <| fun _ hx => le_of_lt (lt_of_lt_of_le (Set.mem_setOf.1 hx) hγ)
