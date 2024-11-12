@@ -13,8 +13,8 @@ set_option linter.longLine false
 # Adic valuations on Dedekind domains
 
 Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions and `v`
-a maximal ideal of `R`. In this file we prove compactness results for the `v`-adic
-completion of `K` and its ring of integers.
+a maximal ideal of `R`. In this file we prove that the `v`-adic completion of `K` is locally
+compact and its ring of integers is compact.
 
 ## Main definitions
  - `IsDedekindDomain.HeightOneSpectrum.AdicCompletionIntegers.ofFiniteCoeffs π n`

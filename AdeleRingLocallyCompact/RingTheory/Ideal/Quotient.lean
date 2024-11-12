@@ -8,7 +8,7 @@ import Mathlib
 /-!
 # Ideal quotients
 
-Ideal quotient version of `Submodule.mk_out'`.
+Ideal quotient versions of some basic results.
 
 -/
 

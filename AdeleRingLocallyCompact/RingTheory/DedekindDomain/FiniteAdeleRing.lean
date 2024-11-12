@@ -20,13 +20,13 @@ for working with the topological space of the the finite adele ring.
  - `DedekindDomain.FiniteAdeleRing.localInclusion v` is the map sending an element `x` of the
    `v`-adic completion of `K` to the finite adele which has `x` in its `v`th place and `1`s
    everywhere else.
- - `DedekindDomain.FiniteAdeleRing.globalEmbedding R K` is the map sending an element `x` of the
-   `v`-adic completion of `K` to the finite adele `(x)ᵥ`.
 
 ## Main results
- - `DedekindDomain.FiniteAdeleRing.dvd_of_valued_lt` :  a finite adele is an `∏ v, Oᵥ` multiple of
+ - `DedekindDomain.FiniteAdeleRing.dvd_of_valued_lt` : a finite adele is an `∏ v, Oᵥ` multiple of
    an integer `r` if the valuation of `x v` is less than the valuation of `r` for every `v`
    dividing `r`.
+ - `DedekindDomain.FiniteAdeleRing.exists_not_mem_of_finite_nhds` : there exists a finite adele
+   whose valuation is outside a finite collection of open balls.
 
 ## References
  * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
@@ -150,6 +150,7 @@ theorem exists_not_mem_of_finite_nhds
     simp only [Set.mem_setOf_eq, not_not, y, hv, if_false, (v.adicCompletionIntegers K).one_mem]
   exact ⟨⟨y, hy⟩, fun v hv => by simp only [y, hv]; exact hx _⟩
 
+/-- Clears the denominator of the subtraction of two finite adeles. -/
 theorem sub_mul_nonZeroDivisor_mem_finiteIntegralAdeles
     (x y : FiniteAdeleRing R K) :
     ∃ (r : nonZeroDivisors R) (z : FiniteIntegralAdeles R K),

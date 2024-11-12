@@ -18,17 +18,16 @@ We show that the infinite adele ring is locally compact and that it is isomorphi
 space `ℝ ^ r₁ × ℂ ^ r₂` used in `Mathlib.NumberTheory.NumberField.mixedEmbedding`.
 
 ## Main definitions
- - `NumberField.infiniteAdeleRing` of a number field `K` is defined as the product of
+ - `NumberField.InfiniteAdeleRing` of a number field `K` is defined as the product of
    the completions of `K` over its Archimedean places.
- - `NumberField.InfiniteAdeleRing.globalEmbedding` is the map sending `x ∈ K` to `(x)ᵥ`.
- - `NumberField.InfiniteAdeleRing.equiv_mixedSpace` is the ring isomorphism between
+ - `NumberField.InfiniteAdeleRing.ringEquiv_mixedSpace` is the ring isomorphism between
    the infinite adele ring of `K` and `ℝ ^ r₁ × ℂ ^ r₂`, where `(r₁, r₂)` is the signature
    of `K`.
 
 ## Main results
  - `NumberField.InfiniteAdeleRing.locallyCompactSpace` : the infinite adele ring is a
    locally compact space.
- - `NumberField.InfiniteAdeleRing.mixedEmbedding_eq_globalEmbedding_comp` : applying the
+ - `NumberField.InfiniteAdeleRing.mixedEmbedding_eq_algebraMap_comp` : applying the
    ring isomorphism of `equiv_mixedSpace` to a globally embedded `(x)ᵥ` in the infinite adele
    ring, where `x ∈ K`, is the same as applying the embedding `K → ℝ ^ r₁ × ℂ ^ r₂` given by
    `NumberField.mixedEmbedding` to `x`.
@@ -105,7 +104,7 @@ theorem ringEquiv_mixedSpace_apply (x : InfiniteAdeleRing K) :
         ringEquiv_complex_of_isComplex v.2 (x v)) :=
   rfl
 
-/-- Transfers the global embedding of `x ↦ (x)ᵥ` of the number field `K` into its infinite adele
+/-- Transfers the embedding of `x ↦ (x)ᵥ` of the number field `K` into its infinite adele
 ring to the mixed embedding `x ↦ (φᵢ(x))ᵢ` of `K` into the space `ℝ ^ r₁ × ℂ ^ r₂`, where
 `(r₁, r₂)` is the signature of `K` and `φᵢ` are the complex embeddings of `K`. -/
 theorem mixedEmbedding_eq_algebraMap_comp {x : K} :

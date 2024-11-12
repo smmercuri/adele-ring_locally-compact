@@ -13,9 +13,9 @@ topological field if the map `f` is a ring homomorphism between fields and if th
 space `b` is a completable topological field.
 
 ## Main results
- - `UniformInducing.comap_completableTopField` : if the codomain of a ring homomorphism between
-   fields is a completable topological field, then the domain is also a completable topological
-   field.
+ - `UniformInducing.completableTopField` : if the codomain of a uniform inducing ring
+   homomorphism between fields is a completable topological field, then the domain is also a
+   completable topological field.
 -/
 variable {α β : Type*} [Field β] [b : UniformSpace β] [CompletableTopField β]
   [Field α]
