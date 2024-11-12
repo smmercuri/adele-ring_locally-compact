@@ -74,40 +74,45 @@ The high-level code structure is modelled after the structure of Mathlib version
 
 ### Compactness of $O\_v$
 
-The proofs that $O\_v$ is totally bounded, complete, and therefore compact can be found in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean).
-
-- The result that $O\_v$ is compact is [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/69b8e2a386adaed060b99ea98f90b1478e68c5da/AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean#L458).
+The proofs that $O\_v$ is totally bounded, complete, and therefore compact can be found in [RingTheory.DedekindDomain.AdicValuation](AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean).
 
 ### Local compactness of $K\_v$
 
-- The result that $K\_v$ is locally compact for finite places $v$ is given in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean), specifically [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/69b8e2a386adaed060b99ea98f90b1478e68c5da/AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean#L507).
+- The result that $K\_v$ is locally compact for finite places $v$ is given in [RingTheory.DedekindDomain.AdicValuation](AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean).
 
 ### Local compactness of $\mathbb{A}\_{K, f}$
 
-- The topology of the finite adele ring and other related definitions are found in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteAdeleRing.lean).
+- Some helper results for the finite adele ring are found in [RingTheory.DedekindDomain.FiniteAdeleRing](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteAdeleRing.lean).
 - The definition of the finite $S$-adele ring and the proof that it is locally compact can be found in 
-[AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean), respectively [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/69b8e2a386adaed060b99ea98f90b1478e68c5da/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean#L204) and [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/69b8e2a386adaed060b99ea98f90b1478e68c5da/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean#L220).
-- The proof that the finite adele ring is locally compact can also be found in [AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean), specifically [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/69b8e2a386adaed060b99ea98f90b1478e68c5da/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean#L417).
+[RingTheory.DedekindDomain.FinsetAdeleRing](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FinsetAdeleRing.lean).
+- The proof that the finite adele ring is locally compact can also be found in [RingTheory.DedekindDomain.FinsetAdeleRing](AdeleRingLocallyCompact/RingTheory/DedekindDomain/FinsetAdeleRing.lean).
 
 ### Local compactness of $\mathbb{A}\_{K, \infty}$
 
-- The completion of a number field at the infinite places is formalised in [AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean). The definition is [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/69b8e2a386adaed060b99ea98f90b1478e68c5da/AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean#L86) and the proof it is locally compact is [here](https://github.com/smmercuri/adele-ring_locally-compact/blob/69b8e2a386adaed060b99ea98f90b1478e68c5da/AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean#L161).
-- The definition, topology and local compactness of the infinite adele ring are found in [AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
+- The completion of a number field at the infinite places and its local compactness is formalised in [NumberTheory.NumberField.Completion](AdeleRingLocallyCompact/NumberTheory/NumberField/Completion.lean).
+- The definition and local compactness of the infinite adele ring are found in [NumberTheory.NumberField.InfiniteAdeleRing](AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
 
 ### Local compactness of $\mathbb{A}\_{K}$
 
-- The definition and local compactness of the adele ring are found in [AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
+- The definition and local compactness of the adele ring are found in [NumberTheory.NumberField.AdeleRing](AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
 
 ## Implementation notes
 
 We collect some implementation notes and describe the Lean proof of the local compactness of the finite $S$-adele ring here.
 
-- [AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean](AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean) currently contains some results that have been adapted from prior work (M.I. de Frutos-Fernández, F.A.E. Nuccio, *A Formalization of Complete Discrete Valuation Rings and Local Fields*) into Lean 4. One result remains unproven, which is the finiteness of the residue field of $O_v$. This also appears in (M.I. de Frutos-Fernández, F.A.E. Nuccio, *A Formalization of Complete Discrete Valuation Rings and Local Fields*). Once these results are available in Mathlib these will be updated accordingly.
-- The finite $S$-adele ring is formalised as a subring of $\widehat{K}$, in an analogous way to the formalisation of $\mathbb{A}\_{K, f}$. It is given the subspace topology of $\mathbb{A}\_{K, f}$ by inducing along the open embedding $\mathbb{A}\_{S, K, f} \hookrightarrow \mathbb{A}\_{K, f}$. This is _the same_ as the topology obtained as a subtype of $\widehat{K}$.
+- [FromLocalClassFieldTheory.LocalClassFieldTheory](AdeleRingLocallyCompact/FromLocalClassFieldTheory/LocalClassFieldTheory.lean) currently contains some results that have been adapted from prior work (M.I. de Frutos-Fernández, F.A.E. Nuccio, *A Formalization of Complete Discrete Valuation Rings and Local Fields*) into Lean 4. One result remains unproven in our work is the finiteness of the residue field of $O_v$. This also appears in (M.I. de Frutos-Fernández, F.A.E. Nuccio, *A Formalization of Complete Discrete Valuation Rings and Local Fields*). 
+- The finite $S$-adele ring is formalised as a subtype of $\widehat{K}$, in an analogous way to the formalisation of $\mathbb{A}\_{K, f}$. 
+This gets the subspace topology of $\widehat{K}$.
 - The equivalence and homeomorphism between $\widehat{K}$ and $\widehat{K}\_S$ are given, respectively, by Mathlib's `Equiv.piEquivPiSubtypeProd` and `Homeomorph.piEquivPiSubtypeProd`.
-- The above homeomorphism then descends to a homeomorphism $\mathbb{A}\_{S, K, f}\cong \prod_{v\in S} K\_v \times \prod_{v\notin S} O\_v$, when the right-hand side is seen as a _subtype_ of $\widehat{K}\_S$.
-- There is a homeomorphism between $\prod_{v\in S} K\_v \times \prod_{v\notin S} O\_v$ when viewed as a subtype of $\widehat{K}\_S$ vs. when it is defined as a topological space in its own right (i.e., with product topology). It is easy to show that the latter is locally compact using standard locally compact product results.
+This homeomorphism then descends to a homeomorphism $\mathbb{A}\_{S, K, f}\cong \prod_{v\in S} K\_v \times \prod_{v\notin S} O\_v$, when the right-hand side is seen as a _subtype_ of $\widehat{K}\_S$.
+- There is a homeomorphism between $\prod_{v\in S} K\_v \times \prod_{v\notin S} O\_v$ when viewed as a subtype of $\widehat{K}\_S$ vs. when it is defined as a topological space in its own right (i.e., with product topology). 
+It is easy to show that the latter is locally compact using standard locally compact product results.
 - This chain of homeomorphisms gives the proof of the local compactness of $\mathbb{A}\_{S, K, f}$. 
+- Lean always expects a single instance of a class on a type. 
+A number field, however, has multiple distinct uniform structures coming from infinite places. 
+To handle this ambiguity, we use a dependent type synonym `WithAbs`, which simply renames a semiring and makes it depend on absolute values.
+When `v` is an infinite place on `K`, we can instead view `K` as `WithAbs v.1`.
+This allows the type class inference system to automatically infer any assigned instances that depend on absolute values.
 
 ## TODOs
 - Incorporate the proof that `v.adicCompletionIntegers K` has finite residue field.
