@@ -8,13 +8,13 @@ import Mathlib
 /-!
 # Ideal quotients
 
-Ideal quotient version of `Submodule.mk_out'`.
+Ideal quotient versions of some basic results.
 
 -/
 
 namespace Ideal
 
-theorem Quotient.mk_out' {R : Type*} [CommRing R] {I : Ideal R} {x : R ⧸ I} :
+theorem Quotient.mk_out' {R : Type*} [CommRing R] {I : Ideal R} (x : R ⧸ I) :
     Ideal.Quotient.mk I (Quotient.out' x) = x := by
   rw [← Ideal.Quotient.mk_eq_mk, ← Submodule.Quotient.mk''_eq_mk, Quotient.out_eq']
 

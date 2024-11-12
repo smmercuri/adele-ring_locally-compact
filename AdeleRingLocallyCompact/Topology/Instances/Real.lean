@@ -7,6 +7,8 @@ import Mathlib
 
 /-!
 # Topological properties of ℝ
+
+We show that the only closed subfield of ℝ is ℝ.
 -/
 
 noncomputable section

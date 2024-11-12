@@ -16,7 +16,7 @@ of `K` and the finite adele ring of `K`. We show that the adele ring of `K` is a
 locally compact space.
 
 ## Main definitions
- - `NumberField.adeleRing K` is the adele ring of a number field `K`.
+ - `NumberField.AdeleRing K` is the adele ring of a number field `K`.
  - `NumberField.AdeleRing.principalSubgroup K` is the subgroup of principal adeles `(x)ᵥ`.
 
 ## Main results
@@ -39,7 +39,7 @@ namespace NumberField
 variable (K : Type*) [Field K] [NumberField K]
 
 /-- The adele ring of a number field. -/
-def AdeleRing := InfiniteAdeleRing K × FiniteAdeleRing (RingOfIntegers K) K
+def AdeleRing := InfiniteAdeleRing K × FiniteAdeleRing (𝓞 K) K
 
 namespace AdeleRing
 
@@ -68,7 +68,7 @@ theorem algebraMap_injective : Function.Injective (algebraMap K (AdeleRing K)) :
 
 /-- The adele ring of a number field is a locally compact space. -/
 instance locallyCompactSpace : LocallyCompactSpace (AdeleRing K) := by
-  letI := FiniteAdeleRing.locallyCompactSpace (RingOfIntegers K) K
+  letI := FiniteAdeleRing.locallyCompactSpace (𝓞 K) K
   exact Prod.locallyCompactSpace _ _
 
 /-- The subgroup of principal adeles `(x)ᵥ` where `x ∈ K`. -/

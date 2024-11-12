@@ -49,10 +49,10 @@ else the extended embedding gives an isomorphism `v.completion ≃+* ℂ`.
  - `NumberField.InfinitePlace.Completion.extensionEmbedding_of_isReal` : if the infinite place `v`
   is real, then this extends the embedding `v.embedding_of_isReal : K →+* ℝ` to
   `v.completion →+* ℝ`.
- - `NumberField.InfinitePlace.Completion.equivReal_of_isReal` : the ring isomorphism
+ - `NumberField.InfinitePlace.Completion.ringEquiv_real_of_isReal` : the ring isomorphism
   `v.completion ≃+* ℝ` when `v` is a real infinite place; the forward direction of this is
   `extensionEmbedding_of_isReal`.
- - `NumberField.InfinitePlace.Completion.equivComplex_of_isComplex` : the ring isomorphism
+ - `NumberField.InfinitePlace.Completion.ringEquiv_complex_of_isComplex` : the ring isomorphism
   `v.completion ≃+* ℂ` when `v` is a complex infinite place; the forward direction of this is
   `extensionEmbedding`.
 

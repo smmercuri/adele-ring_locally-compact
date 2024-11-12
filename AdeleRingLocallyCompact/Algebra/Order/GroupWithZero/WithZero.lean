@@ -7,6 +7,9 @@ import Mathlib
 
 /-!
 # Adjoining a zero to a group
+
+This file contains basic inequality results on the unit subgroup of a group with an adjoined
+zero.
 -/
 
 namespace WithZero

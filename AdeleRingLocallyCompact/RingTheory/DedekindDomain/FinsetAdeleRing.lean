@@ -16,7 +16,7 @@ Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions an
 finite set of finite places `v` of `K`. In this file we define the finite S-adele ring, whose
 carrier is the set of all elements in `ProdAdicCompletions R K` which are in the `v`-adic ring
 of integers outside of `S`, as `FinsetAdeleRing R K S` and we show that this is locally compact.
-The finite S-adele ring affords an open embedding into the regular finite adele ring and,
+The finite S-adele ring has an open embedding into the regular finite adele ring and,
 moreover, cover the finite adele ring. This allows us to show that the finite adele ring is also
 locally compact.
 
@@ -28,8 +28,7 @@ locally compact.
    the product of the `v`-adic ring of integers over all `v ∉ S`.
  - `DedekindDomain.FinsetIntegralAdeles.Subtype R K S` is
    `DedekindDomain.FinsetIntegralAdeles R K S` as a subtype of `DedekindDomain.FinsetProd R K S`.
- - `DedekindDomain.FinsetAdeleRing R K S` is the subring of `ProdAdicCompletions R K` of all finite
-   S-adeles.
+ - `DedekindDomain.FinsetAdeleRing R K S` is the type of all finite S-adeles.
 
 ## Main results
  - `DedekindDomain.FinsetAdeleRing.homeomorph_subtype` : the finite S-adele ring is
@@ -38,8 +37,6 @@ locally compact.
    finite adeles is inducing; equivalently, the topology of the finite S-adele ring when viewed as
    a subspace of the finite adele ring is equal to the topology when viewed as a subspace of
    `ProdAdicCompletions R K`.
- - `DedekindDomain.FinsetAdeleRing.algebraMap_openEmbedding` : the map sending finite
-   S-adeles to finite adeles is an open embedding.
  - `DedekindDomain.FinsetAdeleRing.locallyCompactSpace` : the finite S-adele ring is locally
    compact.
  - `DedekindDomain.FiniteAdeleRing.locallyCompactSpace` : the finite adele ring is locally compact.
@@ -144,7 +141,10 @@ def subtype_homeomorph :
     refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
     exact Continuous.snd  ({ isOpen_preimage := fun s a => a })
 
-/-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact. -/
+set_option synthInstance.maxHeartbeats 100000 in
+/-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact.
+Note: instance search is slow because of the same issues for adicCompletionIntegers that we had
+with RingOfIntegers when it was a subring. -/
 instance : LocallyCompactSpace (FinsetIntegralAdeles R K S) := Prod.locallyCompactSpace _ _
 
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` as a subtype is locally compact. -/
@@ -169,7 +169,7 @@ theorem mul {x y : ProdAdicCompletions R K} (hx : IsFinsetAdele S x) (hy : IsFin
   exact mul_le_one' (hx v hv) (hy v hv)
 
 theorem one : IsFinsetAdele S (1 : ProdAdicCompletions R K) :=
-  fun v _ => by rw [mem_adicCompletionIntegers]; exact le_of_eq (Valued.v.map_one')
+  fun v _ => by rw [mem_adicCompletionIntegers]; exact le_of_eq Valued.v.map_one'
 
 theorem add {x y : ProdAdicCompletions R K} (hx : IsFinsetAdele S x) (hy : IsFinsetAdele S y) :
     IsFinsetAdele S (x + y) := by
@@ -407,10 +407,6 @@ theorem algebraMap_inducing : Inducing ι(S) := by
   refine inducing_iff_nhds.2 (fun x => Filter.ext (fun U => ⟨fun hU => ⟨ι(S) '' U,  ?_⟩,
     mem_nhds_comap_algebraMap x⟩))
   exact ⟨algebraMap_image_mem_nhds x hU, by rw [(algebraMap_injective R K S).preimage_image]⟩
-
-/-- The map sending finite S-adeles to finite adeles is open and injective. -/
-theorem algebraMap_openEmbedding : OpenEmbedding ι(S) :=
-  ⟨⟨algebraMap_inducing R K S, algebraMap_injective R K S⟩, isOpen_algebraMap_range R K S⟩
 
 end FinsetAdeleRing
 
