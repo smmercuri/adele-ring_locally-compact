@@ -25,9 +25,11 @@ This product is _not_ locally compact, given the product topology.
 On the other hand, we define the _finite adele ring_ as the _restricted_ direct product 
 
 $$\mathbb{A}\_{K, f} = \prod\_{v\ \text{finite}}(K\_v, \mathcal{O}\_v) := \\{x \in \widehat{K} \mid x\_v \in \mathcal{O}\_v\ \text{for all but finitely many}\ v\\},$$ 
+
 with basis of open sets 
 
 $$\left\\{ \prod\_{v\ \text{finite}} V\_v \mid V\_v \subseteq K\_v\ \text{open and}\ V\_v = \mathcal{O}\_v\ \text{for all but finitely many}\ v\right\\}.$$
+
 We will prove below that $\mathbb{A}\_{K, f}$ _is_ locally compact.
 
 The _infinite adele ring_ is given as the (finite) direct product of the real/complex completions of $K$ at the real/complex places 
@@ -67,9 +69,11 @@ Then any neighbourhood of $x$ contains a compact neighbourhood by intersecting w
 To achieve this we use the finite $S$-adele ring $\mathbb{A}\_{S, K, f}$, where $S$ is some finite set of finite places, defined by 
 
 $$\mathbb{A}\_{S, K, f} := \\{x \in \widehat{K} \mid x\_v \in \mathcal{O}\_v\ \text{for all}\ v \notin S\\}.$$
+
 This clearly belongs to the basis of open sets for $\mathbb{A}_{K, f}$, hence it is open. Moreover, through the map $x\mapsto ((x\_v)\_{v\in S}, (x\_v)\_{v\notin S})$, it is homeomorphic to 
 
 $$\widehat{K}\_S := \prod\_{v \in S} K\_v \times \prod\_{v\notin S} \mathcal{O}\_v,$$
+
 which is locally compact as $\prod\_{v\in S} K\_v$ is a finite product of locally compact spaces and $\prod\_{v\notin S} \mathcal{O}\_v$ is an infinite product of compact spaces.
 Therefore $\mathbb{A}\_{S, K, f}$ is locally compact as well. Finally, the finite $S$-adele rings cover $\mathbb{A}\_{K, f}$ since $x \in \mathbb{A}\_{S(x), K, f}$, where $S(x)$ is the (finitely-many) places $v$ such that $x \notin \mathcal{O}\_v$. 
 
