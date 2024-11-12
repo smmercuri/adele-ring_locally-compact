@@ -1,7 +1,7 @@
 # Local Compactness of the Adele Ring of a Number Field
 
 This repository contains the source code for the paper [_Formalising the local compactness of the adele ring_](https://arxiv.org/pdf/2405.19270v1).
-This code requires Lean 4.7.0 and uses mathlib's version [eaede86](https://github.com/leanprover-community/mathlib4/tree/eaede86aa7777630a3826cd8f3fbf0cbaafa53e6).
+This code requires Lean 4.10.0 and uses mathlib's version [eaede86](https://github.com/leanprover-community/mathlib4/tree/eaede86aa7777630a3826cd8f3fbf0cbaafa53e6).
 
 The adele ring of a number field is a central object in modern number theory and its status as a locally compact topological ring is one of the key reasons why, leading to its widespread use within the Langlands Program. 
 In this repository, we build upon [the work](https://drops.dagstuhl.de/storage/00lipics/lipics-vol237-itp2022/LIPIcs.ITP.2022.14/LIPIcs.ITP.2022.14.pdf) of Maria Inés de Frutos-Fernández who first formalised the adele ring of global fields in Lean, much of which has been subsequently integrated into mathlib.
@@ -46,6 +46,9 @@ The code for various sections of the paper can be found as follows.
 
 This project requires Lean 4 and mathlib. To install Lean follow the instructions [here](https://leanprover-community.github.io/get_started.html).
 
-After installation of Lean 4, this project can be installed by running `git clone https://github.com/smmercuri/adele-ring_locally-compact.git` from a terminal in the location you wish to place this project, and then `cd adele-ring_locally_compact`. This will install all branches and version history of the project. To obtain the version described in the paper and contained within this branch, follow up with the command `git checkout journal`. The project be installed by first running `source ~/.profile` (or `source ~/.bash_profile` depending on the OS) and then running `lake exe cache get`.
+After installation of Lean 4, this project can be installed by running `git clone https://github.com/smmercuri/adele-ring_locally-compact.git` from a terminal in the location you wish to place this project, and then `cd adele-ring_locally_compact`. 
+This will install all branches and version history of the project. 
+To obtain the version described in the paper and contained within this branch, follow up with the command `git checkout journal`. 
+The project be installed by first running `source ~/.profile` (or `source ~/.bash_profile` depending on the OS) and then running `lake exe cache get`.
 
 See [this page](https://leanprover-community.github.io/install/project.html) for further details on setting up Lean projects.

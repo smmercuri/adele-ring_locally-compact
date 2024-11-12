@@ -10,46 +10,51 @@ import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 /-!
 # The completion of a number field at an infinite place
 
-This file defines an indirect approach to the completion of a number field with respect to
-an infinite place. While this suffices for the proof of the local compactness of the adele ring,
-we have identified deficiencies with this approach, detailed in the implementation notes below.
-We keep this approach here for reference.
+This file defines three alternate approaches to the completion of a number field with respect to
+an infinite place.
+There are two classes of differences from the main appraoch in
+[NumberTheory.NumberfField.Completion](AdeleRingLocallyCompact/NumberTheory/NumberField/Completion.lean).
+- Design: the overall formalisation of the completion is definitionally equal to the main approach,
+  but the way we assign various instances differ (`v.completion₀` and `v.completion₁`).
+- Definitional: the formalisation of the completion is not definitionally equal to the main
+  approach, but it is mathematically equivalent (`v.completion₂`).
 
 ## Main definitions
- - `NumberField.InfinitePlace.completion'` is the (indirect) Archimedean completion of a number
+ - `NumberField.InfinitePlace.completion₀` is the completion of a number field at an infinite
+   place, using a dependent constructor `normedField₀` to determine the `UniformSpace` instance.
+ - `NumberField.InfinitePlace.completion₁` is the completion of a number field at an infinite
+   place, using a data-carrying type class `WithAbsReal` to determine the `UniformSpace` instance.
+ - `NumberField.InfinitePlace.completion₂` is the completion of a number
    field as an infinite place, obtained by embedding as a subfield of ℂ and completing
    this subfield.
 
 ## Main results
- - `NumberField.InfinitePlace.Completion.locallyCompactSpace'` : the (indirect) Archimedean
-   completion of a number field is locally compact.
+ - `NumberField.InfinitePlace.Completion.locallyCompactSpace₂` : the completion of a number field
+   at an infinite place using the subfield approach (`v.completion₂`) is locally compact.
 
 ## Implementation notes
- - We have identified two approaches for formalising the completion of a number field `K` at
-   an infinite place `v`. One is to define an appropriate uniform structure on `K` directly,
-   and apply the `UniformSpace.Completion` functor to this. To show that
-   the resultant completion is a field requires one to prove that `K` has a
-   `completableTopField` instance with this uniform space. This approach is the principal
-   approach taken in
-   [Completion.lean](AdeleRingLocallyCompact/NumberTheory/NumberField/Completion.lean),
-   by defining a normed field instance coming from the absolute value associated to an infinite
-   place. In such a scenario, the completable topological field instance from `ℂ` transfers to `K`
-   because the uniform structure of the absolute value is shown to be equivalent to the pullback
-   uniform structure of `ℂ` along the embedding associated to an infinite place. We show that
-   the pullback of a completable topological field is a completable topological field here:
-   [Topology/UniformSpace/Basic.lean](AdeleRingLocallyCompact/Topology/UniformSpace/Basic.lean)
- - The alternative approach (in this file) is to use the embedding associated to an infinite place
-   to embed `K` to a `Subfield ℂ` term, which already has a `CompletableTopField` instance. We
-   complete `K` indirectly by applying the `UniformSpace.Completion` functor to the `Subfield ℂ`
-   term. This is the approach taken in this file. It leads to an isomorphic field completion to
-   the approach described above, since both define abstract completions. However, the API for
+ - The main approach `v.completion` is found in [NumberTheory.NumberField.Completion](AdeleRingLocallyCompact/NumberTheory/NumberField/Completion.lean).
+   This approach uses a dependent type synonym `WithAbs` to assign instances that depend on
+   absolute values.
+ - `v.completion₀` and `v.completion₁` differ from the main approach only in how the
+   `UniformSpace` instance is assigned, so that `UniformSpace.Completion` may be applied.
+   In constrast to the type synonym approach, `v.completion₀` uses a dependent constructor
+   `v.normedField₀` to the `NormedField` instance (from which `UniformSpace` is derived) and
+   `v.completion₁` uses a data-carrying type class `WithAbsReal` to hold the `NormedField`
+   instances. Both of the alternative approaches require us to explicitly signal the
+   `NormedField` instance that we mean within multiple definitions and theorems, whereas the
+   type synonym approach does not.
+ - `v.completion₂` differs from the main approach by using the embedding associated to an infinite
+   place to embed `K` to a `Subfield ℂ` term. We complete `K` indirectly by applying the
+   `UniformSpace.Completion` functor to the `Subfield ℂ` term. It leads to an isomorphic field
+   completion to the main approach, since both define abstract completions. However, the API for
    the alternative approach in this file is deficient, because we lose any `UniformSpace.Completion`
    constructions which transfer properties of the base field `K` to its completion; for example,
    `UniformSpace.Completion.extension` which extends a uniform continuous map on `K` to one on its
    completion. These would have to be re-established.
 
 ## Tags
-number field, embeddings, places, infinite places
+number field, completion, places, infinite places
 -/
 
 noncomputable section
@@ -58,7 +63,7 @@ namespace AbsoluteValue
 
 variable {K : Type*} [Field K] (v : AbsoluteValue K ℝ)
 
-/-! ## Alternative approach using dependent constructors -/
+/-! ## Design alternative: using dependent constructors -/
 
 instance normedField₀ : NormedField K where
   norm := v
@@ -101,7 +106,7 @@ def extensionEmbedding₀ :=
 
 end NumberField.InfinitePlace.Completion
 
-/-! ## Alternative approach using data-carrying type class -/
+/-! ## Design alternative: using a data-carrying type class -/
 
 class WithAbsReal (R : Type*) [Semiring R] where
   v : AbsoluteValue R ℝ
@@ -144,7 +149,7 @@ def extensionEmbedding₁ :=
 
 end NumberField.InfinitePlace.Completion
 
-/-! ## Alternative approach via subfields -/
+/-! ## Definitional alternative: using subfields -/
 
 namespace NumberField.InfinitePlace
 
