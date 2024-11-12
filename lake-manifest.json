@@ -98,7 +98,7 @@
    "rev": "c369436d21c583a60da62d4513c7b9ea08389074",
    "name": "«doc-gen4»",
    "manifestFile": "lake-manifest.json",
-   "inputRev": "c369436d21c583a60da62d4513c7b9ea08389074",
+   "inputRev": "v4.10.0-rc1",
    "inherited": false,
    "configFile": "lakefile.lean"}],
  "name": "«adele-ring_locally-compact»",
