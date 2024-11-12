@@ -20,7 +20,10 @@ Let $v$ be a place of $K$, then we denote by $K\_v$ the completion of $K$ with r
 The place $v$ extends naturally to a place on $K\_v$, which we denote by $|\cdot|\_v$. 
 The integral closure of $O\_K$ inside $K\_v$ is called the ($v$-adic) ring of integers and is denoted $\mathcal{O}\_v$; this corresponds to the ring of all $x \in K\_v$ such that $|x|_v \le 1$. 
 
-The direct product of completions of $K$ at finite places is denoted $$\widehat{K} := \prod\_{v\ \text{finite}} K\_v.$$ 
+The direct product of completions of $K$ at finite places is denoted 
+
+$$\widehat{K} := \prod\_{v\ \text{finite}} K\_v.$$ 
+
 This product is _not_ locally compact, given the product topology. 
 On the other hand, we define the _finite adele ring_ as the _restricted_ direct product 
 
