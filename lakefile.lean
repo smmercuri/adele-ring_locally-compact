@@ -14,4 +14,4 @@ lean_lib «AdeleRingLocallyCompact» {
 }
 
 meta if get_config? env = some "dev" then -- dev is so not everyone has to build it
-require «doc-gen4» from git "https://github.com/leanprover/doc-gen4" @ "4.10.0"
+require «doc-gen4» from git "https://github.com/leanprover/doc-gen4" @ "v4.10.0"
