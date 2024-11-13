@@ -1,9 +1,9 @@
 /-
-Copyright (c) 2024 Salvatore Mercuri, María Inés de Frutos-Fernández, Filippo A. E. Nuccio. All rights reserved.
-Released under Apache 2.0 license as described in the file LICENSE.
+Copyright (c) 2024 Salvatore Mercuri, María Inés de Frutos-Fernández, Filippo A. E. Nuccio.
+All rights reserved. Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri, María Inés de Frutos-Fernández, Filippo A. E. Nuccio
 -/
-import Mathlib
+import Mathlib.RingTheory.DedekindDomain.AdicValuation
 
 /-! Results imported from [LocalClassFieldTheory](https://github.com/mariainesdff/LocalClassFieldTheory/tree/master)
 
