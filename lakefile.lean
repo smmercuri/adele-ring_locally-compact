@@ -6,7 +6,7 @@ package «adele-ring_locally-compact» {
 }
 
 require mathlib from git
-  "https://github.com/leanprover-community/mathlib4.git" @ "caac5b13fb72ba0c5d0b35a0067de108db65e964"
+  "https://github.com/leanprover-community/mathlib4.git" @ "v4.10.0"
 
 @[default_target]
 lean_lib «AdeleRingLocallyCompact» {
@@ -14,4 +14,4 @@ lean_lib «AdeleRingLocallyCompact» {
 }
 
 meta if get_config? env = some "dev" then -- dev is so not everyone has to build it
-require «doc-gen4» from git "https://github.com/leanprover/doc-gen4" @ "4.10.0"
+require «doc-gen4» from git "https://github.com/leanprover/doc-gen4" @ "v4.10.0-rc1"
