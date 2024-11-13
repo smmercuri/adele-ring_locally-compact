@@ -1,11 +1,14 @@
 import AdeleRingLocallyCompact.Algebra.Field.Subfield
+import AdeleRingLocallyCompact.Algebra.Group.WithOne.Defs
 import AdeleRingLocallyCompact.Algebra.Order.GroupWithZero.Canonical
 import AdeleRingLocallyCompact.Algebra.Order.GroupWithZero.WithZero
 import AdeleRingLocallyCompact.Algebra.Ring.Equiv
 import AdeleRingLocallyCompact.Analysis.Normed.Module.Completion
+import AdeleRingLocallyCompact.Analysis.NormedSpace.Completion
 import AdeleRingLocallyCompact.FromLocalClassFieldTheory.LocalClassFieldTheory
 import AdeleRingLocallyCompact.NumberTheory.NumberField.AdeleRing
 import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
+import AdeleRingLocallyCompact.NumberTheory.NumberField.CompletionAlt
 import AdeleRingLocallyCompact.NumberTheory.NumberField.InfiniteAdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.Factorization
