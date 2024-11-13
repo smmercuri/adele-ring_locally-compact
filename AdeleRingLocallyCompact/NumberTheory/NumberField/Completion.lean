@@ -3,9 +3,9 @@ Copyright (c) 2024 Salvatore Mercuri. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
-import Mathlib
+import Mathlib.NumberTheory.NumberField.Embeddings
 import AdeleRingLocallyCompact.Algebra.Field.Subfield
-import AdeleRingLocallyCompact.Analysis.NormedSpace.Completion
+import AdeleRingLocallyCompact.Analysis.Normed.Module.Completion
 import AdeleRingLocallyCompact.Topology.Algebra.UniformRing
 import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 import AdeleRingLocallyCompact.Topology.Instances.Real
@@ -112,7 +112,7 @@ theorem isometry_of_comp (h : ∀ x, ‖f x‖ = v x) : Isometry f :=
 the pseudo metric space associated to the absolute value is the same as the pseudo metric space
 induced by `f`. -/
 theorem pseudoMetricSpace_induced_of_comp (h : ∀ x, ‖f x‖ = v x) :
-     PseudoMetricSpace.induced f inferInstance = (normedField v).toPseudoMetricSpace := by
+    PseudoMetricSpace.induced f inferInstance = (normedField v).toPseudoMetricSpace := by
   ext; exact isometry_of_comp h |>.dist_eq _ _
 
 /-- If the absolute value `v` factors through an embedding `f` into a normed field, then

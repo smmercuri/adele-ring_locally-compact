@@ -3,7 +3,7 @@ Copyright (c) 2024 Salvatore Mercuri, María Inés de Frutos-Fernández. All rig
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri, María Inés de Frutos-Fernández
 -/
-import Mathlib
+import Mathlib.RingTheory.DedekindDomain.FiniteAdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.Factorization
 
@@ -48,12 +48,6 @@ variable (R : Type*) [CommRing R] [IsDomain R] [IsDedekindDomain R] (K : Type*)
   [Field K] [Algebra R K] [IsFractionRing R K]
 
 namespace ProdAdicCompletions
-
-def globalEmbedding : K →+* ProdAdicCompletions R K :=
-  algebraMap K (ProdAdicCompletions R K)
-
-@[simp]
-theorem globalEmbedding_apply (x : K) : globalEmbedding R K x v = x := rfl
 
 variable {R}
 
