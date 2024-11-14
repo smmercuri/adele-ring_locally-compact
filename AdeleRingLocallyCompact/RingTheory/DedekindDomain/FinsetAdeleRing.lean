@@ -226,7 +226,7 @@ theorem ext {x y : FinsetAdeleRing R K S} (h : x.val = y.val) : x = y :=
 /-- The finite S-adele ring is homeomorphic to `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
 def homeomorph_subtype :
     FinsetAdeleRing R K S ≃ₜ FinsetIntegralAdeles.Subtype R K S :=
-  Homeomorph.subtype (Homeomorph.piEquivPiSubtypeProd _ _) <| fun _ =>
+  (Homeomorph.piEquivPiSubtypeProd _ _).subtype <| fun _ =>
     ⟨fun hx v => hx v.1 v.2, fun hx v hv => hx ⟨v, hv⟩⟩
 
 /-- The finite S-adele ring is locally compact. -/
