@@ -127,18 +127,8 @@ def subtype_equiv :
 def subtype_homeomorph :
     Subtype R K S ≃ₜ FinsetIntegralAdeles R K S where
   toEquiv := subtype_equiv R K S
-  continuous_toFun := by
-    refine Continuous.prod_mk (Continuous.fst (Continuous.subtype_val
-      ({ isOpen_preimage := fun s a => a }) )) ?_
-    refine continuous_pi (fun v => Continuous.subtype_mk ?_ _)
-    refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
-    exact (Continuous.snd (Continuous.subtype_val ({ isOpen_preimage := fun s a => a }) ))
-  continuous_invFun := by
-    refine Continuous.subtype_mk (Continuous.prod_mk
-      (Continuous.fst { isOpen_preimage := fun s a => a }) ?_) _
-    refine continuous_pi (fun v => Continuous.subtype_val ?_)
-    refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
-    exact Continuous.snd  ({ isOpen_preimage := fun s a => a })
+  continuous_toFun := Continuous.prod_mk (by fun_prop) (by fun_prop)
+  continuous_invFun := Continuous.subtype_mk (by fun_prop) _
 
 set_option synthInstance.maxHeartbeats 100000 in
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact.
@@ -226,7 +216,7 @@ theorem ext {x y : FinsetAdeleRing R K S} (h : x.val = y.val) : x = y :=
 /-- The finite S-adele ring is homeomorphic to `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
 def homeomorph_subtype :
     FinsetAdeleRing R K S ≃ₜ FinsetIntegralAdeles.Subtype R K S :=
-  Homeomorph.subtype (Homeomorph.piEquivPiSubtypeProd _ _) <| fun _ =>
+  (Homeomorph.piEquivPiSubtypeProd _ _).subtype <| fun _ =>
     ⟨fun hx v => hx v.1 v.2, fun hx v hv => hx ⟨v, hv⟩⟩
 
 /-- The finite S-adele ring is locally compact. -/
