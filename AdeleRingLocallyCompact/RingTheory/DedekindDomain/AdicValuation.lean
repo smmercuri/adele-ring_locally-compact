@@ -251,7 +251,7 @@ theorem totallyBounded : TotallyBounded (v.adicCompletionIntegers K).carrier :=
   (hasBasis_uniformity K v).totallyBounded_iff.2 <| fun _ hγ =>
     finite_subcover_of_uniformity_basis K v hγ
 
-instance : CompleteSpace (v.adicCompletionIntegers K) :=
+instance completeSpace : CompleteSpace (v.adicCompletionIntegers K) :=
   IsClosed.completeSpace_coe (isClosed K v)
 
 /-- The `v`-adic integers is compact. -/

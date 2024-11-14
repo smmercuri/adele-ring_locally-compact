@@ -3,7 +3,6 @@ Copyright (c) 2024 Salvatore Mercuri. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
-import Mathlib
 import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
 import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 
@@ -13,7 +12,8 @@ import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 This file defines three alternate approaches to the completion of a number field with respect to
 an infinite place.
 There are two classes of differences from the main appraoch in
-[NumberTheory.NumberfField.Completion](AdeleRingLocallyCompact/NumberTheory/NumberField/Completion.lean).
+[NumberTheory.NumberfField.Completion](
+AdeleRingLocallyCompact/NumberTheory/NumberField/Completion.lean).
 - Design: the overall formalisation of the completion is definitionally equal to the main approach,
   but the way we assign various instances differ (`v.completion₀` and `v.completion₁`).
 - Definitional: the formalisation of the completion is not definitionally equal to the main
