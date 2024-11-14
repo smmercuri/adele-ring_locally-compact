@@ -127,18 +127,8 @@ def subtype_equiv :
 def subtype_homeomorph :
     Subtype R K S ≃ₜ FinsetIntegralAdeles R K S where
   toEquiv := subtype_equiv R K S
-  continuous_toFun := by
-    refine Continuous.prod_mk (Continuous.fst (Continuous.subtype_val
-      ({ isOpen_preimage := fun s a => a }) )) ?_
-    refine continuous_pi (fun v => Continuous.subtype_mk ?_ _)
-    refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
-    exact (Continuous.snd (Continuous.subtype_val ({ isOpen_preimage := fun s a => a }) ))
-  continuous_invFun := by
-    refine Continuous.subtype_mk (Continuous.prod_mk
-      (Continuous.fst { isOpen_preimage := fun s a => a }) ?_) _
-    refine continuous_pi (fun v => Continuous.subtype_val ?_)
-    refine Continuous.comp (ContinuousMap.eval v).continuous_toFun ?_
-    exact Continuous.snd  ({ isOpen_preimage := fun s a => a })
+  continuous_toFun := Continuous.prod_mk (by fun_prop) (by fun_prop)
+  continuous_invFun := Continuous.subtype_mk (by fun_prop) _
 
 set_option synthInstance.maxHeartbeats 100000 in
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact.
