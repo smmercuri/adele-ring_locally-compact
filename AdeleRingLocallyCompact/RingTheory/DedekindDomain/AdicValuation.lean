@@ -251,7 +251,7 @@ theorem totallyBounded : TotallyBounded (v.adicCompletionIntegers K).carrier :=
   (hasBasis_uniformity K v).totallyBounded_iff.2 <| fun _ hγ =>
     finite_subcover_of_uniformity_basis K v hγ
 
-instance : CompleteSpace (v.adicCompletionIntegers K) :=
+instance completeSpace : CompleteSpace (v.adicCompletionIntegers K) :=
   IsClosed.completeSpace_coe (isClosed K v)
 
 /-- The `v`-adic integers is compact. -/
@@ -273,14 +273,14 @@ variable (v)
 /-- Any open ball centred at zero in the `v`-adic completion of `K` is compact. -/
 theorem isCompact_nhds_zero {γ : ℤₘ₀ˣ} (hγ : γ ≤ 1) :
     IsCompact { y : v.adicCompletion K | Valued.v y < γ } :=
-  IsCompact.of_isClosed_subset (isCompact K v) (isClosed_nhds_zero K v γ)
+  (isCompact K v).of_isClosed_subset (isClosed_nhds_zero K v γ)
       <| fun _ hx => le_of_lt (lt_of_lt_of_le (Set.mem_setOf.1 hx) hγ)
 
 set_option synthInstance.maxHeartbeats 80000 in
 /-- The `v`-adic completion of `K` is locally compact.
 Note: slow search for `TopologicalAddGroup` instance of `v.adicCompletion K`. -/
 instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletion K) :=
-  IsCompact.locallyCompactSpace_of_mem_nhds_of_addGroup (isCompact_nhds_zero K v le_rfl)
+  (isCompact_nhds_zero K v le_rfl).locallyCompactSpace_of_mem_nhds_of_addGroup
     <| (hasBasis_nhds_zero K v).mem_of_mem le_rfl
 
 
