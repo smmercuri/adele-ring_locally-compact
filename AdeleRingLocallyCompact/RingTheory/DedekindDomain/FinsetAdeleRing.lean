@@ -109,7 +109,7 @@ instance : TopologicalSpace (FinsetIntegralAdeles R K S) :=
   instTopologicalSpaceProd
 
 instance topologicalSpaceSubtype : TopologicalSpace (Subtype R K S) :=
- instTopologicalSpaceSubtype
+  instTopologicalSpaceSubtype
 
 instance : CommRing (FinsetIntegralAdeles R K S) := Prod.instCommRing
 
@@ -302,7 +302,7 @@ def ofFiniteAdele_mem_range {x : FiniteAdeleRing R K} (hx : x ∈ Set.range ι(S
 
 theorem algebraMap_range_mem_nhds (x : FinsetAdeleRing R K S) :
     Set.range ι(S) ∈ nhds (ι(S) x) := by
-  simp only [Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds _ _), true_and]
+  simp only [(RingSubgroupsBasis.hasBasis_nhds _ _).mem_iff, true_and]
   choose a b _ using FiniteAdeleRing.mul_nonZeroDivisor_mem_finiteIntegralAdeles (ι(S) x)
   refine ⟨a, fun y hy => ?_⟩
   rw [algebraMap_range]
@@ -344,8 +344,8 @@ open Set Submodule in
 theorem algebraMap_image_mem_nhds (x : FinsetAdeleRing R K S)
     {U : Set (FinsetAdeleRing R K S)} (h : U ∈ nhds x) :
     ι(S) '' U ∈ nhds (ι(S) x) := by
-  simp only [Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds _ _), true_and,
-    coe_toAddSubgroup, Subtype.exists, exists_prop]
+  simp only [(RingSubgroupsBasis.hasBasis_nhds _ _).mem_iff, true_and, coe_toAddSubgroup,
+    Subtype.exists, exists_prop]
   obtain ⟨V, I, hV, hVU⟩ := nhds_iff.1 h
   choose γ hγ using fun v => Valued.mem_nhds.1 <| hV v
   choose y hy using exists_not_mem_of_finite_nhds I (fun v => (γ v)⁻¹) (ι(S) x)
@@ -377,7 +377,7 @@ theorem mem_nhds_comap_algebraMap (x : FinsetAdeleRing R K S)
     {U : Set (FinsetAdeleRing R K S)} (h : U ∈ Filter.comap ι(S) (nhds (ι(S) x))) :
     U ∈ nhds x := by
   simp only [nhds_iff, Valued.mem_nhds]
-  simp only [Filter.mem_comap, Filter.HasBasis.mem_iff (RingSubgroupsBasis.hasBasis_nhds _ _)] at h
+  simp only [Filter.mem_comap, (RingSubgroupsBasis.hasBasis_nhds _ _).mem_iff] at h
   obtain ⟨t, ⟨r, _, hrt⟩, htU⟩ := h
   use fun (v : HeightOneSpectrum R) =>
     { y | Valued.v (y - ι(S) x v) < Valued.v (algebraMap _ (v.adicCompletion K) r.val) }
