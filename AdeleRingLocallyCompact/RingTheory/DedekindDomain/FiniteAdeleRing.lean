@@ -44,53 +44,12 @@ open scoped Classical
 
 namespace DedekindDomain
 
-variable (R : Type*) [CommRing R] [IsDomain R] [IsDedekindDomain R] (K : Type*)
+variable {R : Type*} [CommRing R] [IsDomain R] [IsDedekindDomain R] {K : Type*}
   [Field K] [Algebra R K] [IsFractionRing R K]
-
-namespace ProdAdicCompletions
-
-variable {R}
-
-/-- Sends a local element to the product of all `adicCompletions` filled with `1`s elsewhere. -/
-def localInclusion (v : HeightOneSpectrum R) :
-    v.adicCompletion K → ProdAdicCompletions R K :=
-  fun x =>
-    (fun w =>
-      if hw : w = v then
-        congrArg (fun v => v.adicCompletion K) hw ▸ x else
-        (1 : w.adicCompletion K)
-    )
-
-variable {K}
-
-/-- The local inclusion of any element is a finite adele. -/
-theorem localInclusion_isFiniteAdele (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-    (localInclusion K v x).IsFiniteAdele := by
-  rw [ProdAdicCompletions.IsFiniteAdele, Filter.eventually_cofinite]
-  refine Set.Finite.subset (Set.finite_singleton v) (fun w hw => ?_)
-  simp only [localInclusion, Set.mem_setOf_eq, Set.mem_singleton_iff] at hw ⊢
-  contrapose! hw
-  simp only [hw, ↓reduceDIte]
-  exact (w.adicCompletionIntegers K).one_mem'
-
-/-- The `v`th place of the local inclusion is the original element. -/
-@[simp]
-theorem localInclusion_apply (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-    localInclusion K v x v = x := by
-  simp only [localInclusion, dif_pos]
-
-@[simp]
-theorem localInclusion_apply' {v w : HeightOneSpectrum R} (x : v.adicCompletion K) (h : w ≠ v) :
-    localInclusion K v x w = 1 := by
-  simp only [localInclusion, h, ↓reduceDIte]
-
-end ProdAdicCompletions
 
 namespace FiniteAdeleRing
 
 local notation "ℤₘ₀" => WithZero (Multiplicative ℤ)
-
-variable {R}
 
 @[simp]
 theorem smul_apply (x : FiniteIntegralAdeles R K) (y : FiniteAdeleRing R K) :
@@ -107,24 +66,6 @@ theorem sub_apply (x : FiniteAdeleRing R K) (y : FiniteAdeleRing R K) :
 @[simp]
 theorem mul_integer_apply (x : FiniteAdeleRing R K) (r : R) :
     (x * algebraMap _ _ r) v = x v * algebraMap _ _ r := rfl
-
-/-- Sends a local element to a finite adele filled with `1`s elsewhere. -/
-def localInclusion (v : HeightOneSpectrum R) : v.adicCompletion K → FiniteAdeleRing R K :=
-  fun x => ⟨ProdAdicCompletions.localInclusion K v x,
-          ProdAdicCompletions.localInclusion_isFiniteAdele v x⟩
-
-variable {K}
-
-/-- The `v`th place of the local inclusion is the original element. -/
-@[simp]
-theorem localInclusion_apply (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-    (localInclusion K v x).val v = x := by
-  simp only [localInclusion, ProdAdicCompletions.localInclusion_apply]
-
-@[simp]
-theorem localInclusion_apply' (v w : HeightOneSpectrum R) (x : v.adicCompletion K) (h : w ≠ v) :
-    (localInclusion K v x).val w = 1 := by
-  simp only [localInclusion, ProdAdicCompletions.localInclusion_apply' _ h]
 
 def support (x : FiniteAdeleRing R K) := (Filter.eventually_cofinite.1 x.2).toFinset
 
