@@ -300,23 +300,7 @@ def ofFiniteAdele_mem_range {x : FiniteAdeleRing R K} (hx : x ∈ Set.range ι(S
     FinsetAdeleRing R K S :=
   ⟨x, isFinsetAdele_mem_range hx⟩
 
-theorem algebraMap_range_mem_nhds (x : FinsetAdeleRing R K S) :
-    Set.range ι(S) ∈ nhds (ι(S) x) := by
-  simp only [(RingSubgroupsBasis.hasBasis_nhds _ _).mem_iff, true_and]
-  choose a b _ using FiniteAdeleRing.mul_nonZeroDivisor_mem_finiteIntegralAdeles (ι(S) x)
-  refine ⟨a, fun y hy => ?_⟩
-  rw [algebraMap_range]
-  intro v hv
-  rw [Set.mem_setOf_eq, Submodule.mem_toAddSubgroup, Submodule.mem_span_singleton] at hy
-  obtain ⟨c, hc⟩ := hy
-  rw [← add_eq_of_eq_sub hc]
-  exact add_mem (mul_mem (SetLike.coe_mem _) (v.coe_mem_adicCompletionIntegers _)) (x.2 v hv)
-
 variable (R K S)
-
-/-- The finite S-adele ring is open in the finite adele ring. -/
-theorem isOpen_algebraMap_range : IsOpen (Set.range ι(S)) :=
-  isOpen_iff_mem_nhds.2 <| fun _ hx => algebraMap_range_mem_nhds <| ofFiniteAdele_mem_range hx
 
 /-- `Subtype.val` of the finite S-adele ring factors through the embedding into the
 finite adele ring. -/
@@ -381,7 +365,7 @@ theorem mem_nhds_comap_algebraMap (x : FinsetAdeleRing R K S)
   obtain ⟨t, ⟨r, _, hrt⟩, htU⟩ := h
   use fun (v : HeightOneSpectrum R) =>
     { y | Valued.v (y - ι(S) x v) < Valued.v (algebraMap _ (v.adicCompletion K) r.val) }
-  let I := S ∪ Ideal.factorsFinset_of_nonZeroDivisor r
+  let I := S ∪ Ideal.factors_finset_of_nonZeroDivisor r
   let γr (v : HeightOneSpectrum R) := (isUnit_iff_ne_zero.2 (v.algebraMap_valuation_ne_zero K r))
   refine ⟨I, ⟨fun v => ⟨(γr v).unit, subset_rfl⟩, subset_trans (fun y hy => hrt ?_) htU⟩⟩
   rw [mem_setOf_eq, mem_toAddSubgroup, mem_span_singleton]
@@ -404,6 +388,14 @@ namespace FiniteAdeleRing
 open FinsetAdeleRing
 
 local notation "ι(" S ")" => algebraMap (FinsetAdeleRing R K S) (FiniteAdeleRing R K)
+
+variable {R K S}
+
+theorem algebraMap_range_mem_nhds (x : FinsetAdeleRing R K S) :
+    Set.range ι(S) ∈ nhds (ι(S) x) :=
+  Set.image_univ ▸ algebraMap_image_mem_nhds x (Filter.univ_mem)
+
+variable (R K S)
 
 /-- The finite adele ring is locally compact. -/
 theorem locallyCompactSpace : LocallyCompactSpace (FiniteAdeleRing R K) := by

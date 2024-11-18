@@ -31,7 +31,7 @@ theorem finite_factors_of_nonZeroDivisor (r : nonZeroDivisors R) :
 abbrev factorsFinset {I : Ideal R} (h : I ≠ 0) :=
     (Ideal.finite_factors h).toFinset
 
-abbrev factorsFinset_of_nonZeroDivisor (r : nonZeroDivisors R) :=
+abbrev factors_finset_of_nonZeroDivisor (r : nonZeroDivisors R) :=
     (Ideal.finite_factors_of_nonZeroDivisor r).toFinset
 
 end Ideal
