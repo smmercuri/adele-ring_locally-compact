@@ -381,7 +381,7 @@ theorem mem_nhds_comap_algebraMap (x : FinsetAdeleRing R K S)
   obtain ⟨t, ⟨r, _, hrt⟩, htU⟩ := h
   use fun (v : HeightOneSpectrum R) =>
     { y | Valued.v (y - ι(S) x v) < Valued.v (algebraMap _ (v.adicCompletion K) r.val) }
-  let I := S ∪ Ideal.factorsFinset_of_nonZeroDivisor r
+  let I := S ∪ Ideal.factors_finset_of_nonZeroDivisor r
   let γr (v : HeightOneSpectrum R) := (isUnit_iff_ne_zero.2 (v.algebraMap_valuation_ne_zero K r))
   refine ⟨I, ⟨fun v => ⟨(γr v).unit, subset_rfl⟩, subset_trans (fun y hy => hrt ?_) htU⟩⟩
   rw [mem_setOf_eq, mem_toAddSubgroup, mem_span_singleton]
