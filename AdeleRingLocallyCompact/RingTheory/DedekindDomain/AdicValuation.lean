@@ -3,6 +3,7 @@ Copyright (c) 2024 Salvatore Mercuri. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
+import Mathlib
 import AdeleRingLocallyCompact.Algebra.Order.GroupWithZero.WithZero
 import AdeleRingLocallyCompact.RingTheory.Ideal.Quotient
 import AdeleRingLocallyCompact.FromLocalClassFieldTheory.LocalClassFieldTheory
@@ -56,6 +57,15 @@ theorem algebraMap_valuation_ne_zero (v : HeightOneSpectrum R) (r : nonZeroDivis
     Valued.v (algebraMap _ (v.adicCompletion K) r.val) ≠ 0 := by
   rw [v.valuedAdicCompletion_eq_valuation, ne_eq, map_eq_zero, IsFractionRing.to_map_eq_zero_iff]
   exact nonZeroDivisors.coe_ne_zero _
+
+def IsIntUniformizer (v : HeightOneSpectrum R) (π : R) : Prop :=
+  v.intValuationDef π = Multiplicative.ofAdd (-1 : ℤ)
+
+theorem isIntUniformizer_ne_zero (v : HeightOneSpectrum R) {π : R}
+    (hπ : v.IsIntUniformizer π) : π ≠ 0 := by
+  contrapose! hπ
+  rw [hπ, IsIntUniformizer, intValuationDef_zero]
+  exact WithZero.zero_ne_coe
 
 local notation "μ" => @WithZero.unitsWithZeroEquiv (Multiplicative ℤ)
 local notation "ℤₘ₀" => WithZero (Multiplicative ℤ)
@@ -120,6 +130,30 @@ theorem exists_not_mem_of_nhds (γ : ℤₘ₀ˣ) (y : v.adicCompletion K) :
     Valued.valuedCompletion_apply, v.adicValued_apply, hπ, gt_iff_lt, ← coe_zpow, coe_lt_coe,
     ← Multiplicative.toAdd_lt, ofAdd_neg, inv_zpow', neg_sub, sub_neg_eq_add, toAdd_zpow,
     toAdd_ofAdd, smul_eq_mul, mul_one, lt_add_iff_pos_left, zero_lt_one]
+
+variable (K)
+
+open WithZero Multiplicative Ideal in
+theorem nonZeroDivisor_mem_nhds_zero (v : HeightOneSpectrum R) (γ : ℤₘ₀ˣ) :
+    ∃ (r : nonZeroDivisors R), Valued.v (algebraMap _ (v.adicCompletion K) r.1) < γ := by
+  let ⟨π, hπ⟩ := v.intValuation_exists_uniformizer
+  by_cases hγ : γ.val ≤ 1
+  · use ⟨π ^ (- toAdd (μ γ) + 1).toNat,
+      mem_nonZeroDivisors_of_ne_zero (pow_ne_zero _ <| v.isIntUniformizer_ne_zero hπ)⟩
+    simp only [v.valuedAdicCompletion_eq_valuation]
+    simp only [map_pow, v.valuation_eq_intValuationDef, hπ, ← WithZero.coe_pow, ← ofAdd_nsmul,
+      smul_neg, nsmul_eq_mul, mul_one, WithZero.unitsWithZeroEquiv_units_val, WithZero.coe_lt_coe,
+      Int.toNat_of_nonneg (units_toAdd_neg_add_one hγ), neg_add_rev, neg_neg, ofAdd_add]
+    rw [ofAdd_neg, ofAdd_toAdd, mul_lt_iff_lt_one_right', Left.inv_lt_one_iff, ← ofAdd_zero,
+      ofAdd_lt]
+    exact zero_lt_one
+  · use ⟨π, mem_nonZeroDivisors_of_ne_zero (v.isIntUniformizer_ne_zero hπ)⟩
+    apply lt_trans _ (lt_of_not_le hγ)
+    rw [v.valuedAdicCompletion_eq_valuation, v.valuation_eq_intValuationDef, hπ,
+      ← coe_one, coe_lt_coe, ← ofAdd_zero, ofAdd_lt]
+    exact neg_one_lt_zero
+
+variable {K}
 
 /-- If `x ∈ Kᵥ` has valuation at most that of `y ∈ Kᵥ`, then `x` is an integral
 multiple of `y`. -/

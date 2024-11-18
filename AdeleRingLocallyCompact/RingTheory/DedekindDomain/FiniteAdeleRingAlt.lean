@@ -14,20 +14,26 @@ set_option linter.longLine false
 
 Let `R` be a Dedekind domain of Krull dimension 1, `K` its field of fractions. The finite adele
 ring of `K` is defined as a topological ring in `Mathlib.RingTheory.DedekindDomain.FiniteAdeleRing`.
-In this file we supplement the theory by defining some local and global maps, and helper results
-for working with the topological space of the the finite adele ring.
+The finite integral adeles is the product of the `v`-adic ring of integers as `v` ranges over the
+primes of `R`, defined in `Mathlib.RingTheory.DedekindDomain.FiniteIntegralAdeles`.
 
-## Main definitions
- - `DedekindDomain.FiniteAdeleRing.localInclusion v` is the map sending an element `x` of the
-   `v`-adic completion of `K` to the finite adele which has `x` in its `v`th place and `1`s
-   everywhere else.
+This file contains a simplified proof that the finite adele ring is locally compact. This
+uses the fact that the finite adele ring is a topological ring, so we need only show that
+`0` has a compact neighbourhood. It suffices then to take `S = ∅` in the proof that uses
+`FinsetAdeleRing R K S` in `FinsetAdeleRing.lean`. In this case, `FinsetAdeleRing R K ∅` is
+simply the already defined `FiniteIntegralAdeles R K`. This is compact because we showed that
+each of the ring of integers is compact. Moreover, it is a neighbourhood of zero because
+the two topologies of the integral adeles when viewed as subspaces of `ProdAdicCompletions R K`
+and of the finite adele ring are the same.
 
 ## Main results
- - `DedekindDomain.FiniteAdeleRing.dvd_of_valued_lt` : a finite adele is an `∏ v, Oᵥ` multiple of
-   an integer `r` if the valuation of `x v` is less than the valuation of `r` for every `v`
-   dividing `r`.
- - `DedekindDomain.FiniteAdeleRing.exists_not_mem_of_finite_nhds` : there exists a finite adele
-   whose valuation is outside a finite collection of open balls.
+ - `DedekindDomain.FiniteIntegralAdeles.algebraMap_inducing` : the map sending integral adeles to
+   finite adeles is inducing; equivalently, the topology of the integral adeles when viewed as
+   a subspace of the finite adele ring is equal to the topology when viewed as a subspace of
+   `ProdAdicCompletions R K`.
+ - `DedekindDomain.FiniteIntegralAdeles.compactSpace` : the integral adeles are locally
+   compact.
+ - `DedekindDomain.FiniteAdeleRing.locallyCompactSpace` : the finite adele ring is locally compact.
 
 ## References
  * [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
@@ -84,10 +90,13 @@ variable {R}
 
 local notation "ℤₘ₀" => WithZero (Multiplicative ℤ)
 
+/-- Given a finite set of primes `v` and an open ball in each, we can find a global integer that
+lies in each of the balls.
+-/
 theorem nonZeroDivisor_mem_finite_nhds_zero
     (S : Set (HeightOneSpectrum R))
     (hS : Set.Finite S)
-    (γ : (v : HeightOneSpectrum R) → (WithZero (Multiplicative ℤ))ˣ) :
+    (γ : (v : HeightOneSpectrum R) → ℤₘ₀ˣ) :
     ∃ (r : nonZeroDivisors R), ∀ v ∈ S, Valued.v (algebraMap _ (v.adicCompletion K) r.1) < γ v := by
   choose s hs using fun v => AdicCompletion.nonZeroDivisor_mem_nhds_zero K v (γ v)
   refine ⟨hS.toFinset.prod s, fun v hv => ?_⟩
@@ -99,6 +108,7 @@ theorem nonZeroDivisor_mem_finite_nhds_zero
 
 variable (R)
 
+/-- The embedding of the integral adeles into the finite adele ring preserves neighbourhoods. -/
 theorem algebraMap_image_mem_nhds
     {U : Set (FiniteIntegralAdeles R K)} (h : U ∈ nhds 0) :
     ι '' U ∈ nhds 0 := by
@@ -122,6 +132,8 @@ theorem algebraMap_image_mem_nhds
   exact hr v hv
 
 open FiniteAdeleRing Ideal in
+/-- The pullback of a neighbourhood in the finite adele ring is a neighbourhood in the
+integral adeles. -/
 theorem mem_nhds_comap_algebraMap
     {U : Set (FiniteIntegralAdeles R K)} (h : U ∈ Filter.comap ι (nhds 0)) :
     U ∈ nhds 0 := by
@@ -142,26 +154,21 @@ theorem mem_nhds_comap_algebraMap
     exact dvd_of_valued_lt (fun _ hv => (Set.Finite.mem_toFinset _).2 hv) hy (fun v _ => (y v).2)
 
 open TopologicalRing in
+/-- The topologies of the integral adeles when viewed as a subspace of
+`ProdAdicCompletions R K` and as a subspace of the finite adele ring coincide. -/
 theorem algebraMap_inducing : Inducing ι := by
   rw [inducing_iff_nhds_zero]
   refine Filter.ext (fun U => ⟨fun hU => ?_, mem_nhds_comap_algebraMap R K⟩)
   exact ⟨ι '' U, algebraMap_image_mem_nhds R K hU,
     by rw [(algebraMap_injective R K).preimage_image]⟩
 
+/-- The integral adeles are compact. -/
 theorem compactSpace : CompactSpace (FiniteIntegralAdeles R K) :=
   Pi.compactSpace
 
 theorem isCompact : IsCompact (Set.range ι) := by
   rw [← Set.image_univ, ← (algebraMap_inducing R K).isCompact_iff]
   exact (compactSpace R K).isCompact_univ
-
-theorem algebraMap_range_eq_span_one : Set.range ι = Submodule.span (FiniteIntegralAdeles R K)
-    {(algebraMap _ (FiniteAdeleRing R K) (1 : nonZeroDivisors R).1)} := by
-  simp only [OneMemClass.coe_one, map_one, Set.image_univ]
-  ext x
-  simp only [SetLike.mem_coe, Submodule.mem_span_singleton]
-  refine ⟨fun ⟨a, h⟩ => ⟨a, by rwa [← Algebra.algebraMap_eq_smul_one]⟩, fun ⟨a, h⟩ => ⟨a, ?_⟩⟩
-  rwa [Algebra.algebraMap_eq_smul_one]
 
 end FiniteIntegralAdeles
 
@@ -171,11 +178,14 @@ open FiniteIntegralAdeles
 
 local notation "ι" => algebraMap (FiniteIntegralAdeles R K) (FiniteAdeleRing R K)
 
+/-- The image of the embedding from the finite integral adeles to the finite adele ring is
+a neighbourhood of zero. -/
+theorem algebraMap_range_mem_nhds' : Set.range ι ∈ nhds 0 :=
+  Set.image_univ ▸ algebraMap_image_mem_nhds R K (Filter.univ_mem)
+
 /-- The finite adele ring is locally compact. -/
-theorem locallyCompactSpace : LocallyCompactSpace (FiniteAdeleRing R K) := by
-  have : Set.range ι ∈ nhds 0 := by
-    rw [algebraMap_range_eq_span_one R K]
-    exact (submodulesRingBasis R K).toRing_subgroups_basis.hasBasis_nhds_zero.mem_of_mem trivial
-  exact IsCompact.locallyCompactSpace_of_mem_nhds_of_addGroup (isCompact R K) this
+theorem locallyCompactSpace' : LocallyCompactSpace (FiniteAdeleRing R K) :=
+  IsCompact.locallyCompactSpace_of_mem_nhds_of_addGroup (isCompact R K)
+    (algebraMap_range_mem_nhds' R K)
 
 end DedekindDomain.FiniteAdeleRing
