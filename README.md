@@ -23,24 +23,27 @@ The latest documentation for Lean and its various libraries can be found [here](
 
 The code for various sections of the paper can be found as follows.
 
-### Section 2
-- Section 2.3: The result that the pullback under a field embedding of a completable topological field is a completable topological field is in [UniformSpace/Basic.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/Topology/UniformSpace/Basic.lean).
-
 ### Section 3
-- Section 3.1.2: The completion of a number field at an infinite place is in [Embeddings.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean).
-- Section 3.1.3: The formalisation of the infinite adele ring is in [InfiniteAdeleRing.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
-- Section 3.2.2: Topological results for the finite adele ring are in [FiniteAdeleRing.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteAdeleRing.lean).
-- Section 3.3: The formalisation of the adele ring is in [AdeleRing.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
+- Section 3.1, 3.2: The type synonym `WithAbs` and the completion of a field with respect to an absolute value is in [`NumberTheory.NumberField.Completion`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/Completion.lean)
+- Section 3.3: The result that the pullback under a field embedding of a completable topological field is a completable topological field is in [UniformSpace/Basic.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/Topology/UniformSpace/Basic.lean).
 
 ### Section 4
-- Section 4.1: The proof that each Archimedean completion of a number field is locally compact is in [Embeddings.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/Embeddings.lean) and that the infinite adele ring is locally compact is in [InfiniteAdeleRing.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
-- Section 4.2.1: Compactness results for non-Archimedean completions of a number field are found in [AdicValuation.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean). 
-- Section 4.2.2: The proof that the finite $S$-adele ring is locally compact is in [FiniteSAdeleRing.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean).
-- Section 4.2.3: The proof that the finite adele ring is locally compact is in [FiniteSAdeleRing.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteSAdeleRing.lean).
-- Section 4.3: The proof that the adele ring is locally compact is in [AdeleRing.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
+- Section 4.1.2: The completion of a number field at an infinite place is in [`NumberTheory.NumberField.Completion`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/Completion.lean).
+- Section 4.1.3: The formalisation of the infinite adele ring is in [`NumberTheory.NumberField.InfiniteAdeleRing`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
+- Section 4.3: The formalisation of the adele ring is in [`NumberTheory.NumberField.AdeleRing`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
 
 ### Section 5
-- Section 5: The alternative approach for formalising the completion of a number field at an infinite place is in [EmbeddingsAlt.lean](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/EmbeddingsAlt.lean).
+- Section 5.1: The proof that each Archimedean completion of a number field is locally compact is in [`NumberTheory.NumberField.Completion`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/Completion.lean) and that the infinite adele ring is locally compact is in [`NumberTheory.NumberField.InfiniteAdeleRing`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
+- Section 5.2.1: Compactness results for non-Archimedean completions of a number field are found in [`RingTheory.DedekindDomain.AdicValuation`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/RingTheory/DedekindDomain/AdicValuation.lean). 
+- Section 5.2.2: The proof that the finite $S$-adele ring is locally compact is in [`RingTheory.DedekindDomain.FinsetAdeleRing`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FinsetAdeleRing.lean).
+- Section 5.2.3: The proof that the finite adele ring is locally compact is in [`RingTheory.DedekindDomain.FinsetAdeleRing`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FinsetAdeleRing.lean).
+- Section 5.2.3: The simplified proof that the finite adele ring is locally compact is in [`RingTheory.DedekindDomain.FiniteAdeleRingAlt`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/RingTheory/DedekindDomain/FiniteAdeleRingAlt.lean).
+- Section 5.3: The proof that the adele ring is locally compact is in [`NumberTheory.NumberField.AdeleRing`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/AdeleRing.lean).
+
+### Section 6
+- Section 6.1: The various approaches for handling multiple instances can be found in [`NumberTheory.NumberField.CompletionAlt`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/CompletionAlt.lean).
+- Section 6.2: The subfield approach for formalising the completion of a number field at an infinite place is in [`NumberTheory.NumberField.CompletionAlt`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/CompletionAlt.lean).
+- Section 6.3: The ring equivalence between the infinite adele ring and the mixed space is in [`NumberTheory.NumberField.InfiniteAdeleRing`](https://github.com/smmercuri/adele-ring_locally-compact/blob/journal/AdeleRingLocallyCompact/NumberTheory/NumberField/InfiniteAdeleRing.lean).
 
 ## Installation instructions
 

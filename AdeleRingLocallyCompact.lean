@@ -11,6 +11,7 @@ import AdeleRingLocallyCompact.NumberTheory.NumberField.InfiniteAdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.AdicValuation
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.Factorization
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
+import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRingAlt
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FinsetAdeleRing
 import AdeleRingLocallyCompact.RingTheory.Ideal.Quotient
 import AdeleRingLocallyCompact.Topology.Algebra.UniformRing
