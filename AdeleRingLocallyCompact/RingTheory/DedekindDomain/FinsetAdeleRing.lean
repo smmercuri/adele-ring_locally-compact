@@ -234,30 +234,6 @@ theorem isFiniteAdele (x : FinsetAdeleRing R K S) :
   rw [Set.mem_setOf_eq, not_not]
   exact x.2 v hv
 
-/-- If `x` is a `v`-adic integer, then the local inclusion of `x` at any place `v` is a
-finite S-adele. -/
-theorem isFinsetAdele_localInclusion (v : HeightOneSpectrum R) {x : v.adicCompletion K}
-    (hx : x ∈ v.adicCompletionIntegers K) :
-    IsFinsetAdele S (localInclusion K v x).val := by
-  intros w _
-  simp only [localInclusion, ProdAdicCompletions.localInclusion]
-  by_cases hw : w = v
-  · rw [hw, dif_pos]
-    simp only [hx]
-    rfl
-  · simp only [hw, ↓reduceDIte]
-    exact (w.adicCompletionIntegers K).one_mem'
-
-/-- If `v ∈ S` then the local inclusion of any `x` in the `v`-adic completion of `K` is a
-finite S-adele. -/
-theorem isFinsetAdele_localInclusion_of_mem {v : HeightOneSpectrum R}
-    (x : v.adicCompletion K) (h : v ∈ S) :
-    IsFinsetAdele S (localInclusion K v x).val := by
-  intros w hw
-  simp only [localInclusion, ProdAdicCompletions.localInclusion,
-    Ne.symm (ne_of_mem_of_not_mem h hw), ↓reduceDIte]
-  exact (w.adicCompletionIntegers K).one_mem
-
 theorem isFinsetAdele_support (x : FiniteAdeleRing R K) :
     IsFinsetAdele (support x) x.1 :=
   fun v hv => by rwa [support, Set.Finite.mem_toFinset, Set.nmem_setOf_iff, not_not] at hv
@@ -308,9 +284,6 @@ theorem subtype_val_algebraMap :
     (Subtype.val : FinsetAdeleRing R K S → ProdAdicCompletions R K) = Subtype.val ∘ ι(S) := rfl
 
 variable {R K S}
-
-theorem algebraMap_mk {x : FiniteAdeleRing R K} (hx : IsFinsetAdele S x.1) :
-    ι(S) ⟨x, hx⟩ = x := rfl
 
 /-- Neighbourhoods of the finite S-adele ring. -/
 theorem nhds_iff {x : FinsetAdeleRing R K S} {U : Set (FinsetAdeleRing R K S)} : U ∈ nhds x ↔
