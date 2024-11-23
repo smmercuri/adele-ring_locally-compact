@@ -24,8 +24,8 @@ def piEquivPiSubtypeProd (p : ι → Prop) [DecidablePred p] (Y : ι → Type*)
   map_add' _ _ := rfl
 
 @[simps!]
-def prodCongr {R R' S S' : Type*} [Add R] [Add R'] [Mul R] [Mul R'] [Add S] [Add S'] [Mul S] [Mul S']
-    (f : R ≃+* R') (g : S ≃+* S') :
+def prodCongr {R R' S S' : Type*} [Add R] [Add R'] [Mul R] [Mul R'] [Add S] [Add S'] [Mul S]
+    [Mul S'] (f : R ≃+* R') (g : S ≃+* S') :
     R × S ≃+* R' × S' where
   toEquiv := Equiv.prodCongr f g
   map_mul' _ _ := by

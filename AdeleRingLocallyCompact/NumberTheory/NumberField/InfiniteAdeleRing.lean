@@ -181,7 +181,7 @@ def mixedSpace_homeomorph_pi : E ≃ₜ (Fin (FiniteDimensional.finrank ℚ K) �
   rfl
 
 /- Now put these together to show base change -/
-
+/- TODO: this should be a continuous algebra equivalence -/
 def baseChange : InfiniteAdeleRing K ⊗[K] L ≃ₜ InfiniteAdeleRing L := by
   apply Homeomorph.trans (tensorProduct_continuousLinearEquiv_pi K L).toHomeomorph
   apply Homeomorph.trans <| Homeomorph.piCongrRight (fun _ => (homeomorph_mixedSpace K))
@@ -192,8 +192,68 @@ def baseChange : InfiniteAdeleRing K ⊗[K] L ≃ₜ InfiniteAdeleRing L := by
   apply @Homeomorph.piCongrLeft _ _ (fun _ => ℝ) _
   apply Fintype.equivOfCardEq
   simp only [Fintype.card_sigma, Fintype.card_fin, Finset.sum_const, Finset.card_univ, smul_eq_mul]
-  rw [mul_comm]
-  rw [FiniteDimensional.finrank_mul_finrank ℚ K L]
+  rw [mul_comm, FiniteDimensional.finrank_mul_finrank]
+
+def baseChange' : InfiniteAdeleRing K ⊗[K] L ≃+* InfiniteAdeleRing L where
+  toEquiv := baseChange K L
+  map_mul' _ _ := sorry
+  map_add' _ _ := sorry
+
+/- New strategy! because I cannot get a ring equiv, or an algebra equiv out of above
+(because ℂ is not ring equiv to ℝ × ℝ !). -/
+
+/- 𝔸_K ⊗[K] L = (Πᵥ Kᵥ) ⊗[K] L ≃+* Πᵥ (Kᵥ ⊗[K] L).-/
+-- This is the Pi version of TensorProduct.prodLeft
+def piLeft : InfiniteAdeleRing K ⊗[K] L ≃+* ((v : InfinitePlace K) → v.completion ⊗[K] L) :=
+  sorry
+
+/- Now we need to show that each Kᵥ ⊗[K] L ≃+* Π_{w ∣ v} L_w, where w ∣ v means that
+v = w.comap (algebraMap K L). -/
+def NumberField.Completion.baseChange (v : InfinitePlace K) :
+  v.completion ⊗[K] L ≃+*
+    ((w : {w : InfinitePlace L // v = w.comap (algebraMap K L)}) → w.1.completion) := sorry
+
+def NumberField.InfinitePlace.card_comap :
+  Fintype.card { w : InfinitePlace L // v = w.comap (algebraMap K L) } =
+    FiniteDimensional.finrank K L :=
+  sorry
+
+/- Then we show that
+  InfinitePlace L ≃ (v : InfinitePlace K) → { w // v = w.comap (algebraMap K L)},
+AS TYPES.
+
+Can prove this by a cardinality argument with current results in mathlib. -/
+def NumberField.Completion.equiv_comap :
+    InfinitePlace L ≃
+      ((v : InfinitePlace K) × { w : InfinitePlace L // v = w.comap (algebraMap K L)}) := by
+  apply Fintype.equivOfCardEq
+  norm_num
+  haveI : IsUnramifiedAtInfinitePlaces K L := sorry
+  haveI : IsGalois K L := sorry
+  rw [IsUnramifiedAtInfinitePlaces.card_infinitePlace K L]
+  simp_rw [InfinitePlace.card_comap]
+  norm_num
+
+theorem NumberField.Completion.equiv_comap_apply :
+    (NumberField.Completion.equiv_comap K L).symm i = i.2.1 := sorry
+
+/- Then piece together 𝔸_K ⊗[K] L ≃+* Πᵥ (Kᵥ ⊗[K] L) ≃+* Πᵥ Π_{w ∣ v} L_w ≃+* Π_w L_w = 𝔸_L. -/
+def baseChange'' : InfiniteAdeleRing K ⊗[K] L ≃+* InfiniteAdeleRing L := by
+  apply RingEquiv.trans (piLeft K L)
+  have := RingEquiv.piCongrRight <| NumberField.Completion.baseChange K L
+  apply RingEquiv.trans this
+  let γ : (v : InfinitePlace K) → (w : {w : InfinitePlace L // v = w.comap (algebraMap K L)})
+      → Type _ :=
+    fun v w => w.1.completion
+  apply RingEquiv.trans (RingEquiv.piCurry γ).symm
+  have := RingEquiv.piCongrLeft (fun w => w.completion)
+    (NumberField.Completion.equiv_comap K L).symm
+  refine RingEquiv.trans ?_ this
+  apply RingEquiv.piCongrRight
+  intro i
+  rw [NumberField.Completion.equiv_comap_apply]
+  rfl
+
 
 end InfiniteAdeleRing
 

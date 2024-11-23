@@ -40,7 +40,7 @@ noncomputable section
 
 open IsDedekindDomain IsDedekindDomain.HeightOneSpectrum
 
-open scoped Classical
+open scoped Classical TensorProduct
 
 namespace DedekindDomain
 
@@ -48,12 +48,6 @@ variable (R : Type*) [CommRing R] [IsDomain R] [IsDedekindDomain R] (K : Type*)
   [Field K] [Algebra R K] [IsFractionRing R K]
 
 namespace ProdAdicCompletions
-
-def globalEmbedding : K →+* ProdAdicCompletions R K :=
-  algebraMap K (ProdAdicCompletions R K)
-
-@[simp]
-theorem globalEmbedding_apply (x : K) : globalEmbedding R K x v = x := rfl
 
 variable {R}
 
@@ -85,7 +79,7 @@ theorem localInclusion_apply (v : HeightOneSpectrum R) (x : v.adicCompletion K) 
     localInclusion K v x v = x := by simp only [localInclusion, dif_pos]
 
 @[simp]
-theorem localInclusion_apply' {v w : HeightOneSpectrum R} (x : v.adicCompletion K) (h : w ≠ v) :
+theorem localInclusion_apply_of_ne {v w : HeightOneSpectrum R} (x : v.adicCompletion K) (h : w ≠ v) :
     localInclusion K v x w = 1 := by simp only [localInclusion, h, ↓reduceDIte]
 
 end ProdAdicCompletions
@@ -120,9 +114,10 @@ theorem localInclusion_apply (v : HeightOneSpectrum R) (x : v.adicCompletion K) 
   simp only [localInclusion, ProdAdicCompletions.localInclusion_apply]
 
 @[simp]
-theorem localInclusion_apply' (v w : HeightOneSpectrum R) (x : v.adicCompletion K) (h : w ≠ v) :
+theorem localInclusion_apply_of_ne (v w : HeightOneSpectrum R)
+    (x : v.adicCompletion K) (h : w ≠ v) :
     (localInclusion K v x).val w = 1 := by
-  simp only [localInclusion, ProdAdicCompletions.localInclusion_apply' _ h]
+  simp only [localInclusion, ProdAdicCompletions.localInclusion_apply_of_ne _ h]
 
 /-- Given balls centred at `yᵥ` of radius `γᵥ` for a finite set of primes `v ∈ S`, we can find a
 finite adele  `x` for which `xᵥ` is outside each open ball for `v ∈ S`. -/
@@ -167,38 +162,8 @@ theorem dvd_of_valued_lt {x : FiniteAdeleRing R K} {r : nonZeroDivisors R}
 
 variable (R K)
 
-open Valued ProdAdicCompletions in
-/-- The element `(x)ᵥ` where `x ∈ K` is a finite adele.
-
-[https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685](https://github.com/mariainesdff/ideles/blob/e6646cd462c86a8813ca04fb82e84cdc14a59ad4/src/adeles_R.lean#L685)-/
-theorem globalEmbedding_isFiniteAdele (x : K) :
-    ProdAdicCompletions.IsFiniteAdele (ProdAdicCompletions.globalEmbedding R K x) := by
-  let S := { v : HeightOneSpectrum R | (globalEmbedding R K) x v ∉ adicCompletionIntegers K v }
-  obtain ⟨r, d, hx⟩ := IsLocalization.mk'_surjective (nonZeroDivisors R) x
-  have hsubset : S ⊆ (Ideal.factorsFinset_of_nonZeroDivisor d).toSet := by
-    intro v hv
-    simp only [S, mem_adicCompletionIntegers, not_le, not_lt, Set.mem_setOf_eq] at hv
-    rw [Set.Finite.coe_toFinset]
-    contrapose! hv
-    simp only [IsFractionRing.mk'_eq_div] at hx
-    simp only [globalEmbedding_apply, valuedCompletion_apply, adicValued_apply, ← hx, map_div₀]
-    have h_val_d : v.valuation (algebraMap R K d) = 1 := by
-      apply le_antisymm (v.valuation_le_one d)
-      contrapose! hv
-      exact (v.valuation_lt_one_iff_dvd _).1 hv
-    rw [h_val_d, div_one]
-    exact v.valuation_le_one _
-  exact Set.Finite.subset (Finset.finite_toSet _) hsubset
-
-/-- The global embedding sending an element `x ∈ K` to `(x)ᵥ` in the finite adele ring.
-
-TODO : this can be changed to algebraMap K (FiniteAdeleRing R K). -/
-def globalEmbedding : K →+* FiniteAdeleRing R K where
-  toFun := fun x => ⟨ProdAdicCompletions.globalEmbedding R K x, globalEmbedding_isFiniteAdele R K x⟩
-  map_one' := rfl
-  map_zero' := rfl
-  map_mul' x y := by simp only [map_mul]; rfl
-  map_add' x y := by simp only [map_add]; rfl
+/-- The global embedding sending an element `x ∈ K` to `(x)ᵥ` in the finite adele ring. -/
+def globalEmbedding : K →+* FiniteAdeleRing R K := algebraMap K (FiniteAdeleRing R K)
 
 @[simp]
 theorem globalEmbedding_apply (x : K) : globalEmbedding R K x v = x := rfl
@@ -221,6 +186,29 @@ theorem globalEmbedding_injective [i : Nonempty (HeightOneSpectrum R)] :
     Function.Injective (globalEmbedding R K) := by
   letI := nontrivial_of_nonEmpty
   exact (globalEmbedding R K).injective
+
+variable (R' : Type*) [CommRing R'] [IsDomain R'] [IsDedekindDomain R']
+    (L : Type*) [Field L] [Algebra K L] [FiniteDimensional K L]
+    [Algebra R' L] [IsFractionRing R' L]
+
+-- this must exist already
+def tensorProduct_equiv_pi : FiniteAdeleRing R K ⊗[K] L ≃ₗ[K]
+    (Fin (FiniteDimensional.finrank K L) → FiniteAdeleRing R K) :=
+  LinearEquiv.trans (TensorProduct.congr (LinearEquiv.refl K (FiniteAdeleRing R K))
+      (Basis.equivFun (FiniteDimensional.finBasis K L)))
+    (TensorProduct.piScalarRight _ _ _ _)
+
+instance : TopologicalSpace (FiniteAdeleRing R K ⊗[K] L) :=
+  TopologicalSpace.induced (tensorProduct_equiv_pi R K L) inferInstance
+
+def baseChange : FiniteAdeleRing R K ⊗[K] L ≃ₜ FiniteAdeleRing R' L :=
+  sorry
+
+instance : Algebra K (FiniteAdeleRing R' L) :=
+  RingHom.toAlgebra <| (algebraMap _ _).comp <| algebraMap K L
+
+def baseChange'' : FiniteAdeleRing R K ⊗[K] L ≃ₗ[K] FiniteAdeleRing R' L :=
+  sorry
 
 end FiniteAdeleRing
 
