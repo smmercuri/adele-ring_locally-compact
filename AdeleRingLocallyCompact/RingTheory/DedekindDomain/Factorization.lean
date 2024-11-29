@@ -3,7 +3,7 @@ Copyright (c) 2024 Salvatore Mercuri. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
-import Mathlib
+import Mathlib.RingTheory.DedekindDomain.Factorization
 
 /-!
 # Factorization of ideals and fractional ideals of Dedekind domains
@@ -31,7 +31,7 @@ theorem finite_factors_of_nonZeroDivisor (r : nonZeroDivisors R) :
 abbrev factorsFinset {I : Ideal R} (h : I ≠ 0) :=
     (Ideal.finite_factors h).toFinset
 
-abbrev factorsFinset_of_nonZeroDivisor (r : nonZeroDivisors R) :=
+abbrev factors_finset_of_nonZeroDivisor (r : nonZeroDivisors R) :=
     (Ideal.finite_factors_of_nonZeroDivisor r).toFinset
 
 end Ideal

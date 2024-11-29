@@ -3,7 +3,8 @@ Copyright (c) 2024 Salvatore Mercuri. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
-import Mathlib
+import Mathlib.Topology.UniformSpace.Basic
+import Mathlib.Topology.Algebra.UniformField
 
 /-!
 # Uniform spaces
@@ -13,19 +14,17 @@ topological field if the map `f` is a ring homomorphism between fields and if th
 space `b` is a completable topological field.
 
 ## Main results
- - `UniformInducing.comap_completableTopField` : if the codomain of a ring homomorphism between
-   fields is a completable topological field, then the domain is also a completable topological
-   field.
+ - `UniformInducing.completableTopField` : if the codomain of a uniform inducing ring
+   homomorphism between fields is a completable topological field, then the domain is also a
+   completable topological field.
 -/
 variable {α β : Type*} [Field β] [b : UniformSpace β] [CompletableTopField β]
   [Field α]
 
 /-- The pullback of a completable topological field along a uniform inducing
 ring homomorphism is a completable topological field. -/
-theorem UniformInducing.completableTopField
-    [UniformSpace α] [T0Space α]
-    {f : α →+* β} (hf : UniformInducing f) :
-    CompletableTopField α := by
+theorem UniformInducing.completableTopField [UniformSpace α] [T0Space α] {f : α →+* β}
+    (hf : UniformInducing f) : CompletableTopField α := by
   refine CompletableTopField.mk (fun F F_cau inf_F => ?_)
   rw [← UniformInducing.cauchy_map_iff hf] at F_cau ⊢
   have h_comm : (f ∘ fun x => x⁻¹) = (fun x => x⁻¹) ∘ f := by

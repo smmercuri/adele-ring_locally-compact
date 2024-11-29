@@ -1,9 +1,9 @@
 import AdeleRingLocallyCompact.Algebra.Field.Subfield
-import AdeleRingLocallyCompact.Algebra.Group.WithOne.Defs
 import AdeleRingLocallyCompact.Algebra.Order.GroupWithZero.Canonical
 import AdeleRingLocallyCompact.Algebra.Order.GroupWithZero.WithZero
 import AdeleRingLocallyCompact.Algebra.Ring.Equiv
-import AdeleRingLocallyCompact.Analysis.NormedSpace.Completion
+import AdeleRingLocallyCompact.Analysis.Normed.Module.Completion
+import AdeleRingLocallyCompact.FromLocalClassFieldTheory.LocalClassFieldTheory
 import AdeleRingLocallyCompact.Logic.Equiv.Basic
 import AdeleRingLocallyCompact.NumberTheory.NumberField.AdeleRing
 import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
