@@ -4,6 +4,8 @@ import AdeleRingLocallyCompact.Algebra.Order.GroupWithZero.WithZero
 import AdeleRingLocallyCompact.Algebra.Ring.Equiv
 import AdeleRingLocallyCompact.Analysis.Normed.Module.Completion
 import AdeleRingLocallyCompact.FromLocalClassFieldTheory.LocalClassFieldTheory
+import AdeleRingLocallyCompact.FromMathlib.LinearAlgebra.TensorProduct.Pi
+import AdeleRingLocallyCompact.FromMathlib.Topology.Algebra.Algebra
 import AdeleRingLocallyCompact.Logic.Equiv.Basic
 import AdeleRingLocallyCompact.NumberTheory.NumberField.AdeleRing
 import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
@@ -13,6 +15,7 @@ import AdeleRingLocallyCompact.RingTheory.DedekindDomain.Factorization
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FiniteAdeleRing
 import AdeleRingLocallyCompact.RingTheory.DedekindDomain.FinsetAdeleRing
 import AdeleRingLocallyCompact.RingTheory.Ideal.Quotient
+import AdeleRingLocallyCompact.Topology.Algebra.Algebra
 import AdeleRingLocallyCompact.Topology.Algebra.UniformRing
 import AdeleRingLocallyCompact.Topology.Homeomorph
 import AdeleRingLocallyCompact.Topology.Instances.Real
