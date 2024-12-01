@@ -186,6 +186,28 @@ theorem locallyCompactSpace [LocallyCompactSpace L] (h : ∀ x, ‖f x‖ = v x)
     LocallyCompactSpace (v.completion) :=
   (closedEmbedding_extensionEmbedding_of_comp h).locallyCompactSpace
 
+variable {w : AbsoluteValue L ℝ} {g : WithAbs v →+* WithAbs w}
+
+abbrev map_of_comp (h : ∀ x, w (g x) = v x) : v.completion →+* w.completion :=
+    UniformSpace.Completion.mapRingHom g
+      (WithAbs.uniformInducing_of_comp h).uniformContinuous.continuous
+
+theorem map_of_comp_coe (h : ∀ x, w (g x) = v x) (x : K) : map_of_comp h x = g x :=
+  UniformSpace.Completion.mapRingHom_coe
+    (WithAbs.uniformInducing_of_comp h).uniformContinuous x
+
+theorem map_of_comp_dist_eq (h : ∀ x, w (g x) = v x) (x y : v.completion) :
+    dist (map_of_comp h x) (map_of_comp h y) = dist x y := by
+  refine UniformSpace.Completion.induction_on₂ x y ?_ (fun x y => ?_)
+  · refine isClosed_eq ?_ continuous_dist
+    exact continuous_iff_continuous_dist.1 UniformSpace.Completion.continuous_extension
+  · simp only [map_of_comp_coe, UniformSpace.Completion.dist_eq]
+    exact UniformSpace.Completion.dist_eq x y ▸
+      (WithAbs.isometry_of_comp (L := WithAbs w) h).dist_eq x y
+
+theorem isometry_map_of_comp (h : ∀ x, w (g x) = v x) : Isometry (map_of_comp h) :=
+  Isometry.of_dist_eq <| map_of_comp_dist_eq h
+
 end AbsoluteValue.Completion
 
 namespace NumberField.InfinitePlace

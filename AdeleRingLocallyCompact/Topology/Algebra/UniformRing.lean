@@ -21,4 +21,13 @@ theorem extensionHom_coe [CompleteSpace β] [T0Space β] (a : α):
   simp only [Completion.extensionHom, RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk,
     UniformSpace.Completion.extension_coe <| uniformContinuous_addMonoidHom_of_continuous hf]
 
+theorem mapRingHom_apply {x : UniformSpace.Completion α} :
+    UniformSpace.Completion.mapRingHom f hf x = UniformSpace.Completion.map f x := rfl
+
+variable {f}
+
+theorem mapRingHom_coe (hf : UniformContinuous f) (a : α) :
+    mapRingHom f hf.continuous a = f a := by
+  rw [mapRingHom_apply, map_coe hf]
+
 end UniformSpace.Completion

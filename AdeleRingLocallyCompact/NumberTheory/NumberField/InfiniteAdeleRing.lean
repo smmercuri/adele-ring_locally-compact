@@ -8,6 +8,7 @@ import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
 import AdeleRingLocallyCompact.Algebra.Ring.Equiv
 import AdeleRingLocallyCompact.FromMathlib.LinearAlgebra.TensorProduct.Pi
 import AdeleRingLocallyCompact.Topology.Algebra.Algebra
+import AdeleRingLocallyCompact.Topology.Algebra.UniformRing
 import AdeleRingLocallyCompact.Topology.Homeomorph
 
 open scoped TensorProduct Classical
@@ -239,17 +240,21 @@ instance (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) : Algebra (WithAbs 
 theorem WithAbs.norm_eq (v : AbsoluteValue K ℝ) (x : WithAbs v) : ‖x‖ = v x := rfl
 
 theorem WithAbs.uniformContinuous_algebraMap (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ)
-    (h : w.comp (algebraMap _ _).injective = v):
-    UniformContinuous (algebraMap (WithAbs v) (WithAbs w)) := by
-  apply uniformContinuous_of_tendsto_zero
+    (h : ∀ x, w (algebraMap (WithAbs v) (WithAbs w) x) = v x) :
+    UniformContinuous (algebraMap (WithAbs v) (WithAbs w)) :=
+  (WithAbs.uniformInducing_of_comp (L := WithAbs w) h).uniformContinuous
+  /-apply uniformContinuous_of_tendsto_zero
   rw [Metric.nhds_basis_closedBall.tendsto_iff Metric.nhds_basis_closedBall]
   refine fun ε _ => ⟨ε, ‹_›, fun x hx => ?_⟩
   rw [Metric.mem_closedBall, dist_zero_right, WithAbs.norm_eq _, ← h] at hx ⊢
-  exact hx
+  exact hx-/
 
 theorem NumberField.InfinitePlace.abs_eq_of_comap {v : InfinitePlace K} {w : InfinitePlace L}
-    (h : w.comap (algebraMap _ _) = v) : w.1.comp (algebraMap _ _).injective = v.1 := by
-  rw [← h]; rfl
+    (h : w.comap (algebraMap _ _) = v) :
+    ∀ x, w.1 (algebraMap (WithAbs v.1) (WithAbs w.1) x) = v.1 x := by
+  rw [← h]
+  intro x
+  rfl
 
 variable (w : InfinitePlace L)
 
@@ -259,10 +264,8 @@ local notation "Σ_" v => {w : InfinitePlace L // w.comap (algebraMap K L) = v}
 Kᵥ ⊗[K] L ≃ₐ[v.completion] Π_{w ∣ v} L_w, where w ∣ v means that
 v = w.comap (algebraMap K L). -/
 def NumberField.Completion.comap_ringHom {v : InfinitePlace K} (w : Σ_v) :
-    v.completion →+* w.1.completion := by
-  apply UniformSpace.Completion.mapRingHom (algebraMap (WithAbs v.1) (WithAbs w.1.1))
-  exact (WithAbs.uniformContinuous_algebraMap K L v.1 w.1.1
-    (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)).continuous
+    v.completion →+* w.1.completion :=
+  map_of_comp (L := WithAbs w.1.1) (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)
 
 instance : Algebra K (WithAbs w.1) := ‹Algebra K L›
 
@@ -278,9 +281,7 @@ instance (w : Σ_v) : Algebra v.completion w.1.completion := RingHom.toAlgebra <
 
 @[simp]
 theorem algebraMap_def' (w : Σ_v) : algebraMap v.completion w.1.completion =
-    UniformSpace.Completion.mapRingHom (algebraMap (WithAbs v.1) (WithAbs w.1.1))
-      (WithAbs.uniformContinuous_algebraMap K L v.1 w.1.1
-        (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)).continuous :=
+    map_of_comp (L := WithAbs w.1.1) (NumberField.InfinitePlace.abs_eq_of_comap K L w.2) :=
   rfl
 
 @[simp]
@@ -295,6 +296,11 @@ theorem algebraMap_coe' (w : Σ_v) (k : K) :
   rw [algebraMap_apply']
   exact UniformSpace.Completion.map_coe (WithAbs.uniformContinuous_algebraMap K L v.1 w.1.1
     (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)) _
+
+@[simp]
+theorem smul_def (w : Σ_v) (x : v.completion) (y : w.1.completion) :
+    x • y = algebraMap _ _ x * y :=
+  rfl
 
 noncomputable instance : Algebra K (w.completion) where
   toFun k := algebraMap L w.completion (algebraMap K L k)
@@ -321,12 +327,24 @@ theorem algebraMap_comp' (w : Σ_v) (k : K) : algebraMap K w.1.completion k =
 instance (w : Σ_v) : IsScalarTower K v.completion w.1.completion :=
   IsScalarTower.of_algebraMap_eq (algebraMap_comp' K v L w)
 
-noncomputable instance (w : Σ_v) : FiniteDimensional v.completion w.1.completion := sorry
+open NumberField in
+instance (v : InfinitePlace K) : NontriviallyNormedField (v.completion) where
+  toNormedField := InfinitePlace.Completion.instNormedFieldCompletion v
+  non_trivial := by
+    simp only [← dist_zero_right]
+    have h := InfinitePlace.Completion.isometry_extensionEmbedding v |>.dist_eq
+    use 2
+    simp only [← h 2 0, map_ofNat, map_zero, dist_zero_right, RCLike.norm_ofNat, Nat.one_lt_ofNat]
 
-theorem UniformSpace.Completion.mapRingHom_apply {α β : Type*} [Ring α] [UniformSpace α]
-    [TopologicalRing α] [UniformAddGroup α] [UniformSpace β] [Ring β] [UniformAddGroup β]
-    [TopologicalRing β] (f : α →+* β) (hf : Continuous f) {x : UniformSpace.Completion α} :
-    UniformSpace.Completion.mapRingHom f hf x = UniformSpace.Completion.map f x := rfl
+instance (w : Σ_v) : NormedSpace v.completion w.1.completion where
+  norm_smul_le x y := by
+    rw [smul_def, norm_mul, algebraMap_def']
+    have := AbsoluteValue.Completion.isometry_map_of_comp (L := WithAbs w.1.1)
+      (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)
+    rw [this.norm_map_of_map_zero (map_zero _)]
+
+noncomputable instance (w : Σ_v) : FiniteDimensional v.completion w.1.completion :=
+  FiniteDimensional.of_locallyCompactSpace v.completion
 
 theorem NumberField.Completion.algebraMap_eq_coe :
     ⇑(algebraMap K v.completion) = ((↑) : K → v.completion) := rfl
@@ -405,10 +423,6 @@ theorem NumberField.Completion.comap_pi_injective :
 theorem NumberField.Completion.algebraMap_pi_injective :
     Function.Injective (algebraMap_pi K v L) :=
   (algebraMap_pi K v L).injective
-
-
-
---instance : IsScalarTower K v.completion ((w : Σ_v) → w.1.completion) := inferInstance
 
 def NumberField.Completion.baseChange_algHom (v : InfinitePlace K) :
     v.completion ⊗[K] L →ₐ[v.completion] ((w : Σ_v) → w.1.completion) :=
