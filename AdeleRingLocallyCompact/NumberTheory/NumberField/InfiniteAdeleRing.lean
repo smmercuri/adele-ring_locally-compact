@@ -276,6 +276,26 @@ instance : SMulCommClass K v.completion v.completion := Algebra.to_smulCommClass
 instance (w : Σ_v) : Algebra v.completion w.1.completion := RingHom.toAlgebra <|
   NumberField.Completion.comap_ringHom K L w
 
+@[simp]
+theorem algebraMap_def' (w : Σ_v) : algebraMap v.completion w.1.completion =
+    UniformSpace.Completion.mapRingHom (algebraMap (WithAbs v.1) (WithAbs w.1.1))
+      (WithAbs.uniformContinuous_algebraMap K L v.1 w.1.1
+        (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)).continuous :=
+  rfl
+
+@[simp]
+theorem algebraMap_apply' (w : Σ_v) (x : v.completion) :
+    algebraMap v.completion w.1.completion x = UniformSpace.Completion.map
+      (algebraMap (WithAbs v.1) (WithAbs w.1.1)) x :=
+  rfl
+
+@[simp]
+theorem algebraMap_coe' (w : Σ_v) (k : K) :
+    algebraMap v.completion w.1.completion k = algebraMap (WithAbs v.1) (WithAbs w.1.1) k := by
+  rw [algebraMap_apply']
+  exact UniformSpace.Completion.map_coe (WithAbs.uniformContinuous_algebraMap K L v.1 w.1.1
+    (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)) _
+
 noncomputable instance : Algebra K (w.completion) where
   toFun k := algebraMap L w.completion (algebraMap K L k)
   map_one' := by simp only [map_one]
@@ -287,6 +307,19 @@ noncomputable instance : Algebra K (w.completion) where
     rw [RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, UniformSpace.Completion.smul_def,
     ← RingHom.comp_apply, ← IsScalarTower.algebraMap_eq,
     UniformSpace.Completion.map_smul_eq_mul_coe, UniformSpace.Completion.algebraMap_def]
+
+theorem algebraMap_comp (k : K) : algebraMap K w.completion k =
+    algebraMap L w.completion (algebraMap K L k) :=
+  rfl
+
+theorem algebraMap_comp' (w : Σ_v) (k : K) : algebraMap K w.1.completion k =
+    algebraMap v.completion w.1.completion (algebraMap K v.completion k) := by
+  simp only [UniformSpace.Completion.algebraMap_def]
+  rw [algebraMap_coe' K v L w _]
+  rfl
+
+instance (w : Σ_v) : IsScalarTower K v.completion w.1.completion :=
+  IsScalarTower.of_algebraMap_eq (algebraMap_comp' K v L w)
 
 noncomputable instance (w : Σ_v) : FiniteDimensional v.completion w.1.completion := sorry
 
@@ -373,7 +406,9 @@ theorem NumberField.Completion.algebraMap_pi_injective :
     Function.Injective (algebraMap_pi K v L) :=
   (algebraMap_pi K v L).injective
 
-instance : IsScalarTower K v.completion ((w : Σ_v) → w.1.completion) := by sorry
+
+
+--instance : IsScalarTower K v.completion ((w : Σ_v) → w.1.completion) := inferInstance
 
 def NumberField.Completion.baseChange_algHom (v : InfinitePlace K) :
     v.completion ⊗[K] L →ₐ[v.completion] ((w : Σ_v) → w.1.completion) :=
