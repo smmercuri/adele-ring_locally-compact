@@ -7,6 +7,7 @@ import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.Basic
 import AdeleRingLocallyCompact.NumberTheory.NumberField.Completion
 import AdeleRingLocallyCompact.Algebra.Ring.Equiv
 import AdeleRingLocallyCompact.FromMathlib.LinearAlgebra.TensorProduct.Pi
+import AdeleRingLocallyCompact.Topology.Algebra.Algebra
 import AdeleRingLocallyCompact.Topology.Homeomorph
 
 open scoped TensorProduct Classical
