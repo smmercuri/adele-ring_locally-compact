@@ -147,7 +147,7 @@ def tensorProduct_equiv_pi : InfiniteAdeleRing K ⊗[K] L ≃ₗ[K]
       (Basis.equivFun (FiniteDimensional.finBasis K L)))
     (TensorProduct.piScalarRight _ _ _ _)
 
-instance : TopologicalSpace (InfiniteAdeleRing K ⊗[K] L) :=
+/-instance : TopologicalSpace (InfiniteAdeleRing K ⊗[K] L) :=
   TopologicalSpace.induced (tensorProduct_equiv_pi K L) inferInstance
 
 def tensorProduct_continuousLinearEquiv_pi : InfiniteAdeleRing K ⊗[K] L ≃L[K]
@@ -189,14 +189,14 @@ def baseChange_old : InfiniteAdeleRing K ⊗[K] L ≃ₜ InfiniteAdeleRing L := 
   apply @Homeomorph.piCongrLeft _ _ (fun _ => ℝ) _
   apply Fintype.equivOfCardEq
   simp only [Fintype.card_sigma, Fintype.card_fin, Finset.sum_const, Finset.card_univ, smul_eq_mul]
-  rw [mul_comm, FiniteDimensional.finrank_mul_finrank]
+  rw [mul_comm, FiniteDimensional.finrank_mul_finrank]-/
 
 /- New strategy! because I cannot get a ring equiv, or an algebra equiv out of above
 (because ℂ is not ring equiv to ℝ × ℝ !). -/
 
 /- K-algebra isomorphisms: 𝔸_K ⊗[K] L =ₐ[K] (Πᵥ Kᵥ) ⊗[K] L ≃ₐ[K] Πᵥ (Kᵥ ⊗[K] L).-/
 
-def piRight (R S A : Type*) {ι : Type*}  (B : ι → Type*) [CommSemiring R]
+def AlgEquiv.piRight (R S A : Type*) {ι : Type*}  (B : ι → Type*) [CommSemiring R]
     [CommSemiring S] [Algebra R S] [Semiring A] [Algebra R A] [Algebra S A] [IsScalarTower R S A]
     [(i : ι) → Semiring (B i)] [(i : ι) → Algebra R (B i)] [Fintype ι] [DecidableEq ι] :
     A ⊗[R] ((i : ι) → B i) ≃ₐ[S] (i : ι) → A ⊗[R] (B i) := by
@@ -228,10 +228,10 @@ def piRight (R S A : Type*) {ι : Type*}  (B : ι → Type*) [CommSemiring R]
       Algebra.TensorProduct.tmul_mul_tmul, LinearEquiv.coe_coe, TensorProduct.piRight_apply,
       TensorProduct.piRightHom_tmul, Pi.mul_apply, LinearMap.compl₂_apply]
 
-def AlgEquiv.piLeft : InfiniteAdeleRing K ⊗[K] L ≃ₐ[K]
+def piLeft_algEquiv : InfiniteAdeleRing K ⊗[K] L ≃ₐ[K]
     ((v : InfinitePlace K) → v.completion ⊗[K] L) := by
   apply AlgEquiv.trans (Algebra.TensorProduct.comm _ _ _)
-  apply AlgEquiv.trans (piRight _ _ _ _)
+  apply AlgEquiv.trans (AlgEquiv.piRight _ _ _ _)
   exact AlgEquiv.piCongrRight <| fun _ => Algebra.TensorProduct.comm _ _ _
 
 instance (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) : Algebra (WithAbs v) (WithAbs w) :=
@@ -350,7 +350,7 @@ theorem NumberField.Completion.algebraMap_eq_coe :
     ⇑(algebraMap K v.completion) = ((↑) : K → v.completion) := rfl
 
 def NumberField.Completion.comap {v : InfinitePlace K} (w : Σ_v) :
-    v.completion →ₐ[K] w.1.completion where
+    v.completion →A[K] w.1.completion where
   __ := NumberField.Completion.comap_ringHom K L w
   commutes' := by
     intro r
@@ -359,12 +359,34 @@ def NumberField.Completion.comap {v : InfinitePlace K} (w : Σ_v) :
     rw [algebraMap_eq_coe, UniformSpace.Completion.map_coe] ; rfl
     exact WithAbs.uniformContinuous_algebraMap K L v.1 w.1.1
       (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)
+  cont := UniformSpace.Completion.continuous_map
 
 instance : IsScalarTower K v.completion v.completion := IsScalarTower.right
 
+def ContinuousAlgHom.extendScalars {A : Type*} (B : Type*) {C D : Type*}
+    [CommSemiring A] [CommSemiring C] [CommSemiring D] [TopologicalSpace C]
+    [TopologicalSpace D] [Algebra A C] [Algebra A D] [CommSemiring B] [Algebra A B]
+    [Algebra B C] [IsScalarTower A B C] (f : C →A[A] D) :
+    letI : Algebra B D := f.restrictDomain B |>.toRingHom.toAlgebra
+    C →A[B] D :=
+  letI : Algebra B D := f.restrictDomain B |>.toRingHom.toAlgebra
+  {
+    __ := f.toAlgHom.extendScalars B
+    cont := f.cont
+  }
+
+def ContinuousAlgEquiv.restrictScalars (A : Type*) {B : Type*} {C D : Type*}
+    [CommSemiring A] [CommSemiring C] [CommSemiring D] [TopologicalSpace C]
+    [TopologicalSpace D] [CommSemiring B]  [Algebra B C] [Algebra B D] [Algebra A B]
+    [Algebra A C] [Algebra A D] [IsScalarTower A B C] [IsScalarTower A B D] (f : C ≃A[B] D) :
+    C ≃A[A] D where
+  __ := f.toAlgEquiv.restrictScalars A
+  continuous_toFun := f.continuous_toFun
+  continuous_invFun := f.continuous_invFun
+
 def NumberField.Completion.comap_extend {v : InfinitePlace K} (w : Σ_v) :
-    v.completion →ₐ[v.completion] w.1.completion :=
-  (comap K L w).extendScalars _
+    v.completion →A[v.completion] w.1.completion :=
+  ContinuousAlgHom.extendScalars v.completion (comap K L w)
 
 def NumberField.Completion.comap_injective {v : InfinitePlace K} (w : Σ_v) :
     Function.Injective (NumberField.Completion.comap K L w) :=
@@ -381,13 +403,21 @@ def Pi.algHom {I R A : Type*} (f : I → Type*) [CommSemiring R] [s : (i : I) �
   __ := Pi.ringHom fun i ↦ (g i).toRingHom
   commutes' r := by ext; simp
 
+@[simps!]
+def Pi.continuousAlgHom {I R A : Type*} (f : I → Type*) [CommSemiring R]
+    [(i : I) → Semiring (f i)] [(i : I) → Algebra R (f i)] [(i : I) → TopologicalSpace (f i)]
+    [Semiring A] [TopologicalSpace A] [Algebra R A] (g : (i : I) → A →A[R] f i) :
+    A →A[R] (i : I) → f i where
+  __ := Pi.algHom _ <| fun _ => (g _).toAlgHom
+  cont := continuous_pi <| fun _ => (g _).cont
+
 def NumberField.Completion.comap_pi (v : InfinitePlace K) :
-    v.completion →ₐ[K] ((w : Σ_v) → w.1.completion) :=
-  Pi.algHom _ <| (fun _ => NumberField.Completion.comap K L _)
+    v.completion →A[K] ((w : Σ_v) → w.1.completion) :=
+  Pi.continuousAlgHom _ <| (fun _ => NumberField.Completion.comap K L _)
 
 def NumberField.Completion.comap_pi_extend (v : InfinitePlace K) :
-    v.completion →ₐ[v.completion] ((w : Σ_v) → w.1.completion) :=
-  (comap_pi K L v).extendScalars _
+    v.completion →A[v.completion] ((w : Σ_v) → w.1.completion) :=
+  ContinuousAlgHom.extendScalars v.completion (comap_pi K L v)
 
 def NumberField.Completion.algebraMap_pi_ringHom :
     L →+* ((w : Σ_v) → w.1.completion) :=
@@ -429,6 +459,13 @@ def NumberField.Completion.baseChange_algHom (v : InfinitePlace K) :
   Algebra.TensorProduct.lift (NumberField.Completion.comap_pi_extend K L v)
     (NumberField.Completion.algebraMap_pi K v L) (fun _ _ => mul_comm _ _)
 
+instance : TopologicalSpace (v.completion ⊗[K] L) :=
+  TopologicalSpace.induced (NumberField.Completion.baseChange_algHom K L v) inferInstance
+
+def NumberField.Completion.baseChange_continuousAlgHom (v : InfinitePlace K) :
+    v.completion ⊗[K] L →A[v.completion] ((w : Σ_v) → w.1.completion) where
+  __ := baseChange_algHom K L v
+
 theorem finrank_eq : FiniteDimensional.finrank v.completion ((w : Σ_v) → w.1.completion) =
     FiniteDimensional.finrank v.completion (v.completion ⊗[K] L) := sorry
 
@@ -443,7 +480,7 @@ def NumberField.Completion.baseChange_linearEquiv (v : InfinitePlace K) :
     v.completion ⊗[K] L ≃ₗ[v.completion] ((w : Σ_v) → w.1.completion) :=
   LinearEquiv.ofIsUnitDet (baseChange_det_ne_zero K L v).isUnit
 
-def NumberField.Completion.baseChange (v : InfinitePlace K) :
+def NumberField.Completion.baseChange_algEquiv (v : InfinitePlace K) :
     v.completion ⊗[K] L ≃ₐ[v.completion] ((w : Σ_v) → w.1.completion) := by
   apply AlgEquiv.ofLinearEquiv (baseChange_linearEquiv K L v)
   · rw [baseChange_linearEquiv]
@@ -454,6 +491,13 @@ def NumberField.Completion.baseChange (v : InfinitePlace K) :
     simp only [baseChange_linearEquiv,
       LinearEquiv.ofIsUnitDet_apply (baseChange_det_ne_zero K L v).isUnit, AlgHom.toLinearMap_apply]
     exact map_mul _ _ _
+
+def NumberField.Completion.baseChange (v : InfinitePlace K) :
+    v.completion ⊗[K] L ≃A[v.completion] ((w : Σ_v) → w.1.completion) where
+  __ := baseChange_algEquiv K L v
+  continuous_toFun := continuous_induced_dom
+  continuous_invFun := by
+    convert (baseChange_algEquiv K L v).toEquiv.coinduced_symm ▸ continuous_coinduced_rng
 
 /- Now have two algebra isomorphisms
 (1) 𝔸_K ⊗[K] L ≃ₐ[K] Πᵥ (Kᵥ ⊗[K] L)
@@ -478,6 +522,18 @@ def AlgEquiv.piCurry (S : Type*) [CommSemiring S] {Y : ι → Type*} (α : (i : 
   map_add' _ _ := rfl
   commutes' _ := rfl
 
+def ContinuousAlgEquiv.piCurry (S : Type*) [CommSemiring S] {Y : ι → Type*}
+    (α : (i : ι) → Y i → Type*) [(i : ι) → (y : Y i) → Semiring (α i y)]
+    [(i : ι) → (y : Y i) → Algebra S (α i y)]  [(i : ι) → (y : Y i) → TopologicalSpace (α i y)] :
+    ((i : Sigma Y) → α i.1 i.2) ≃A[S] ((i : ι) → (y : Y i) → α i y) where
+  toAlgEquiv := AlgEquiv.piCurry S α
+  continuous_toFun := by
+    simp [AlgEquiv.piCurry, Equiv.piCurry]
+    continuity
+  continuous_invFun := by
+    simp [AlgEquiv.piCurry, Equiv.piCurry]
+    sorry
+
 @[simps!]
 def AlgEquiv.piCongrLeft' (S : Type*) [CommSemiring S] (A : α → Type*) (e : α ≃ β)
     [∀ a, Semiring (A a)] [∀ a, Algebra S (A a)] :
@@ -501,21 +557,46 @@ def AlgEquiv.piCongrLeft (S : Type*) [CommSemiring S] (B : β → Type*) (e : α
     ((a : α) → B (e a)) ≃ₐ[S] ((b : β) → B b) :=
   (AlgEquiv.piCongrLeft' S B e.symm).symm
 
+def ContinuousAlgEquiv.piCongrLeft (S : Type*) [CommSemiring S] (B : β → Type*) (e : α ≃ β)
+    [∀ b, Semiring (B b)] [∀ b, Algebra S (B b)] [∀ b, TopologicalSpace (B b)]  :
+    ((a : α) → B (e a)) ≃A[S] ((b : β) → B b) where
+  __ := AlgEquiv.piCongrLeft S B e
+  continuous_toFun := sorry
+  continuous_invFun := sorry
+
+instance : TopologicalSpace (InfiniteAdeleRing K ⊗[K] L) :=
+  TopologicalSpace.induced (piLeft_algEquiv K L) inferInstance
+
+def piLeft : InfiniteAdeleRing K ⊗[K] L ≃A[K] ((v : InfinitePlace K) → v.completion ⊗[K] L) where
+  __ := piLeft_algEquiv K L
+  continuous_toFun := continuous_induced_dom
+  continuous_invFun := by
+    convert (piLeft_algEquiv K L).toEquiv.coinduced_symm ▸ continuous_coinduced_rng
+
+def ContinuousAlgEquiv.piCongrRight {R ι : Type*} {A₁ A₂ : ι → Type*} [CommSemiring R]
+    [(i : ι) → Semiring (A₁ i)] [(i : ι) → Semiring (A₂ i)] [(i : ι) → TopologicalSpace (A₁ i)]
+    [(i : ι) → TopologicalSpace (A₂ i)] [(i : ι) → Algebra R (A₁ i)] [(i : ι) → Algebra R (A₂ i)]
+    (e : (i : ι) → A₁ i ≃A[R] A₂ i) :
+    ((i : ι) → A₁ i) ≃A[R] (i : ι) → A₂ i where
+  __ := AlgEquiv.piCongrRight <| fun _ => (e _).toAlgEquiv
+  continuous_toFun := sorry
+  continuous_invFun := sorry
+
 def baseChange :
     letI : Algebra K (InfiniteAdeleRing L) := Pi.algebra _ _
-    InfiniteAdeleRing K ⊗[K] L ≃ₐ[K] InfiniteAdeleRing L := by
+    InfiniteAdeleRing K ⊗[K] L ≃A[K] InfiniteAdeleRing L := by
   letI : Algebra K (InfiniteAdeleRing L) := Pi.algebra _ _
-  apply AlgEquiv.piLeft K L |>.trans
-  have (v : _) := (NumberField.Completion.baseChange K L v).restrictScalars K
-  apply AlgEquiv.piCongrRight this |>.trans
+  apply piLeft K L |>.trans
+  have (v : _) := ContinuousAlgEquiv.restrictScalars K (NumberField.Completion.baseChange K L v)
+  apply ContinuousAlgEquiv.piCongrRight this |>.trans
   let γ : (v : InfinitePlace K) → (w : Σ_v) → Type _ :=
     fun v w => w.1.completion
-  apply AlgEquiv.piCurry K γ |>.symm |>.trans
-  have := AlgEquiv.piCongrLeft K (fun w => w.completion)
+  apply ContinuousAlgEquiv.piCurry K γ |>.symm |>.trans
+  have := ContinuousAlgEquiv.piCongrLeft K (fun w => w.completion)
     (NumberField.Completion.equiv_comap K L).symm
-  refine AlgEquiv.trans ?_ this
+  refine ContinuousAlgEquiv.trans ?_ this
   simp_rw [NumberField.Completion.equiv_comap_apply, γ]
-  exact AlgEquiv.refl
+  exact ContinuousAlgEquiv.refl _ _
 
 end InfiniteAdeleRing
 
