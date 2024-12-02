@@ -522,17 +522,18 @@ def AlgEquiv.piCurry (S : Type*) [CommSemiring S] {Y : ι → Type*} (α : (i : 
   map_add' _ _ := rfl
   commutes' _ := rfl
 
+@[simps!]
 def ContinuousAlgEquiv.piCurry (S : Type*) [CommSemiring S] {Y : ι → Type*}
     (α : (i : ι) → Y i → Type*) [(i : ι) → (y : Y i) → Semiring (α i y)]
     [(i : ι) → (y : Y i) → Algebra S (α i y)]  [(i : ι) → (y : Y i) → TopologicalSpace (α i y)] :
     ((i : Sigma Y) → α i.1 i.2) ≃A[S] ((i : ι) → (y : Y i) → α i y) where
   toAlgEquiv := AlgEquiv.piCurry S α
-  continuous_toFun := by
-    simp [AlgEquiv.piCurry, Equiv.piCurry]
-    continuity
+  continuous_toFun := continuous_pi (fun _ => continuous_pi <| fun _ => continuous_apply _)
   continuous_invFun := by
-    simp [AlgEquiv.piCurry, Equiv.piCurry]
-    sorry
+    refine continuous_pi (fun ⟨x, y⟩ => ?_)
+    simp only [AlgEquiv.toEquiv_eq_coe, Equiv.invFun_as_coe, AlgEquiv.symm_toEquiv_eq_symm,
+      EquivLike.coe_coe, AlgEquiv.piCurry_symm_apply, Sigma.uncurry]
+    exact Continuous.comp' (continuous_apply _) (continuous_apply _)
 
 @[simps!]
 def AlgEquiv.piCongrLeft' (S : Type*) [CommSemiring S] (A : α → Type*) (e : α ≃ β)
@@ -551,18 +552,31 @@ theorem AlgEquiv.piCongrLeft'_symm (S : Type*) {A : Type*} [CommSemiring S] [Sem
     Equiv.piCongrLeft'_symm]
   rfl
 
-@[simps!]
+@[simp]
+theorem AlgEquiv.piCongrLeft'_symm_apply_apply (S : Type*) (A : α → Type*) [CommSemiring S]
+    [∀ a, Semiring (A a)] [∀ a, Algebra S (A a)] (e : α ≃ β) (g : (b : β) → A (e.symm b)) (b : β) :
+    (piCongrLeft' S A e).symm g (e.symm b) = g b := by
+  rw [← Equiv.piCongrLeft'_symm_apply_apply A e g b]
+  rfl
+
+@[simps! apply toEquiv]
 def AlgEquiv.piCongrLeft (S : Type*) [CommSemiring S] (B : β → Type*) (e : α ≃ β)
     [∀ b, Semiring (B b)] [∀ b, Algebra S (B b)] :
     ((a : α) → B (e a)) ≃ₐ[S] ((b : β) → B b) :=
   (AlgEquiv.piCongrLeft' S B e.symm).symm
 
+@[simps!]
 def ContinuousAlgEquiv.piCongrLeft (S : Type*) [CommSemiring S] (B : β → Type*) (e : α ≃ β)
     [∀ b, Semiring (B b)] [∀ b, Algebra S (B b)] [∀ b, TopologicalSpace (B b)]  :
     ((a : α) → B (e a)) ≃A[S] ((b : β) → B b) where
-  __ := AlgEquiv.piCongrLeft S B e
-  continuous_toFun := sorry
-  continuous_invFun := sorry
+  toAlgEquiv := AlgEquiv.piCongrLeft S B e
+  continuous_toFun := continuous_pi <| e.forall_congr_right.mp fun i ↦ by
+    simp only [AlgEquiv.toEquiv_eq_coe, AlgEquiv.piCongrLeft, Equiv.toFun_as_coe, EquivLike.coe_coe]
+    have := AlgEquiv.piCongrLeft'_symm_apply_apply S B e.symm
+    simp only [Equiv.symm_symm_apply] at this
+    simp only [this]
+    exact continuous_apply _
+  continuous_invFun := Pi.continuous_precomp' e
 
 instance : TopologicalSpace (InfiniteAdeleRing K ⊗[K] L) :=
   TopologicalSpace.induced (piLeft_algEquiv K L) inferInstance
@@ -579,8 +593,8 @@ def ContinuousAlgEquiv.piCongrRight {R ι : Type*} {A₁ A₂ : ι → Type*} [C
     (e : (i : ι) → A₁ i ≃A[R] A₂ i) :
     ((i : ι) → A₁ i) ≃A[R] (i : ι) → A₂ i where
   __ := AlgEquiv.piCongrRight <| fun _ => (e _).toAlgEquiv
-  continuous_toFun := sorry
-  continuous_invFun := sorry
+  continuous_toFun := Pi.continuous_postcomp' fun i ↦ (e i).continuous
+  continuous_invFun := Pi.continuous_postcomp' fun i ↦ (e i).symm.continuous
 
 def baseChange :
     letI : Algebra K (InfiniteAdeleRing L) := Pi.algebra _ _
