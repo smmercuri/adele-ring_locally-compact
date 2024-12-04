@@ -234,27 +234,11 @@ def piLeft_algEquiv : InfiniteAdeleRing K ⊗[K] L ≃ₐ[K]
   apply AlgEquiv.trans (AlgEquiv.piRight _ _ _ _)
   exact AlgEquiv.piCongrRight <| fun _ => Algebra.TensorProduct.comm _ _ _
 
-instance (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) : Algebra (WithAbs v) (WithAbs w) :=
-  inferInstanceAs (Algebra K L)
-
-theorem WithAbs.norm_eq (v : AbsoluteValue K ℝ) (x : WithAbs v) : ‖x‖ = v x := rfl
-
-theorem WithAbs.uniformContinuous_algebraMap (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ)
-    (h : ∀ x, w (algebraMap (WithAbs v) (WithAbs w) x) = v x) :
-    UniformContinuous (algebraMap (WithAbs v) (WithAbs w)) :=
-  (WithAbs.uniformInducing_of_comp (L := WithAbs w) h).uniformContinuous
   /-apply uniformContinuous_of_tendsto_zero
   rw [Metric.nhds_basis_closedBall.tendsto_iff Metric.nhds_basis_closedBall]
   refine fun ε _ => ⟨ε, ‹_›, fun x hx => ?_⟩
   rw [Metric.mem_closedBall, dist_zero_right, WithAbs.norm_eq _, ← h] at hx ⊢
   exact hx-/
-
-theorem NumberField.InfinitePlace.abs_eq_of_comap {v : InfinitePlace K} {w : InfinitePlace L}
-    (h : w.comap (algebraMap _ _) = v) :
-    ∀ x, w.1 (algebraMap (WithAbs v.1) (WithAbs w.1) x) = v.1 x := by
-  rw [← h]
-  intro x
-  rfl
 
 variable (w : InfinitePlace L)
 
@@ -263,105 +247,6 @@ local notation "Σ_" v => {w : InfinitePlace L // w.comap (algebraMap K L) = v}
 /- Now establish `Kᵥ`-algebra isomorphisms (Note completion as base field now)
 Kᵥ ⊗[K] L ≃ₐ[v.completion] Π_{w ∣ v} L_w, where w ∣ v means that
 v = w.comap (algebraMap K L). -/
-def NumberField.Completion.comap_ringHom {v : InfinitePlace K} (w : Σ_v) :
-    v.completion →+* w.1.completion :=
-  map_of_comp (L := WithAbs w.1.1) (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)
-
-instance : Algebra K (WithAbs w.1) := ‹Algebra K L›
-
-instance : UniformContinuousConstSMul K (WithAbs w.1) :=
-  uniformContinuousConstSMul_of_continuousConstSMul _ _
-
-instance : IsScalarTower K L (WithAbs w.1) := inferInstanceAs (IsScalarTower K L L)
-
-instance : SMulCommClass K v.completion v.completion := Algebra.to_smulCommClass
-
-instance (w : Σ_v) : Algebra v.completion w.1.completion := RingHom.toAlgebra <|
-  NumberField.Completion.comap_ringHom K L w
-
-@[simp]
-theorem algebraMap_def' (w : Σ_v) : algebraMap v.completion w.1.completion =
-    map_of_comp (L := WithAbs w.1.1) (NumberField.InfinitePlace.abs_eq_of_comap K L w.2) :=
-  rfl
-
-@[simp]
-theorem algebraMap_apply' (w : Σ_v) (x : v.completion) :
-    algebraMap v.completion w.1.completion x = UniformSpace.Completion.map
-      (algebraMap (WithAbs v.1) (WithAbs w.1.1)) x :=
-  rfl
-
-@[simp]
-theorem algebraMap_coe' (w : Σ_v) (k : K) :
-    algebraMap v.completion w.1.completion k = algebraMap (WithAbs v.1) (WithAbs w.1.1) k := by
-  rw [algebraMap_apply']
-  exact UniformSpace.Completion.map_coe (WithAbs.uniformContinuous_algebraMap K L v.1 w.1.1
-    (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)) _
-
-@[simp]
-theorem smul_def (w : Σ_v) (x : v.completion) (y : w.1.completion) :
-    x • y = algebraMap _ _ x * y :=
-  rfl
-
-noncomputable instance : Algebra K (w.completion) where
-  toFun k := algebraMap L w.completion (algebraMap K L k)
-  map_one' := by simp only [map_one]
-  map_mul' k₁ k₂ := by simp only [map_mul]
-  map_zero' := by simp only [map_zero]
-  map_add' k₁ k₂ := by simp only [map_add]
-  commutes' k lhat := mul_comm _ _
-  smul_def' k lhat := by
-    rw [RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, UniformSpace.Completion.smul_def,
-    ← RingHom.comp_apply, ← IsScalarTower.algebraMap_eq,
-    UniformSpace.Completion.map_smul_eq_mul_coe, UniformSpace.Completion.algebraMap_def]
-
-theorem algebraMap_comp (k : K) : algebraMap K w.completion k =
-    algebraMap L w.completion (algebraMap K L k) :=
-  rfl
-
-theorem algebraMap_comp' (w : Σ_v) (k : K) : algebraMap K w.1.completion k =
-    algebraMap v.completion w.1.completion (algebraMap K v.completion k) := by
-  simp only [UniformSpace.Completion.algebraMap_def]
-  rw [algebraMap_coe' K v L w _]
-  rfl
-
-instance (w : Σ_v) : IsScalarTower K v.completion w.1.completion :=
-  IsScalarTower.of_algebraMap_eq (algebraMap_comp' K v L w)
-
-open NumberField in
-instance (v : InfinitePlace K) : NontriviallyNormedField (v.completion) where
-  toNormedField := InfinitePlace.Completion.instNormedFieldCompletion v
-  non_trivial := by
-    simp only [← dist_zero_right]
-    have h := InfinitePlace.Completion.isometry_extensionEmbedding v |>.dist_eq
-    use 2
-    simp only [← h 2 0, map_ofNat, map_zero, dist_zero_right, RCLike.norm_ofNat, Nat.one_lt_ofNat]
-
-instance (w : Σ_v) : NormedSpace v.completion w.1.completion where
-  norm_smul_le x y := by
-    rw [smul_def, norm_mul, algebraMap_def']
-    have := AbsoluteValue.Completion.isometry_map_of_comp (L := WithAbs w.1.1)
-      (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)
-    rw [this.norm_map_of_map_zero (map_zero _)]
-
-noncomputable instance (w : Σ_v) : FiniteDimensional v.completion w.1.completion :=
-  FiniteDimensional.of_locallyCompactSpace v.completion
-
-theorem NumberField.Completion.algebraMap_eq_coe :
-    ⇑(algebraMap K v.completion) = ((↑) : K → v.completion) := rfl
-
-def NumberField.Completion.comap {v : InfinitePlace K} (w : Σ_v) :
-    v.completion →A[K] w.1.completion where
-  __ := NumberField.Completion.comap_ringHom K L w
-  commutes' := by
-    intro r
-    simp only [RingHom.toMonoidHom_eq_coe, OneHom.toFun_eq_coe, MonoidHom.toOneHom_coe,
-      MonoidHom.coe_coe, comap_ringHom, UniformSpace.Completion.mapRingHom_apply]
-    rw [algebraMap_eq_coe, UniformSpace.Completion.map_coe] ; rfl
-    exact WithAbs.uniformContinuous_algebraMap K L v.1 w.1.1
-      (NumberField.InfinitePlace.abs_eq_of_comap K L w.2)
-  cont := UniformSpace.Completion.continuous_map
-
-instance : IsScalarTower K v.completion v.completion := IsScalarTower.right
 
 def ContinuousAlgHom.extendScalars {A : Type*} (B : Type*) {C D : Type*}
     [CommSemiring A] [CommSemiring C] [CommSemiring D] [TopologicalSpace C]
@@ -386,11 +271,11 @@ def ContinuousAlgEquiv.restrictScalars (A : Type*) {B : Type*} {C D : Type*}
 
 def NumberField.Completion.comap_extend {v : InfinitePlace K} (w : Σ_v) :
     v.completion →A[v.completion] w.1.completion :=
-  ContinuousAlgHom.extendScalars v.completion (comap K L w)
+  ContinuousAlgHom.extendScalars v.completion (comap w)
 
 def NumberField.Completion.comap_injective {v : InfinitePlace K} (w : Σ_v) :
-    Function.Injective (NumberField.Completion.comap K L w) :=
-  (NumberField.Completion.comap K L w).injective
+    Function.Injective (Completion.comap w) :=
+  (Completion.comap w).injective
 
 def NumberField.Completion.comap_extend_injective {v : InfinitePlace K} (w : Σ_v) :
     Function.Injective (comap_extend K L w) :=
@@ -413,7 +298,7 @@ def Pi.continuousAlgHom {I R A : Type*} (f : I → Type*) [CommSemiring R]
 
 def NumberField.Completion.comap_pi (v : InfinitePlace K) :
     v.completion →A[K] ((w : Σ_v) → w.1.completion) :=
-  Pi.continuousAlgHom _ <| (fun _ => NumberField.Completion.comap K L _)
+  Pi.continuousAlgHom _ <| (fun _ => comap _)
 
 def NumberField.Completion.comap_pi_extend (v : InfinitePlace K) :
     v.completion →A[v.completion] ((w : Σ_v) → w.1.completion) :=
@@ -428,6 +313,7 @@ def NumberField.Completion.algebraMap_pi :
   __ := algebraMap_pi_ringHom K v L
   commutes' _ := rfl
 
+-- from mathlib
 theorem NumberField.InfinitePlace.comap_surjective {k : Type u_1} [Field k] {K : Type u_2}
     [Field K] [Algebra k K] [Algebra.IsAlgebraic k K] :
     Function.Surjective fun (x : NumberField.InfinitePlace K) => x.comap (algebraMap k K) :=
@@ -466,8 +352,11 @@ def NumberField.Completion.baseChange_continuousAlgHom (v : InfinitePlace K) :
     v.completion ⊗[K] L →A[v.completion] ((w : Σ_v) → w.1.completion) where
   __ := baseChange_algHom K L v
 
+-- I can go via ℝ^n to show this if v is real, otherwise via ℂ^n.
+-- Maybe we need some result that v.IsComplex → w.1.IsComplex - TODO
 theorem finrank_eq : FiniteDimensional.finrank v.completion ((w : Σ_v) → w.1.completion) =
-    FiniteDimensional.finrank v.completion (v.completion ⊗[K] L) := sorry
+    FiniteDimensional.finrank v.completion (v.completion ⊗[K] L) := by
+  sorry
 
 theorem NumberField.Completion.baseChange_det_ne_zero (v : InfinitePlace K) :
     let Bv := FiniteDimensional.finBasis v.completion (v.completion ⊗[K] L)

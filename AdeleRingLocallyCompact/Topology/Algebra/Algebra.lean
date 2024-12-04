@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2024 Salvatore Mercuri. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Salvatore Mercuri
+-/
 import Mathlib.Topology.Algebra.Algebra
 import AdeleRingLocallyCompact.FromMathlib.Topology.Algebra.Algebra
 
@@ -31,7 +36,7 @@ class ContinuousAlgEquivClass (F : Type*) (R A B : outParam Type*) [CommSemiring
 namespace ContinuousAlgEquiv
 
 variable {R A B C : Type*}
-  [CommSemiring R] [CommSemiring S] [Semiring A] [TopologicalSpace A] [Semiring B]
+  [CommSemiring R] [Semiring A] [TopologicalSpace A] [Semiring B]
   [TopologicalSpace B] [Semiring C] [TopologicalSpace C] [Algebra R A] [Algebra R B]
   [Algebra R C]
 
@@ -144,7 +149,7 @@ def refl : A ≃A[R] A where
   continuous_invFun := continuous_id
 
 @[simp]
-theorem refl_apply : refl R A x = x := rfl
+theorem refl_apply (a : A) : refl R A a = a := rfl
 
 @[simp]
 theorem coe_refl : refl R A = ContinuousAlgHom.id R A := rfl
@@ -241,7 +246,6 @@ theorem symm_apply_eq (e : A ≃A[R] B) {a : A} {b : B} : e.symm b = a ↔ b = e
 
 theorem eq_symm_apply (e : A ≃A[R] B) {a : A} {b : B} : a = e.symm b ↔ e a = b :=
   e.toEquiv.eq_symm_apply
-
 
 theorem image_eq_preimage (e : A ≃A[R] B) (S : Set A) : e '' S = e.symm ⁻¹' S :=
   e.toEquiv.image_eq_preimage S

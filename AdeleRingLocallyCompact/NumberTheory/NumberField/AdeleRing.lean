@@ -251,6 +251,11 @@ theorem InfiniteAdeleRing.sub_mem_closedBalls (a : InfiniteAdeleRing ℚ) :
 
 variable (K)
 
+instance : CompactSpace (FiniteIntegralAdeles (𝓞 ℚ) ℚ) := Pi.compactSpace
+
+instance : ContinuousSMul (FiniteIntegralAdeles (𝓞 ℚ) ℚ) (FiniteAdeleRing (𝓞 ℚ) ℚ) :=
+  sorry
+
 open DedekindDomain IsDedekindDomain Metric in
 theorem isCompact_quotient_principal :
     IsCompact (Set.univ : Set <| AdeleRing K ⧸ principalSubgroup K) := by
@@ -268,7 +273,7 @@ theorem isCompact_quotient_principal :
   let f : AdeleRing ℚ → AdeleRing ℚ ⧸ principalSubgroup ℚ := QuotientAddGroup.mk' _
   have h_W_compact : IsCompact W := by
     refine IsCompact.prod (isCompact_univ_pi (fun v => ?_))
-      (sorry) --IsCompact.image CompactSpace.isCompact_univ <| continuous_algebraMap _ _)
+      (IsCompact.image CompactSpace.isCompact_univ <| continuous_algebraMap _ _)
     exact isCompact_iff_isClosed_bounded.2 <| ⟨isClosed_ball, isBounded_closedBall⟩
   have h_W_image : f '' W = Set.univ := by
     simp only [f, Set.eq_univ_iff_forall]
