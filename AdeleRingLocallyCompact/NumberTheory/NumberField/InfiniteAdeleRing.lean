@@ -760,8 +760,6 @@ theorem InfinitePlace.sub_apply_le_of_le {v : InfinitePlace K} (a b : K) (h : v 
   rwa [abs_of_nonneg] at this
   exact sub_nonneg_of_le h
 
-/-theorem tendsto_pow_mul_const {v : InfinitePlace K} {a : K} (ha : v a = 1) (b : K) :
-    Filter.Tendsto (fun (n : ℕ) => v (a ^ n * b)) Filter.atTop (𝓝 (v b)) := sorry-/
 theorem tendsto_one_add_pow {v : InfinitePlace K} {a : K} (ha : v a < 1) :
     Filter.Tendsto (fun n => 1 + (v a ^ n)) Filter.atTop (𝓝 1) := by
   nth_rw 2 [← add_zero 1]
@@ -781,14 +779,6 @@ theorem InfinitePlace.tendsto_oneAddPow_nhds_one {v : InfinitePlace K} {a : K} (
   rw [tendsto_zero_iff_norm_tendsto_zero]
   simp_rw [norm_pow]
   apply tendsto_pow_atTop_nhds_zero_of_lt_one (AbsoluteValue.nonneg _ _) ha
-
-/-theorem InfinitePlace.tendsto_oneAddPow_nhds_zero {v : InfinitePlace K} {a : K} (ha : 1 < v a) :
-    Filter.Tendsto (fun n => oneAddPow v n a) Filter.atTop (𝓝 0) := by
-  rw [← add_zero (0 : WithAbs v.1)]
-  apply Filter.Tendsto.const_add
-  rw [tendsto_zero_iff_norm_tendsto_zero]
-  simp_rw [norm_pow]
-  apply tendsto_pow_atTop_nhds_zero_of_lt_one (AbsoluteValue.nonneg _ _) ha-/
 
 theorem InfinitePlace.tendsto_oneSubPow {v : InfinitePlace K} {a : K} (ha : v a < 1) :
     Filter.Tendsto (fun n => oneSubPow v n a) Filter.atTop (𝓝 1) := by
@@ -1209,8 +1199,27 @@ theorem matrix_det_approx {n : ℕ}
     (hε : ε > 0) :
     ∃ β : Fin n → L,
       dist (B.toMatrix B).det
-        (B.toMatrix (fun i => algebraMap _ ((w : Σ_v) → w.1.completion) (β i))).det < ε :=
-  sorry
+        (B.toMatrix (fun i => algebraMap _ ((w : Σ_v) → w.1.completion) (β i))).det < ε := by
+  let X := (Fin n) → (w : Σ_v) → w.1.completion
+  let f : X → Matrix (Fin n) (Fin n) v.completion := fun α => B.toMatrix fun i => α i
+  have hf : Continuous f :=
+    B.toMatrixEquiv.toLinearMap.continuous_of_finiteDimensional
+  have := Continuous.matrix_det hf
+  rw [Metric.continuous_iff] at this
+  have hc (b : X) := this b ε hε
+  choose δ hδ using hc B
+  specialize h δ hδ.1
+  let ⟨α, hα⟩ := h
+  use α
+  rw [dist_comm]
+  apply hδ.2
+  rw [dist_comm, dist_eq_norm]
+  simp_rw [dist_eq_norm] at hα
+  rw [Pi.norm_def]
+  have := Finset.sup_lt_iff
+    (f := fun i => ‖B i - algebraMap L ((w : Σ_v) → w.1.completion) (α i)‖₊)
+    (a := ⟨δ, le_of_lt hδ.1⟩) (s := Finset.univ) hδ.1
+  exact this.2 fun i _ => hα i
 
 theorem NumberField.Completion.matrix_approx {n : ℕ}
     (B : Basis (Fin n) v.completion ((w : Σ_v) → w.1.completion))
