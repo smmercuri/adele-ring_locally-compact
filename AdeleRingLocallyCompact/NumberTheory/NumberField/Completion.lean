@@ -13,6 +13,8 @@ import AdeleRingLocallyCompact.Topology.UniformSpace.Basic
 import AdeleRingLocallyCompact.Topology.Instances.Real
 import AdeleRingLocallyCompact.Topology.Algebra.UniformRing
 
+open scoped Classical
+
 /-!
 # The completion of a number field at an infinite place
 
@@ -299,6 +301,352 @@ theorem isConjugateTower_of_not_isTower {v : InfinitePlace K} {w : Σ_v} (hw : �
     IsConjugateTower w :=
   isTower_or_isConjugateTower w |>.resolve_left hw
 
+/-- I need this lower down for embeddings, because Classical.choose is causing headaches -/
+
+def IsExtension (f : K →+* ℂ) (g : L →+* ℂ) := g.comp (algebraMap K L) = f
+
+variable (L)
+
+abbrev Extends (f : K →+* ℂ) := { g : L →+* ℂ //  g.comp (algebraMap K L) = f }
+
+variable {L}
+def IsRamifiedExtension (f : K →+* ℂ) (g : Extends L f) :=
+    ComplexEmbedding.IsReal f ∧ ¬ComplexEmbedding.IsReal g.1
+
+theorem comap_mk_of_isExtension {v : InfinitePlace K} (ψ : L →+* ℂ)
+    (hψ : IsExtension v.embedding ψ) :
+    (InfinitePlace.mk ψ).comap (algebraMap K L) = v := by
+  rw [comap_mk, hψ, mk_embedding]
+
+theorem isExtension_of_comap_not_isUnramified {v : InfinitePlace K} {w : InfinitePlace L}
+    (h : ¬IsUnramified K w) (h' : w.comap (algebraMap _ _) = v) :
+    IsExtension v.embedding w.embedding := by
+  rw [← InfinitePlace.mk_embedding w] at h h'
+  rw [not_isUnramified_iff] at h
+  rw [comap_mk] at h h'
+  rw [isComplex_mk_iff, isReal_mk_iff] at h
+  have := InfinitePlace.embedding_mk_eq_of_isReal h.2
+  rw [IsExtension]
+  rw [← this]
+  rw [h']
+
+theorem isExtension_conj_of_comap_not_isUnramified {v : InfinitePlace K} {w : InfinitePlace L}
+    (h : ¬IsUnramified K w) (h' : w.comap (algebraMap _ _) = v) :
+    IsExtension v.embedding (ComplexEmbedding.conjugate w.embedding) := by
+  rw [← InfinitePlace.mk_embedding w] at h h'
+  rw [not_isUnramified_iff] at h
+  rw [comap_mk] at h h'
+  rw [isComplex_mk_iff, isReal_mk_iff] at h
+  have := InfinitePlace.embedding_mk_eq_of_isReal h.2
+  rw [IsExtension]
+  ext k
+  simp
+  rw [← h']
+  rw [this]
+  nth_rw 2 [ComplexEmbedding.isReal_iff] at h
+  have := RingHom.congr_fun h.2 k
+  rw [← this]
+  rfl
+
+def toExtends {v : InfinitePlace K} {w : InfinitePlace L} (h : ¬IsUnramified K w)
+  (h' : w.comap (algebraMap _ _) = v) :
+  Extends L v.embedding := ⟨w.embedding, isExtension_of_comap_not_isUnramified h h'⟩
+
+def toExtends_conj {v : InfinitePlace K} {w : InfinitePlace L} (h : ¬IsUnramified K w)
+  (h' : w.comap (algebraMap _ _) = v) :
+  Extends L v.embedding :=
+    ⟨ComplexEmbedding.conjugate w.embedding, isExtension_conj_of_comap_not_isUnramified h h'⟩
+
+theorem not_isUnramified_of_isRamifiedExtension {v : InfinitePlace K} {ψ : Extends L v.embedding}
+    (h : IsRamifiedExtension v.embedding ψ) :
+    ¬IsUnramified K (InfinitePlace.mk ψ.1) := by
+  rw [not_isUnramified_iff]
+  rw [IsRamifiedExtension] at h
+  have := ψ.2
+  rw [isComplex_iff, comap_mk, isReal_iff]
+  simp_rw [this]
+  rw [embedding_mk_eq_of_isReal h.1]
+  refine ⟨?_, h.1⟩
+  cases embedding_mk_eq ψ.1 with
+  | inl hψ =>
+    rw [hψ]; exact h.2
+  | inr hψ =>
+    rw [hψ, ComplexEmbedding.isReal_conjugate_iff]
+    exact h.2
+
+theorem isRamifiedExtension_of_not_isUnramified {v : InfinitePlace K} {w : InfinitePlace L}
+    (h : ¬IsUnramified K w) (h' : w.comap (algebraMap _ _) = v) :
+    IsRamifiedExtension v.embedding (toExtends h h') := by
+  rw [← InfinitePlace.mk_embedding w] at h h'
+  rw [not_isUnramified_iff] at h
+  rw [comap_mk] at h h'
+  rw [isComplex_mk_iff, isReal_mk_iff] at h
+  have := InfinitePlace.embedding_mk_eq_of_isReal h.2
+  rw [IsRamifiedExtension]
+  refine ⟨?_, h.1⟩
+  convert h.2
+  rw [← this]
+  rw [h']
+
+theorem isRamifiedExtension_of_not_isUnramified_conj {v : InfinitePlace K} {w : InfinitePlace L}
+    (h : ¬IsUnramified K w) (h' : w.comap (algebraMap _ _) = v) :
+    IsRamifiedExtension v.embedding (toExtends_conj h h') := by
+  rw [← InfinitePlace.mk_embedding w] at h h'
+  rw [not_isUnramified_iff] at h
+  rw [comap_mk] at h h'
+  rw [isComplex_mk_iff, isReal_mk_iff] at h
+  have := InfinitePlace.embedding_mk_eq_of_isReal h.2
+  rw [IsRamifiedExtension]
+  refine ⟨?_, not_congr ComplexEmbedding.isReal_conjugate_iff |>.2 h.1⟩
+  convert h.2
+  rw [← this]
+  rw [h']
+
+def sum_not_isUnramified_equiv_IsRamifiedExtension {v : InfinitePlace K} :
+      { w : Σ_v // ¬IsUnramified K w.1} ⊕ { w : Σ_v // ¬IsUnramified K w.1} ≃
+        { ψ : Extends L v.embedding // IsRamifiedExtension v.embedding ψ } := by
+
+  let g₁ : { w : Σ_v // ¬IsUnramified K w.1 } →
+    { ψ : Extends L v.embedding // IsRamifiedExtension v.embedding ψ }
+    := fun ⟨w, h⟩ => ⟨toExtends h w.2, isRamifiedExtension_of_not_isUnramified h w.2⟩
+
+  let g₂ : { w : Σ_v // ¬IsUnramified K w.1 } →
+      { ψ : Extends L v.embedding // IsRamifiedExtension v.embedding ψ }
+    := fun ⟨w, h⟩ => ⟨toExtends_conj h w.2,
+      isRamifiedExtension_of_not_isUnramified_conj h w.2⟩
+  let f := Sum.elim g₁ g₂
+
+  have hg₁_inj : g₁.Injective := by
+    simp [g₁, g₂]
+    intro a b h
+    simp at h ⊢
+    ext
+    rw [← mk_embedding a.1.1, ← mk_embedding b.1.1]
+    simp [toExtends] at h
+    rw [h]
+  have hg₂_inj : g₂.Injective := by
+    simp [g₁, g₂]
+    intro a b h
+    simp at h ⊢
+    ext
+    rw [← mk_embedding a.1.1, ← mk_embedding b.1.1]
+    simp [toExtends_conj] at h
+    rw [h]
+  have hg_ne (a : _) (b : _) : g₁ a ≠ g₂ b := by
+    simp [g₁, g₂, toExtends, toExtends_conj]
+    by_cases hab : a = b
+    · rw [hab]
+      have := b.2
+      rw [not_isUnramified_iff] at this
+      rw [isComplex_iff] at this
+      rw [ComplexEmbedding.isReal_iff] at this
+      exact Ne.symm this.1
+    · contrapose! hab
+      have : a.1.1 = b.1.1 := by
+        rw [← mk_embedding a.1.1, ← mk_embedding b.1.1]
+        rw [hab]
+        simp only [mk_conjugate_eq, mk_embedding]
+      let ⟨⟨a, _⟩, _⟩ := a
+      let ⟨⟨b, _⟩, _⟩ := b
+      congr
+
+  have hf_inj : f.Injective := hg₁_inj.sum_elim hg₂_inj hg_ne
+
+  have hf_surj : f.Surjective := by
+    intro ⟨ψ, h⟩
+    have h' : (mk ψ.1).comap (algebraMap _ _) = v := by
+      rw [comap_mk, ψ.2, mk_embedding]
+    have : ¬IsUnramified K (mk ψ.1) := not_isUnramified_of_isRamifiedExtension h
+    let w : Σ_v := ⟨mk ψ.1, h'⟩
+    cases embedding_mk_eq ψ.1 with
+    | inl h =>
+      use Sum.inl ⟨w, this⟩
+      simp [f, g₁, toExtends, h]
+    | inr h =>
+      use Sum.inr ⟨w, this⟩
+      simp [f, g₂, toExtends_conj]
+      simp [h]
+
+  apply Equiv.ofBijective _ ⟨hf_inj, hf_surj⟩
+
+theorem isExtension_or_conjugate_isExtension {v : InfinitePlace K} {w : Σ_v} :
+    IsExtension v.embedding w.1.embedding ∨
+      IsExtension v.embedding (ComplexEmbedding.conjugate w.1.embedding) := by
+  have := w.2
+  rw [← mk_embedding w.1, comap_mk] at this
+  have := congrArg InfinitePlace.embedding this
+  have := embedding_mk_eq (w.1.embedding.comp (algebraMap K L))
+  cases this with
+  | inl h =>
+    rw [h] at this
+    left
+    exact this
+  | inr h =>
+    rw [h] at this
+    right
+    exact this
+
+theorem not_isRamifiedExtension_of_isUnramified {v : InfinitePlace K} {w : Σ_v}
+    (h : IsUnramified K w.1) (h' : IsExtension v.embedding w.1.embedding) :
+    ¬IsRamifiedExtension v.embedding ⟨w.1.embedding, h'⟩ := by
+  have := w.2
+  rw [← mk_embedding w.1] at this
+  rw [comap_mk] at this
+  contrapose! h
+  rw [not_isUnramified_iff]
+  rw [IsRamifiedExtension] at h
+  rw [isComplex_iff]
+  use h.2
+  rw [isReal_iff]
+  rw [← mk_embedding w.1, comap_mk, h', mk_embedding]
+  exact h.1
+
+theorem not_isRamifiedExtension_of_isUnramified' {v : InfinitePlace K} {w : Σ_v}
+    (h : IsUnramified K w.1)
+    (h' : IsExtension v.embedding (ComplexEmbedding.conjugate w.1.embedding)) :
+    ¬IsRamifiedExtension v.embedding ⟨ComplexEmbedding.conjugate w.1.embedding, h'⟩ := by
+  have := w.2
+  rw [← mk_embedding w.1] at this
+  rw [comap_mk] at this
+  contrapose! h
+  rw [not_isUnramified_iff]
+  rw [IsRamifiedExtension] at h
+  rw [isComplex_iff]
+  rw [← NumberField.ComplexEmbedding.isReal_conjugate_iff]
+  use h.2
+  rw [isReal_iff]
+  rw [← mk_embedding w.1, comap_mk]
+  convert h.1
+
+theorem isUnramified_of_not_isRamifiedExtension {v : InfinitePlace K} {ψ : L →+* ℂ}
+    (h : IsExtension v.embedding ψ) (h' : ¬IsRamifiedExtension v.embedding ⟨ψ, h⟩) :
+    IsUnramified K (mk ψ) := by
+  rw [isUnramified_iff]
+  rw [IsRamifiedExtension] at h'
+  simp at h'
+  by_cases h'' : ComplexEmbedding.IsReal v.embedding
+  · rw [isReal_iff]
+    left
+    specialize h' h''
+    rwa [embedding_mk_eq_of_isReal h']
+  · right
+    contrapose! h''
+    simp only [comap_mk, not_isComplex_iff_isReal] at h''
+    rw [isReal_iff, ComplexEmbedding.isReal_iff] at h''
+    rw [ComplexEmbedding.isReal_iff]
+    ext k
+    rw [IsExtension] at h
+    simp
+    have := RingHom.congr_fun h'' k
+    simp at this
+    rw [h] at this
+    simp at this
+    exact this
+
+def isUnramified_equiv_not_isRamifiedExtension {v : InfinitePlace K} :
+    { w : Σ_v // IsUnramified K w.1} ≃
+      { ψ : Extends L v.embedding // ¬IsRamifiedExtension v.embedding ψ } := by
+  set f : { w : Σ_v // IsUnramified K w.1} →
+    { ψ : Extends L v.embedding // ¬IsRamifiedExtension v.embedding ψ } :=
+      fun ⟨w, h⟩ =>
+        if h' : IsExtension v.embedding w.1.embedding then
+          ⟨⟨w.1.embedding, h'⟩, not_isRamifiedExtension_of_isUnramified h h'⟩ else
+          ⟨⟨ComplexEmbedding.conjugate w.1.embedding,
+            isExtension_or_conjugate_isExtension.resolve_left h'⟩,
+              not_isRamifiedExtension_of_isUnramified' h (
+                isExtension_or_conjugate_isExtension.resolve_left h')⟩
+
+  have hf_inj : f.Injective := by
+    intro ⟨⟨ψ₁, h₁⟩, h₁'⟩ ⟨⟨ψ₂, h₂⟩, h₂'⟩ h
+    simp [f] at h
+    simp only [Subtype.mk.injEq]
+    by_cases hv : ComplexEmbedding.IsReal v.embedding
+    · have : ComplexEmbedding.conjugate ψ₁.embedding = ψ₁.embedding := by
+        have := IsReal.comap_of_isUnramified (w := ⟨ψ₁, h₁⟩) (isReal_iff.2 hv) h₁'
+        rw [isReal_iff] at this
+        simp at this
+        exact this
+      simp [this] at h
+      have : ComplexEmbedding.conjugate ψ₂.embedding = ψ₂.embedding := by
+        have := IsReal.comap_of_isUnramified (w := ⟨ψ₂, h₂⟩) (isReal_iff.2 hv) h₂'
+        rw [isReal_iff] at this
+        simp at this
+        exact this
+      simp [this] at h
+      split_ifs at h <;>
+      · simp at h
+        rw [← mk_embedding ψ₁, h, mk_embedding]
+    · split_ifs at h
+      · simp at h
+        rw [← mk_embedding ψ₁, h, mk_embedding]
+      · simp at h
+        rw [← mk_embedding ψ₁, h]
+        simp only [mk_conjugate_eq, mk_embedding]
+      · simp at h
+        rw [← mk_embedding ψ₂, ← h, mk_conjugate_eq, mk_embedding]
+      · simp at h
+        rw [← mk_embedding ψ₁, h, mk_embedding]
+
+  have hf_surj : f.Surjective := by
+    intro ⟨ψ, hψ⟩
+    have h' : (mk ψ.1).comap (algebraMap _ _) = v := comap_mk_of_isExtension _ ψ.2
+    have : IsUnramified K (mk ψ.1) := by
+      apply isUnramified_of_not_isRamifiedExtension ψ.2 hψ
+    by_cases hv : ComplexEmbedding.IsReal v.embedding
+    · have hψ' : ComplexEmbedding.IsReal ψ.1 := by
+        rw [IsRamifiedExtension] at hψ
+        simp at hψ
+        exact hψ hv
+      let w : Σ_v := ⟨mk ψ.1, h'⟩
+      use ⟨w, this⟩
+      have := embedding_mk_eq_of_isReal hψ'
+      simp [f, this]
+      have : IsExtension v.embedding ψ.1 := ψ.2
+      simp [this]
+    cases embedding_mk_eq ψ.1 with
+    | inl h =>
+      let w : Σ_v := ⟨mk ψ.1, h'⟩
+      use ⟨w, this⟩
+      simp only [f, h, hψ]
+      have : IsExtension v.embedding ψ.1 := ψ.2
+      simp [this]
+    | inr h =>
+      let φ := ComplexEmbedding.conjugate ψ.1
+      have h' : (mk φ).comap (algebraMap _ _) = v := by
+        rw [← mk_conjugate_eq]
+        have := comap_mk_of_isExtension _ ψ.2
+        simpa only [φ, star_star]
+      have : IsUnramified K (mk φ) := by
+        rw [← mk_conjugate_eq]
+        simp only [φ, star_star]
+        apply isUnramified_of_not_isRamifiedExtension ψ.2 hψ
+      let w : Σ_v := ⟨mk φ, h'⟩
+      use ⟨w, this⟩
+      simp [f]
+      have : ¬IsExtension v.embedding (mk φ).embedding := by
+        rw [← mk_conjugate_eq]
+        simp only [φ, star_star, h]
+        rw [ComplexEmbedding.isReal_iff] at hv
+        have := ψ.2
+        --rw [IsExtension] at this ⊢
+        intro h
+        have := congrArg ComplexEmbedding.conjugate this
+        have h' := congrArg ComplexEmbedding.conjugate h
+        simp at h'
+        have h'' : ComplexEmbedding.conjugate (ψ.1.comp (algebraMap K L)) =
+          (ComplexEmbedding.conjugate ψ).comp (algebraMap K L) := rfl
+        rw [h'', h'] at this
+        exact hv <| Eq.symm this
+
+      simp [this]
+      have : (mk ψ.1).embedding = φ := by rw [h]
+      simp_rw [← this]
+      simp
+      simp_rw [h]
+      simp only [star_star]
+
+  exact Equiv.ofBijective _ ⟨hf_inj, hf_surj⟩
+
 theorem IsReal.isTower {v : InfinitePlace K} (hv : v.IsReal) (w : Σ_v) :
     IsTower w := by
   have h := w.2
@@ -411,6 +759,21 @@ def algEquiv_complex_of_isComplex {v : InfinitePlace K} (hv : IsComplex v) :
   letI : Algebra v.completion ℂ := RingHom.toAlgebra <| ringEquiv_complex_of_isComplex hv
   AlgEquiv.ofRingEquiv (fun _ => rfl)
 
+def starAlgEquiv_complex_of_isComplex {v : InfinitePlace K} (hv : IsComplex v) :
+    letI : Algebra v.completion ℂ :=
+      RingHom.toAlgebra <| (starRingAut).toRingHom.comp
+        (ringEquiv_complex_of_isComplex hv).toRingHom
+    v.completion ≃ₐ[v.completion] ℂ := by
+  letI : Algebra v.completion ℂ :=
+      RingHom.toAlgebra <| (starRingAut).toRingHom.comp
+        (ringEquiv_complex_of_isComplex hv).toRingHom
+  let f := (ringEquiv_complex_of_isComplex hv).trans starRingAut
+  have hf : ∀ (x : v.completion), f ((algebraMap v.completion v.completion) x) =
+      (algebraMap v.completion _) x := by
+    intro x
+    simp [f, RingHom.algebraMap_toAlgebra]
+  exact AlgEquiv.ofRingEquiv hf
+
 @[simp]
 theorem algEquiv_complex_of_isComplex_apply {v : InfinitePlace K} (hv : IsComplex v)
     (x : v.completion) :
@@ -448,7 +811,7 @@ def isometryEquiv_real_of_isReal {v : InfinitePlace K} (hv : IsReal v) : v.compl
   toEquiv := ringEquiv_real_of_isReal hv
   isometry_toFun := isometry_extensionEmbedding_of_isReal hv
 
-def algebraEquiv_real_of_isReal {v : InfinitePlace K} (hv : IsReal v) :
+def algEquiv_real_of_isReal {v : InfinitePlace K} (hv : IsReal v) :
     letI : Algebra v.completion ℝ := RingHom.toAlgebra <| ringEquiv_real_of_isReal hv
     v.completion ≃ₐ[v.completion] ℝ :=
   letI : Algebra v.completion ℝ := RingHom.toAlgebra <| ringEquiv_real_of_isReal hv
@@ -602,7 +965,7 @@ def of_isUnramified_isReal (w : Σ_v) (hw : w.1.IsUnramified K)
     simp only [RingHom.algebraMap_toAlgebra, map_mul, mul_assoc, RingEquiv.toRingHom_eq_coe]
     simp only [RingHom.coe_coe]
     rw [ringEquiv_real_of_isReal_comap hv hr]
-  exact algebraEquiv_real_of_isReal hr |>.restrictScalars v.completion
+  exact algEquiv_real_of_isReal hr |>.restrictScalars v.completion
 
 theorem ringEquiv_real_of_isComplex_comap_coe {v : InfinitePlace K} {w : Σ_v} (hv : v.IsReal)
     (hw : w.1.IsComplex) (k : K) :
@@ -821,78 +1184,142 @@ theorem IsConjugateTower.of_isComplex_apply {w : Σ_v} (hv : v.IsComplex) (h : I
   rw [← this]
   rfl
 
-open scoped Classical
+variable (L)
+variable (K v)
+variable [NumberField K]
 
-def comap_prod_equiv_isReal (hv : v.IsReal) :
-    ((w : Σ_v) → w.1.completion) ≃+* ((w : {w : Σ_v // w.1.IsUnramified K}) → ℝ) ×
-      ((w : {w : Σ_v // ¬w.1.IsUnramified K}) → ℂ) :=
-  RingEquiv.trans
-    (RingEquiv.piEquivPiSubtypeProd (fun (w : Σ_v) => w.1.IsUnramified K) _)
-    (RingEquiv.prodCongr
-      (RingEquiv.piCongrRight (fun ⟨w, hw⟩ => of_isUnramified_isReal w hw hv))
-      (RingEquiv.piCongrRight (fun ⟨w, hw⟩ => of_not_isUnramified_isReal w hw hv)))
+def ramificationIdx (w : Σ_v) := if IsUnramified K w.1 then 1 else 2
 
-@[simp]
-theorem comap_prod_equiv_isReal_apply (hv : v.IsReal) (x : (w : Σ_v) → w.1.completion) :
-    comap_prod_equiv_isReal hv x =
-      (fun ⟨w, hw⟩ => of_isUnramified_isReal w hw hv (x w),
-        fun ⟨w, hw⟩ => of_not_isUnramified_isReal w hw hv (x w)) :=
-  rfl
+def equiv_comap :
+    InfinitePlace L ≃ ((v : InfinitePlace K) × Σ_v) :=
+  (Equiv.sigmaFiberEquiv _).symm
 
-def comap_prod_algEquiv_isReal (hv : v.IsReal) :
-    letI : Algebra v.completion ℝ := RingHom.toAlgebra <| ringEquiv_real_of_isReal hv
-    ((w : Σ_v) → w.1.completion) ≃ₐ[v.completion] ((w : {w : Σ_v // w.1.IsUnramified K}) → ℝ) ×
-      ((w : {w : Σ_v // ¬w.1.IsUnramified K}) → ℂ) :=
-  letI : Algebra v.completion ℝ := RingHom.toAlgebra <| ringEquiv_real_of_isReal hv
-  {
-    __ := comap_prod_equiv_isReal hv
-    commutes' := by
-      intro x
-      simp only [RingEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe, EquivLike.coe_coe,
-        comap_prod_equiv_isReal_apply, RingEquiv.toRingHom_eq_coe, Pi.algebraMap_apply,
-        algebraMap_def', Prod.algebraMap_apply, Prod.mk.injEq]
-      constructor
-      · sorry
-      · sorry
-  }
+theorem comap_card : Fintype.card ({w : Σ_v // w.1.IsUnramified K}) +
+    2 * Fintype.card ({w : Σ_v // ¬w.1.IsUnramified K}) = FiniteDimensional.finrank K L := by
+  letI : Algebra K ℂ := v.embedding.toAlgebra
+  rw [← AlgHom.card K L ℂ]
+  -- The idea is this: InfinitePlace.comap is a surjective function from InfinitePlace L
+  -- to InfinitePlace K. That is every embedding L →+* ℂ defines an embedding K →+* ℂ.
+  -- This is not injective. It is one-to-[L : k] if w is Unramified, otherwise it is
+  -- one-to-2*[L : K].
+  -- The key here is that ℂ has v.embedding as it's K-algebra. So L →ₐ[K] ℂ is precisely
+  -- all algHom σ such that σ(k) = v.embedding k. i.e., w.comap (algebraMap K L) = v
+  -- But there are two more in L →ₐ[K] ℂ when ¬w.1.IsUnramified as there are in
+  -- InfinitePlace L because of complex conjugate.
+  have (φ : L →ₐ[K] ℂ) : φ.toRingHom.comp (algebraMap K L) = v.embedding := by
+    have := Function.funext_iff.2 φ.commutes'
+    rw [RingHom.algebraMap_toAlgebra] at this
+    simp only [AlgHom.toRingHom_eq_coe, RingHom.toMonoidHom_eq_coe, OneHom.toFun_eq_coe,
+      MonoidHom.toOneHom_coe, MonoidHom.coe_coe, RingHom.coe_coe, AlgHom.commutes,
+      DFunLike.coe_fn_eq] at this
+    simpa only [AlgHom.toRingHom_eq_coe, AlgHom.comp_algebraMap_of_tower]
 
-def comap_prod_equiv_isComplex (hv : v.IsComplex) :
-    ((w : Σ_v) → w.1.completion) ≃+* ((w : Σ_v) → ℂ) :=
-  RingEquiv.trans
-    (RingEquiv.trans
-      (RingEquiv.piEquivPiSubtypeProd (fun (w : Σ_v) => IsTower w) _)
-      (RingEquiv.prodCongr
-        (RingEquiv.piCongrRight (fun ⟨_, h⟩ => IsTower.of_isComplex hv h))
-        (RingEquiv.piCongrRight (fun ⟨_, hw⟩ => IsConjugateTower.of_isComplex hv <|
-          isConjugateTower_of_not_isTower hw))
-      )
-    )
-    (RingEquiv.piEquivPiSubtypeProd (fun (w : Σ_v) => IsTower w) _ |>.symm)
+  let g : (L →ₐ[K] ℂ) → Extends L v.embedding :=
+    fun φ => ⟨φ.toRingHom, this φ⟩
 
-@[simp]
-theorem comap_prod_equiv_isComplex_apply (hv : v.IsComplex) (x : (w : Σ_v) → w.1.completion)
-  (w : Σ_v) :
-  comap_prod_equiv_isComplex hv x w = if h : IsTower w then IsTower.of_isComplex hv h (x w) else
-    IsConjugateTower.of_isComplex hv (isConjugateTower_of_not_isTower h) (x w) :=
-  rfl
+  have hg_inj : g.Injective := by
+    intro φ₁ φ₂ h
+    simp [g] at h
+    exact AlgHom.coe_ringHom_injective h
 
--- I think I need to split the RHS now because of slightly different algebras for whether
--- IsTower or IsConjugateTower
-def comap_prod_algEquiv_isComplex (hv : v.IsComplex) :
-    letI : Algebra v.completion ℂ := RingHom.toAlgebra <| ringEquiv_complex_of_isComplex hv
-    ((w : Σ_v) → w.1.completion) ≃ₐ[v.completion] ((w : Σ_v) → ℂ) :=
-  letI : Algebra v.completion ℂ := RingHom.toAlgebra <| ringEquiv_complex_of_isComplex hv
-  {
-    __ := comap_prod_equiv_isComplex hv
-    commutes' := by
-      intro x
-      simp only [RingEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe, EquivLike.coe_coe]
-      simp [RingHom.algebraMap_toAlgebra, Pi.algebraMap_def]
-      funext w
-      simp only [comap_prod_equiv_isComplex_apply, Pi.ringHom_apply, IsTower.of_isComplex_apply,
-        RingEquiv.toRingHom_eq_coe, IsConjugateTower.of_isComplex_apply, dite_eq_ite,
-        RingHom.coe_coe, ringEquiv_complex_of_isComplex_apply, ite_eq_left_iff, ne_eq]
-      sorry
-  }
+  have {σ : L →+* ℂ} (h : σ.comp (algebraMap K L) = v.embedding) :
+      ∀ (r : K), σ.toFun (algebraMap K L r) = algebraMap K ℂ r := by
+    intro k
+    rw [RingHom.algebraMap_toAlgebra, ← h]
+    rfl
+
+  have hg_surj : g.Surjective := by
+    intro ⟨σ, h⟩
+    use {
+      __ := σ
+      commutes' := this h
+    }
+
+  have : (L →ₐ[K] ℂ) ≃ Extends L v.embedding :=
+    Equiv.ofBijective _ ⟨hg_inj, hg_surj⟩
+
+  rw [Fintype.card_eq.2 ⟨this⟩]
+
+  have : Extends L v.embedding ≃
+    { ψ : Extends L v.embedding // IsRamifiedExtension v.embedding ψ } ⊕
+      { ψ : Extends L v.embedding // ¬IsRamifiedExtension v.embedding ψ } :=
+        (Equiv.sumCompl _).symm
+
+  rw [Fintype.card_eq.2 ⟨this⟩]
+  rw [Fintype.card_sum]
+  rw [Fintype.card_eq.2 ⟨sum_not_isUnramified_equiv_IsRamifiedExtension.symm⟩]
+  rw [Fintype.card_sum]
+  rw [Fintype.card_eq.2 ⟨isUnramified_equiv_not_isRamifiedExtension.symm⟩]
+  ring
+
+def e : (Σ_v) ≃ {w : Σ_v // w.1.IsUnramified K} ⊕ {w : Σ_v // ¬w.1.IsUnramified K} :=
+  (Equiv.sumCompl _).symm
+
+theorem sum_mult_eq' :
+    ∑ (w : Σ_v), ramificationIdx K v L w = FiniteDimensional.finrank K L := by
+  rw [Fintype.sum_equiv (e K v L) _ ((fun (w : Σ_v) => ramificationIdx K v L w) ∘ (e K v L).symm)
+    (fun _ => by simp only [Function.comp_apply, Equiv.symm_apply_apply])]
+  simp only [Function.comp_apply, Fintype.sum_sum_type, e, Equiv.symm_symm,
+    Equiv.sumCompl_apply_inl, Equiv.sumCompl_apply_inr]
+  have (x : { w : Σ_v // IsUnramified K w.1 }) : ramificationIdx K v L x.1 = 1 := by
+    rw [ramificationIdx]; simp [x.2]
+  simp_rw [this]
+  have (x : { w : Σ_v // ¬IsUnramified K w.1 }) : ramificationIdx K v L x.1 = 2 := by
+    rw [ramificationIdx]; simp [x.2]
+  simp_rw [this]
+  rw [Finset.sum_const, Finset.sum_const, ← Fintype.card, ← Fintype.card, smul_eq_mul, mul_one,
+    smul_eq_mul, mul_comm, comap_card]
+
+theorem comap_prod_finrank : FiniteDimensional.finrank v.completion ((w : Σ_v) → w.1.completion) =
+    FiniteDimensional.finrank K L := by
+  rw [FiniteDimensional.finrank_pi_fintype v.completion (ι := Σ_v)]
+  by_cases hv : v.IsReal
+  · have h₀ (w : Σ_v) (hw : IsUnramified K w.1) :
+        FiniteDimensional.finrank v.completion w.1.completion = 1 := by
+      letI : Algebra v.completion ℝ := (ringEquiv_real_of_isReal hv).toRingHom.toAlgebra
+      have := (of_isUnramified_isReal w hw hv).toLinearEquiv.finrank_eq
+      rw [this]
+      rw [← algEquiv_real_of_isReal hv |>.toLinearEquiv.finrank_eq]
+      exact FiniteDimensional.finrank_self _
+    have h₁ (w : Σ_v) (hw : ¬IsUnramified K w.1) :
+        FiniteDimensional.finrank v.completion w.1.completion = 2 := by
+      letI : Algebra v.completion ℝ := (ringEquiv_real_of_isReal hv).toRingHom.toAlgebra
+      have := (of_not_isUnramified_isReal w hw hv).toLinearEquiv.finrank_eq
+      rw [this]
+      have := algEquiv_real_of_isReal hv |>.toLinearEquiv.finrank_eq
+      rw [← FiniteDimensional.finrank_mul_finrank v.completion ℝ ℂ, ← this,
+        FiniteDimensional.finrank_self _]
+      norm_num
+    convert sum_mult_eq' K v L
+    have h₃ (w : Σ_v) (hw : IsUnramified K w.1) := IsReal.comap_of_isUnramified hv hw
+    have h₄ (w : Σ_v) (hw : ¬IsUnramified K w.1) := comap_of_not_isUnramified hw
+    rename_i w _
+    by_cases hw : IsUnramified K w.1
+    · simp [ramificationIdx, hw, h₃ w hw, h₀ w hw]
+    · simp [ramificationIdx, InfinitePlace.not_isComplex_iff_isReal.2 hv, hw, h₄ w hw, h₁ w hw]
+  · simp at hv
+    have h (w : Σ_v) : FiniteDimensional.finrank v.completion w.1.completion = 1 := by
+      by_cases hw : IsTower w
+      · letI : Algebra v.completion ℂ := (ringEquiv_complex_of_isComplex hv).toRingHom.toAlgebra
+        have := IsTower.of_isComplex hv hw |>.toLinearEquiv.finrank_eq
+        rw [this]
+        rw [← algEquiv_complex_of_isComplex hv |>.toLinearEquiv.finrank_eq]
+        exact FiniteDimensional.finrank_self _
+      · have := letI : Algebra v.completion ℂ :=
+            ((starRingEnd ℂ).comp (ringEquiv_complex_of_isComplex hv).toRingHom).toAlgebra
+          IsConjugateTower.of_isComplex hv (isConjugateTower_of_not_isTower hw)
+          |>.toLinearEquiv.finrank_eq
+        rw [this]
+        have := letI : Algebra v.completion ℂ :=
+          RingHom.toAlgebra <| ((starRingAut (R := ℂ)).toRingHom.comp
+            (ringEquiv_complex_of_isComplex hv).toRingHom)
+          starAlgEquiv_complex_of_isComplex hv |>.toLinearEquiv.finrank_eq
+        rw [FiniteDimensional.finrank_self] at this
+        rw [this]
+    convert sum_mult_eq' K v L
+    rw [h]
+    rename_i w _
+    have := IsComplex.comap_isComplex w hv
+    simp [ramificationIdx, InfinitePlace.isUnramified_iff.2 (Or.inr <| w.2 ▸ hv), this]
 
 end NumberField.InfinitePlace.Completion
