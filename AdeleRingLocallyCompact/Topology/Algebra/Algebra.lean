@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Salvatore Mercuri
 -/
 import Mathlib.Topology.Algebra.Algebra
+import Mathlib.RingTheory.AlgebraTower
+import AdeleRingLocallyCompact.Algebra.Algebra.Pi
 import AdeleRingLocallyCompact.FromMathlib.Topology.Algebra.Algebra
 
 /-!
@@ -18,6 +20,18 @@ theorem ContinuousAlgHom.ext_iff {R A B : Type*}[CommSemiring R]
     [Semiring A] [TopologicalSpace A] [Semiring B] [TopologicalSpace B] [Algebra R A]
     [Algebra R B] {f g : A →A[R] B} : f = g ↔ ∀ x, f x = g x :=
   DFunLike.ext_iff
+
+def ContinuousAlgHom.extendScalars {A : Type*} (B : Type*) {C D : Type*}
+    [CommSemiring A] [CommSemiring C] [CommSemiring D] [TopologicalSpace C]
+    [TopologicalSpace D] [Algebra A C] [Algebra A D] [CommSemiring B] [Algebra A B]
+    [Algebra B C] [IsScalarTower A B C] (f : C →A[A] D) :
+    letI : Algebra B D := f.restrictDomain B |>.toRingHom.toAlgebra
+    C →A[B] D :=
+  letI : Algebra B D := f.restrictDomain B |>.toRingHom.toAlgebra
+  {
+    __ := f.toAlgHom.extendScalars B
+    cont := f.cont
+  }
 
 structure ContinuousAlgEquiv (R A B : Type*) [CommSemiring R]
     [Semiring A] [TopologicalSpace A] [Semiring B] [TopologicalSpace B] [Algebra R A]
@@ -272,5 +286,49 @@ theorem _root_.AlgEquiv.uniformEmbedding {E₁ E₂ : Type*} [UniformSpace E₁]
     (e : E₁ ≃ₐ[R] E₂) (h₁ : Continuous e) (h₂ : Continuous e.symm) :
     UniformEmbedding e :=
   ContinuousAlgEquiv.uniformEmbedding { e with continuous_toFun := h₁ }
+
+def restrictScalars (A : Type*) {B : Type*} {C D : Type*}
+    [CommSemiring A] [CommSemiring C] [CommSemiring D] [TopologicalSpace C]
+    [TopologicalSpace D] [CommSemiring B]  [Algebra B C] [Algebra B D] [Algebra A B]
+    [Algebra A C] [Algebra A D] [IsScalarTower A B C] [IsScalarTower A B D] (f : C ≃A[B] D) :
+    C ≃A[A] D where
+  __ := f.toAlgEquiv.restrictScalars A
+  continuous_toFun := f.continuous_toFun
+  continuous_invFun := f.continuous_invFun
+
+@[simps!]
+def piCurry (S : Type*) [CommSemiring S] {Y : ι → Type*}
+    (α : (i : ι) → Y i → Type*) [(i : ι) → (y : Y i) → Semiring (α i y)]
+    [(i : ι) → (y : Y i) → Algebra S (α i y)]  [(i : ι) → (y : Y i) → TopologicalSpace (α i y)] :
+    ((i : Sigma Y) → α i.1 i.2) ≃A[S] ((i : ι) → (y : Y i) → α i y) where
+  toAlgEquiv := AlgEquiv.piCurry S α
+  continuous_toFun := continuous_pi (fun _ => continuous_pi <| fun _ => continuous_apply _)
+  continuous_invFun := by
+    refine continuous_pi (fun ⟨x, y⟩ => ?_)
+    simp only [AlgEquiv.toEquiv_eq_coe, Equiv.invFun_as_coe, AlgEquiv.symm_toEquiv_eq_symm,
+      EquivLike.coe_coe, AlgEquiv.piCurry_symm_apply, Sigma.uncurry]
+    exact Continuous.comp' (continuous_apply _) (continuous_apply _)
+
+@[simps!]
+def piCongrLeft (S : Type*) [CommSemiring S] (B : β → Type*) (e : α ≃ β)
+    [∀ b, Semiring (B b)] [∀ b, Algebra S (B b)] [∀ b, TopologicalSpace (B b)]  :
+    ((a : α) → B (e a)) ≃A[S] ((b : β) → B b) where
+  toAlgEquiv := AlgEquiv.piCongrLeft S B e
+  continuous_toFun := continuous_pi <| e.forall_congr_right.mp fun i ↦ by
+    simp only [AlgEquiv.toEquiv_eq_coe, AlgEquiv.piCongrLeft, Equiv.toFun_as_coe, EquivLike.coe_coe]
+    have := AlgEquiv.piCongrLeft'_symm_apply_apply S B e.symm
+    simp only [Equiv.symm_symm_apply] at this
+    simp only [this]
+    exact continuous_apply _
+  continuous_invFun := Pi.continuous_precomp' e
+
+def piCongrRight {R ι : Type*} {A₁ A₂ : ι → Type*} [CommSemiring R]
+    [(i : ι) → Semiring (A₁ i)] [(i : ι) → Semiring (A₂ i)] [(i : ι) → TopologicalSpace (A₁ i)]
+    [(i : ι) → TopologicalSpace (A₂ i)] [(i : ι) → Algebra R (A₁ i)] [(i : ι) → Algebra R (A₂ i)]
+    (e : (i : ι) → A₁ i ≃A[R] A₂ i) :
+    ((i : ι) → A₁ i) ≃A[R] (i : ι) → A₂ i where
+  __ := AlgEquiv.piCongrRight <| fun _ => (e _).toAlgEquiv
+  continuous_toFun := Pi.continuous_postcomp' fun i ↦ (e i).continuous
+  continuous_invFun := Pi.continuous_postcomp' fun i ↦ (e i).symm.continuous
 
 end ContinuousAlgEquiv
