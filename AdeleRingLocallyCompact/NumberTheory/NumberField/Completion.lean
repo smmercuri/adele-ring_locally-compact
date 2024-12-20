@@ -866,7 +866,7 @@ theorem weak_approx {p : InfinitePlace K → Prop} [Nonempty {v // p v}] :
     (Pi.map (fun (v : {v  // p v}) (x : WithAbs v.1.1) => (x : v.1.completion))) ∘
       algebraMap K ((v : {v : InfinitePlace K // p v}) → WithAbs v.1.1) := rfl
   rw [this]
-  apply DenseRange.comp hd (InfinitePlace.weak_approx K)
+  apply DenseRange.comp hd (InfinitePlace.weak_approx' K)
     <| Continuous.piMap (fun _ => UniformSpace.Completion.continuous_coe _)
 
 theorem baseChange_surjective :

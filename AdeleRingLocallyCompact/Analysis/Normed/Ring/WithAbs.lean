@@ -51,7 +51,7 @@ instance instRing [Ring R] : Ring (WithAbs v) := inferInstanceAs (Ring R)
 
 instance instInhabited : Inhabited (WithAbs v) := ⟨0⟩
 
-noncomputable instance {R : Type*} [Ring R] (v : AbsoluteValue R ℝ): NormedRing (WithAbs v) where
+noncomputable instance {R : Type*} [Ring R] (v : AbsoluteValue R ℝ) : NormedRing (WithAbs v) where
   norm := v
   dist_eq _ _ := rfl
   dist_self x := by simp only [sub_self, MulHom.toFun_eq_coe, AbsoluteValue.coe_toMulHom, map_zero]
@@ -61,6 +61,10 @@ noncomputable instance {R : Type*} [Ring R] (v : AbsoluteValue R ℝ): NormedRin
   norm_mul x y := (v.map_mul x y).le
   eq_of_dist_eq_zero := by simp only [MulHom.toFun_eq_coe, AbsoluteValue.coe_toMulHom,
     AbsoluteValue.map_sub_eq_zero_iff, imp_self, implies_true]
+
+noncomputable instance {R : Type*} [Ring R] [Nontrivial R] (v : AbsoluteValue R ℝ) :
+    NormOneClass (WithAbs v) where
+  norm_one := v.map_one
 
 noncomputable instance normedField {K : Type*} [Field K] (v : AbsoluteValue K ℝ) :
     NormedField (WithAbs v) where
