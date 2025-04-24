@@ -98,7 +98,7 @@ theorem nonZeroDivisor_mem_finite_nhds_zero
     (hS : Set.Finite S)
     (γ : (v : HeightOneSpectrum R) → ℤₘ₀ˣ) :
     ∃ (r : nonZeroDivisors R), ∀ v ∈ S, Valued.v (algebraMap _ (v.adicCompletion K) r.1) < γ v := by
-  choose s hs using fun v => AdicCompletion.nonZeroDivisor_mem_nhds_zero K v (γ v)
+  choose s hs using fun v => adicCompletion.nonZeroDivisor_mem_nhds_zero K v (γ v)
   refine ⟨hS.toFinset.prod s, fun v hv => ?_⟩
   simp only [Submonoid.coe_finset_prod, map_prod]
   rw [← hS.toFinset.prod_erase_mul _ (hS.mem_toFinset.2 hv)]
@@ -163,10 +163,10 @@ theorem algebraMap_inducing : Inducing ι := by
     by rw [(algebraMap_injective R K).preimage_image]⟩
 
 /-- The integral adeles are compact. -/
-theorem compactSpace : CompactSpace (FiniteIntegralAdeles R K) :=
+theorem compactSpace [NumberField K] : CompactSpace (FiniteIntegralAdeles R K) :=
   Pi.compactSpace
 
-theorem isCompact : IsCompact (Set.range ι) := by
+theorem isCompact [NumberField K] : IsCompact (Set.range ι) := by
   rw [← Set.image_univ, ← (algebraMap_inducing R K).isCompact_iff]
   exact (compactSpace R K).isCompact_univ
 
@@ -184,7 +184,7 @@ theorem algebraMap_range_mem_nhds' : Set.range ι ∈ nhds 0 :=
   Set.image_univ ▸ algebraMap_image_mem_nhds R K (Filter.univ_mem)
 
 /-- The finite adele ring is locally compact. -/
-theorem locallyCompactSpace' : LocallyCompactSpace (FiniteAdeleRing R K) :=
+theorem locallyCompactSpace' [NumberField K] : LocallyCompactSpace (FiniteAdeleRing R K) :=
   IsCompact.locallyCompactSpace_of_mem_nhds_of_addGroup (isCompact R K)
     (algebraMap_range_mem_nhds' R K)
 

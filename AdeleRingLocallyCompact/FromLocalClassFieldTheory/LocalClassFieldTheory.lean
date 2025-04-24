@@ -4,6 +4,7 @@ All rights reserved. Released under Apache 2.0 license as described in the file 
 Authors: Salvatore Mercuri, María Inés de Frutos-Fernández, Filippo A. E. Nuccio
 -/
 import Mathlib.RingTheory.DedekindDomain.AdicValuation
+import Mathlib.NumberTheory.NumberField.Basic
 
 /-! Results imported from [LocalClassFieldTheory](https://github.com/mariainesdff/LocalClassFieldTheory/tree/master)
 
@@ -33,7 +34,7 @@ namespace IsDedekindDomain
 variable {R : Type*} [CommRing R] [IsDomain R] [IsDedekindDomain R] {K : Type*} [Field K]
   [Algebra R K] [IsFractionRing R K] {v : HeightOneSpectrum R}
 
-namespace HeightOneSpectrum.AdicCompletion
+namespace HeightOneSpectrum.adicCompletion
 
 /-- An element `π ∈ v.adicCompletion K` is a uniformizer if it has valuation `ofAdd(-1)`.
 
@@ -69,11 +70,11 @@ theorem isUniformizer_ne_zero {π : v.adicCompletion K} (h : IsUniformizer π) :
   simp only [h, IsUniformizer, ZeroMemClass.coe_zero, map_zero, Int.reduceNeg, ofAdd_neg,
     WithZero.coe_inv, zero_eq_inv, WithZero.zero_ne_coe, not_false_eq_true]
 
-end AdicCompletion
+end adicCompletion
 
-namespace AdicCompletionIntegers
+namespace adicCompletionIntegers
 
-open AdicCompletion
+open adicCompletion
 
 variable (K v)
 
@@ -105,7 +106,7 @@ theorem valuation_eq_one_of_isUnit {x : v.adicCompletionIntegers K} (hx : IsUnit
 theorem isUnit_of_valuation_eq_one {x : v.adicCompletionIntegers K}
     (hx : Valued.v (x : v.adicCompletion K) = 1) :
     IsUnit x := by
-  obtain ⟨u, hu⟩ := AdicCompletion.isUnit_of_valuation_eq_one hx
+  obtain ⟨u, hu⟩ := adicCompletion.isUnit_of_valuation_eq_one hx
   have hu_inv_le : Valued.v u⁻¹.val ≤ 1 := by
     rw [← one_mul (Valued.v _), ← hx, ← hu, ← Valued.v.map_mul, u.mul_inv, hu, hx, Valued.v.map_one]
   let w := (⟨u.val, hu ▸ x.2⟩ : v.adicCompletionIntegers K)
@@ -138,7 +139,7 @@ theorem not_isUnit_iff_valuation_lt_one (x : v.adicCompletionIntegers K) :
 [https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L178](https://github.com/mariainesdff/local_fields_journal/blob/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3/src/discrete_valuation_ring/basic.lean#L178)-/
 theorem isUniformizer_ne_zero {π : v.adicCompletionIntegers K} (h : IsUniformizer π.val) :
     π ≠ 0 := by
-  convert AdicCompletion.isUniformizer_ne_zero h
+  convert adicCompletion.isUniformizer_ne_zero h
   simp only [ZeroMemClass.coe_eq_zero]
 
 /-- A uniformizer is non-zero inside `Kᵥ`.
@@ -196,5 +197,6 @@ theorem isUniformizer_is_generator {π : v.adicCompletionIntegers K} (hπ : IsUn
     simpa [Ideal.mem_span_singleton, hu, IsUnit.dvd_mul_right, Units.isUnit] using dvd_pow_self _ hn
 
 /-- The residue field of the `v`-adic integers is finite. -/
-instance residueField_finite : Finite (Valued.ResidueField (v.adicCompletion K)) :=
+instance residueField_finite [NumberField K] :
+    Finite (Valued.ResidueField (v.adicCompletion K)) :=
   sorry

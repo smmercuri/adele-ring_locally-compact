@@ -69,7 +69,7 @@ theorem isIntUniformizer_ne_zero (v : HeightOneSpectrum R) {π : R}
 local notation "μ" => @WithZero.unitsWithZeroEquiv (Multiplicative ℤ)
 local notation "ℤₘ₀" => WithZero (Multiplicative ℤ)
 
-namespace AdicCompletion
+namespace adicCompletion
 
 variable (v)
 
@@ -141,8 +141,9 @@ theorem nonZeroDivisor_mem_nhds_zero (v : HeightOneSpectrum R) (γ : ℤₘ₀ˣ
       mem_nonZeroDivisors_of_ne_zero (pow_ne_zero _ <| v.isIntUniformizer_ne_zero hπ)⟩
     simp only [v.valuedAdicCompletion_eq_valuation]
     simp only [map_pow, v.valuation_eq_intValuationDef, hπ, ← WithZero.coe_pow, ← ofAdd_nsmul,
-      smul_neg, nsmul_eq_mul, mul_one, WithZero.unitsWithZeroEquiv_units_val, WithZero.coe_lt_coe,
-      Int.toNat_of_nonneg (units_toAdd_neg_add_one hγ), neg_add_rev, neg_neg, ofAdd_add]
+      smul_neg, nsmul_eq_mul, mul_one, WithZero.unitsWithZeroEquiv_units_val]
+    simp only [WithZero.coe_lt_coe]
+    rw [Int.toNat_of_nonneg (units_toAdd_neg_add_one hγ), neg_add_rev, neg_neg, ofAdd_add]
     rw [ofAdd_neg, ofAdd_toAdd, mul_lt_iff_lt_one_right', Left.inv_lt_one_iff, ← ofAdd_zero,
       ofAdd_lt]
     exact zero_lt_one
@@ -163,11 +164,11 @@ theorem dvd_of_valued_le
     rwa [Valued.v.map_mul, map_inv₀, mul_inv_le_iff₀ ((map_ne_zero _).2 hy), one_mul]
   exact ⟨⟨x * y⁻¹, this⟩, by rw [inv_mul_cancel_right₀ hy]⟩
 
-end AdicCompletion
+end adicCompletion
 
-namespace AdicCompletionIntegers
+namespace adicCompletionIntegers
 
-open AdicCompletion
+open adicCompletion
 
 variable {K}
 
@@ -236,7 +237,7 @@ theorem toFiniteCoeffs_injective {π : v.adicCompletionIntegers K}
   exact Ideal.sub_mem _ hx (hxy ▸ hy)
 
 /-- The quotient of the `v`-adic integers with a power of the maximal ideal is finite. -/
-instance quotient_maximalIdeal_pow_finite {π : v.adicCompletionIntegers K} (n : ℕ)
+instance quotient_maximalIdeal_pow_finite [NumberField K] {π : v.adicCompletionIntegers K} (n : ℕ)
     (hπ : IsUniformizer π.val) :
     Finite (v.adicCompletionIntegers K ⧸ (Valued.maximalIdeal (v.adicCompletion K)) ^ n) :=
   Finite.of_injective _ (toFiniteCoeffs_injective n hπ)
@@ -258,7 +259,7 @@ open WithZero Multiplicative Ideal in
 /-- There is a finite covering of the `v`-adic integers of open balls of radius less than one,
 obtained by using the finite representatives in the quotient of the `v`-adic integers by an
 appropriate power of the maximal ideal. -/
-theorem finite_subcover_of_uniformity_basis {γ : ℤₘ₀ˣ} (hγ : γ.val ≤ 1) :
+theorem finite_subcover_of_uniformity_basis [NumberField K] {γ : ℤₘ₀ˣ} (hγ : γ.val ≤ 1) :
     ∃ t : Set (v.adicCompletion K), Set.Finite t ∧
       ↑(adicCompletionIntegers K v) ⊆ ⋃ y ∈ t,
         { x | (x, y) ∈ { p | Valued.v (p.2 - p.1) < γ.val } } := by
@@ -280,7 +281,7 @@ theorem finite_subcover_of_uniformity_basis {γ : ℤₘ₀ˣ} (hγ : γ.val ≤
 /-- The `v`-adic integers is a totally bounded set since they afford a finite subcover of
 open balls, obtained by using the finite representatives of the quotient of the `v`-adic
 integers by a power of the maximal ideal. -/
-theorem totallyBounded : TotallyBounded (v.adicCompletionIntegers K).carrier :=
+theorem totallyBounded [NumberField K] : TotallyBounded (v.adicCompletionIntegers K).carrier :=
   (hasBasis_uniformity K v).totallyBounded_iff.2 <| fun _ hγ =>
     finite_subcover_of_uniformity_basis K v hγ
 
@@ -288,23 +289,23 @@ instance completeSpace : CompleteSpace (v.adicCompletionIntegers K) :=
   IsClosed.completeSpace_coe (isClosed K v)
 
 /-- The `v`-adic integers is compact. -/
-theorem isCompact : IsCompact (v.adicCompletionIntegers K).carrier :=
+theorem isCompact [NumberField K] : IsCompact (v.adicCompletionIntegers K).carrier :=
   isCompact_iff_totallyBounded_isComplete.2
     ⟨totallyBounded K v, IsClosed.isComplete (isClosed K v)⟩
 
-instance compactSpace : CompactSpace (v.adicCompletionIntegers K) :=
+instance compactSpace [NumberField K] : CompactSpace (v.adicCompletionIntegers K) :=
   CompactSpace.mk (isCompact_iff_isCompact_univ.1 <| isCompact K v)
 
-end AdicCompletionIntegers
+end adicCompletionIntegers
 
-namespace AdicCompletion
+namespace adicCompletion
 
-open AdicCompletionIntegers
+open adicCompletionIntegers
 
 variable (v)
 
 /-- Any open ball centred at zero in the `v`-adic completion of `K` is compact. -/
-theorem isCompact_nhds_zero {γ : ℤₘ₀ˣ} (hγ : γ ≤ 1) :
+theorem isCompact_nhds_zero [NumberField K] {γ : ℤₘ₀ˣ} (hγ : γ ≤ 1) :
     IsCompact { y : v.adicCompletion K | Valued.v y < γ } :=
   (isCompact K v).of_isClosed_subset (isClosed_nhds_zero K v γ)
       <| fun _ hx => le_of_lt (lt_of_lt_of_le (Set.mem_setOf.1 hx) hγ)
@@ -312,9 +313,9 @@ theorem isCompact_nhds_zero {γ : ℤₘ₀ˣ} (hγ : γ ≤ 1) :
 set_option synthInstance.maxHeartbeats 80000 in
 /-- The `v`-adic completion of `K` is locally compact.
 Note: slow search for `TopologicalAddGroup` instance of `v.adicCompletion K`. -/
-instance locallyCompactSpace : LocallyCompactSpace (v.adicCompletion K) :=
+instance locallyCompactSpace [NumberField K] : LocallyCompactSpace (v.adicCompletion K) :=
   (isCompact_nhds_zero K v le_rfl).locallyCompactSpace_of_mem_nhds_of_addGroup
     <| (hasBasis_nhds_zero K v).mem_of_mem le_rfl
 
 
-  end IsDedekindDomain.HeightOneSpectrum.AdicCompletion
+  end IsDedekindDomain.HeightOneSpectrum.adicCompletion

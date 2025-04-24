@@ -76,7 +76,7 @@ theorem exists_not_mem_of_finite_nhds
     (γ : (v : HeightOneSpectrum R) → ℤₘ₀ˣ)
     (y : FiniteAdeleRing R K) :
     ∃ (x : FiniteAdeleRing R K), ∀ v ∈ S, Valued.v (x v - y v) > γ v := by
-  choose x hx using fun v => AdicCompletion.exists_not_mem_of_nhds (γ v) (y v)
+  choose x hx using fun v => adicCompletion.exists_not_mem_of_nhds (γ v) (y v)
   let y : ProdAdicCompletions R K := fun v => if v ∈ S then x v else 1
   have hy : y.IsFiniteAdele := by
     refine y.isFiniteAdele_iff.2 <| Set.Finite.subset S.finite_toSet (fun v hv => ?_)
@@ -98,7 +98,7 @@ theorem sub_mul_nonZeroDivisor_mem_finiteIntegralAdeles
   rw [← mul_assoc, hrs₂]
   rfl
 
-open AdicCompletion in
+open adicCompletion in
 /-- Let `x` be a finite adele and let `r` be a non-zero integral divisor. If, for some finite
 set of primes `v ∈ S` containing the factors of `r`, the valuation of `xᵥ` is less than the
 valuation of `r`, then `x` is an integral multiple of the global embedding of `r`. -/

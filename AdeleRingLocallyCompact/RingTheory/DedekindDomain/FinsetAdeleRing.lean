@@ -134,10 +134,11 @@ set_option synthInstance.maxHeartbeats 100000 in
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact.
 Note: instance search is slow because of the same issues for adicCompletionIntegers that we had
 with RingOfIntegers when it was a subring. -/
-instance : LocallyCompactSpace (FinsetIntegralAdeles R K S) := Prod.locallyCompactSpace _ _
+instance [NumberField K] : LocallyCompactSpace (FinsetIntegralAdeles R K S) :=
+  Prod.locallyCompactSpace _ _
 
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` as a subtype is locally compact. -/
-instance : LocallyCompactSpace (Subtype R K S) :=
+instance [NumberField K] : LocallyCompactSpace (Subtype R K S) :=
   (subtype_homeomorph R K S).locallyCompactSpace_iff.2 inferInstance
 
 end FinsetIntegralAdeles
@@ -220,7 +221,7 @@ def homeomorph_subtype :
     ⟨fun hx v => hx v.1 v.2, fun hx v hv => hx ⟨v, hv⟩⟩
 
 /-- The finite S-adele ring is locally compact. -/
-instance locallyCompactSpace : LocallyCompactSpace (FinsetAdeleRing R K S) :=
+instance locallyCompactSpace [NumberField K] : LocallyCompactSpace (FinsetAdeleRing R K S) :=
   (homeomorph_subtype R K S).locallyCompactSpace_iff.2 inferInstance
 
 variable {R K S}
@@ -371,7 +372,7 @@ theorem algebraMap_range_mem_nhds (x : FinsetAdeleRing R K S) :
 variable (R K S)
 
 /-- The finite adele ring is locally compact. -/
-theorem locallyCompactSpace : LocallyCompactSpace (FiniteAdeleRing R K) := by
+theorem locallyCompactSpace [NumberField K] : LocallyCompactSpace (FiniteAdeleRing R K) := by
   refine LocallyCompactSpace.mk <| fun x N hN => let S := support x; ?_
   have h := (algebraMap_inducing R K S).nhds_eq_comap (ofFiniteAdele_support x)
   let ⟨M, hM⟩ := (FinsetAdeleRing.locallyCompactSpace R K S).local_compact_nhds
