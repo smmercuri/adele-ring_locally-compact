@@ -77,7 +77,7 @@ instance normedFieldCons : NormedField K where
     AbsoluteValue.map_sub_eq_zero_iff, imp_self, implies_true]
 
 abbrev CompletionCons :=
-  letI := v.normedFieldCons
+  letI := v.normedFieldCons -- Explicit instance required
   UniformSpace.Completion K
 
 end AbsoluteValue
