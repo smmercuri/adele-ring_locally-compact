@@ -138,7 +138,7 @@ instance locallyCompactSpace [NumberField K] : LocallyCompactSpace (FinsetIntegr
   Prod.locallyCompactSpace _ _
 
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` as a subtype is locally compact. -/
-instance [NumberField K] : LocallyCompactSpace (Subtype R K S) :=
+instance locallyCompactSpaceSubtype [NumberField K] : LocallyCompactSpace (Subtype R K S) :=
   (subtypeHomeomorph R K S).locallyCompactSpace_iff.2 inferInstance
 
 end FinsetIntegralAdeles
