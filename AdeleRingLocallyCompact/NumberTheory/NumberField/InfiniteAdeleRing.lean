@@ -20,7 +20,7 @@ space `ℝ ^ r₁ × ℂ ^ r₂` used in `Mathlib.NumberTheory.NumberField.mixed
 ## Main definitions
  - `NumberField.InfiniteAdeleRing` of a number field `K` is defined as the product of
    the completions of `K` over its Archimedean places.
- - `NumberField.InfiniteAdeleRing.ringEquiv_mixedSpace` is the ring isomorphism between
+ - `NumberField.InfiniteAdeleRing.ringEquivMixedSpace` is the ring isomorphism between
    the infinite adele ring of `K` and `ℝ ^ r₁ × ℂ ^ r₂`, where `(r₁, r₂)` is the signature
    of `K`.
 
@@ -81,7 +81,7 @@ instance locallyCompactSpace : LocallyCompactSpace (InfiniteAdeleRing K) :=
 
 /-- The ring isomorphism between the infinite adele ring of a number field and the
 space `ℝ ^ r₁ × ℂ ^ r₂`, where `(r₁, r₂)` is the signature of the number field. -/
-def ringEquiv_mixedSpace :
+def ringEquivMixedSpace :
     InfiniteAdeleRing K ≃+*
       ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ) :=
   RingEquiv.trans
@@ -96,8 +96,8 @@ def ringEquiv_mixedSpace :
           Equiv.subtypeEquivRight (fun _ => not_isReal_iff_isComplex))))
 
 @[simp]
-theorem ringEquiv_mixedSpace_apply (x : InfiniteAdeleRing K) :
-    ringEquiv_mixedSpace K x =
+theorem ringEquivMixedSpace_apply (x : InfiniteAdeleRing K) :
+    ringEquivMixedSpace K x =
       (fun (v : {w : InfinitePlace K // IsReal w}) =>
         ringEquiv_real_of_isReal v.2 (x v),
       fun (v : {w : InfinitePlace K // IsComplex w}) =>
@@ -108,8 +108,8 @@ theorem ringEquiv_mixedSpace_apply (x : InfiniteAdeleRing K) :
 ring to the mixed embedding `x ↦ (φᵢ(x))ᵢ` of `K` into the space `ℝ ^ r₁ × ℂ ^ r₂`, where
 `(r₁, r₂)` is the signature of `K` and `φᵢ` are the complex embeddings of `K`. -/
 theorem mixedEmbedding_eq_algebraMap_comp {x : K} :
-    mixedEmbedding K x = ringEquiv_mixedSpace K (algebraMap K (InfiniteAdeleRing K) x) := by
-  ext v <;> simp only [ringEquiv_mixedSpace_apply, algebraMap_apply, ringEquiv_real_of_isReal,
+    mixedEmbedding K x = ringEquivMixedSpace K (algebraMap K (InfiniteAdeleRing K) x) := by
+  ext v <;> simp only [ringEquivMixedSpace_apply, algebraMap_apply, ringEquiv_real_of_isReal,
     ringEquiv_complex_of_isComplex, extensionEmbedding, extensionEmbedding_of_isReal,
     extensionEmbedding_of_comp, RingEquiv.coe_ofBijective, RingHom.coe_mk, MonoidHom.coe_mk,
     OneHom.coe_mk, UniformSpace.Completion.extensionHom]
