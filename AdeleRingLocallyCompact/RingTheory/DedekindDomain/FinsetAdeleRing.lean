@@ -222,7 +222,7 @@ def homeomorphSubtype :
 
 /-- The finite S-adele ring is locally compact. -/
 instance locallyCompactSpace [NumberField K] : LocallyCompactSpace (FinsetAdeleRing R K S) :=
-  (homeomorphSubtype R K S).locallyCompactSpace_iff.2 inferInstance
+  (homeomorphSubtype R K S).closedEmbedding.locallyCompactSpace
 
 variable {R K S}
 
