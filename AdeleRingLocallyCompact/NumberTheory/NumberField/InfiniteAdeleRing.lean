@@ -51,7 +51,7 @@ open scoped Classical
 variable (K : Type*) [Field K] [NumberField K] (v : InfinitePlace K)
 
 /-- The infinite adele ring of a number field. -/
-def InfiniteAdeleRing := (v : InfinitePlace K) → v.completion
+def InfiniteAdeleRing := (v : InfinitePlace K) → v.Completion
 
 namespace InfiniteAdeleRing
 
@@ -86,7 +86,7 @@ def ringEquivMixedSpace :
       ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ) :=
   RingEquiv.trans
     (RingEquiv.piEquivPiSubtypeProd (fun (v : InfinitePlace K) => IsReal v)
-      (fun (v : InfinitePlace K) => v.completion))
+      (fun (v : InfinitePlace K) => v.Completion))
     (RingEquiv.prodMap
       (RingEquiv.piCongrRight (fun ⟨_, hv⟩ => Completion.ringEquiv_real_of_isReal hv))
       (RingEquiv.trans
