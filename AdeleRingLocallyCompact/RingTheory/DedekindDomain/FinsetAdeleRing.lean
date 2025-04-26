@@ -30,7 +30,7 @@ locally compact.
  - `DedekindDomain.FinsetAdeleRing R K S` is the type of all finite S-adeles.
 
 ## Main results
- - `DedekindDomain.FinsetAdeleRing.homeomorph_subtype` : the finite S-adele ring is
+ - `DedekindDomain.FinsetAdeleRing.homeomorphSubtype` : the finite S-adele ring is
    homeomorphic to `DedekindDomain.FiniteIntegralAdeles.Subtype`.
  - `DedekindDomain.FinsetAdeleRing.algebraMap_inducing` : the map sending finite S-adeles to
    finite adeles is inducing; equivalently, the topology of the finite S-adele ring when viewed as
@@ -116,7 +116,7 @@ instance : CommRing (FinsetIntegralAdeles R K S) := Prod.instCommRing
 instance : Inhabited (FinsetIntegralAdeles R K S) := instInhabitedProd
 
 /-- The type equivalence between the two formalisations of `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
-def subtype_equiv :
+def subtypeEquiv :
     Subtype R K S ≃ FinsetIntegralAdeles R K S where
   toFun x := (x.val.1 , fun v => ⟨x.val.2 v, x.property v⟩)
   invFun x := ⟨x, fun v => SetLike.coe_mem (x.2 v)⟩
@@ -124,9 +124,9 @@ def subtype_equiv :
   right_inv _ := rfl
 
 /-- The homeomorphism between the two formalisations of `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
-def subtype_homeomorph :
+def subtypeHomeomorph :
     Subtype R K S ≃ₜ FinsetIntegralAdeles R K S where
-  toEquiv := subtype_equiv R K S
+  toEquiv := subtypeEquiv R K S
   continuous_toFun := Continuous.prod_mk (by fun_prop) (by fun_prop)
   continuous_invFun := Continuous.subtype_mk (by fun_prop) _
 
@@ -134,12 +134,12 @@ set_option synthInstance.maxHeartbeats 100000 in
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` is locally compact.
 Note: instance search is slow because of the same issues for adicCompletionIntegers that we had
 with RingOfIntegers when it was a subring. -/
-instance [NumberField K] : LocallyCompactSpace (FinsetIntegralAdeles R K S) :=
+instance locallyCompactSpace [NumberField K] : LocallyCompactSpace (FinsetIntegralAdeles R K S) :=
   Prod.locallyCompactSpace _ _
 
 /-- `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ` as a subtype is locally compact. -/
 instance [NumberField K] : LocallyCompactSpace (Subtype R K S) :=
-  (subtype_homeomorph R K S).locallyCompactSpace_iff.2 inferInstance
+  (subtypeHomeomorph R K S).locallyCompactSpace_iff.2 inferInstance
 
 end FinsetIntegralAdeles
 
@@ -215,14 +215,14 @@ theorem ext {x y : FinsetAdeleRing R K S} (h : x.val = y.val) : x = y :=
   Subtype.ext h
 
 /-- The finite S-adele ring is homeomorphic to `Π (v ∈ S), Kᵥ × Π (v ∉ S), Oᵥ`. -/
-def homeomorph_subtype :
+def homeomorphSubtype :
     FinsetAdeleRing R K S ≃ₜ FinsetIntegralAdeles.Subtype R K S :=
   (Homeomorph.piEquivPiSubtypeProd _ _).subtype <| fun _ =>
     ⟨fun hx v => hx v.1 v.2, fun hx v hv => hx ⟨v, hv⟩⟩
 
 /-- The finite S-adele ring is locally compact. -/
 instance locallyCompactSpace [NumberField K] : LocallyCompactSpace (FinsetAdeleRing R K S) :=
-  (homeomorph_subtype R K S).locallyCompactSpace_iff.2 inferInstance
+  (homeomorphSubtype R K S).locallyCompactSpace_iff.2 inferInstance
 
 variable {R K S}
 
@@ -239,7 +239,7 @@ theorem isFinsetAdele_support (x : FiniteAdeleRing R K) :
     IsFinsetAdele (support x) x.1 :=
   fun v hv => by rwa [support, Set.Finite.mem_toFinset, Set.nmem_setOf_iff, not_not] at hv
 
-def ofFiniteAdele_support (x : FiniteAdeleRing R K) : FinsetAdeleRing R K (support x) :=
+def ofFiniteAdeleSupport (x : FiniteAdeleRing R K) : FinsetAdeleRing R K (support x) :=
   ⟨x, isFinsetAdele_support x⟩
 
 variable (R K S)
@@ -273,7 +273,7 @@ theorem isFinsetAdele_mem_range {x : FiniteAdeleRing R K} (hx : x ∈ Set.range 
     IsFinsetAdele S x.val := by
   rwa [algebraMap_range R K S] at hx
 
-def ofFiniteAdele_mem_range {x : FiniteAdeleRing R K} (hx : x ∈ Set.range ι(S)) :
+def ofFiniteAdeleMemRange {x : FiniteAdeleRing R K} (hx : x ∈ Set.range ι(S)) :
     FinsetAdeleRing R K S :=
   ⟨x, isFinsetAdele_mem_range hx⟩
 
@@ -374,12 +374,12 @@ variable (R K S)
 /-- The finite adele ring is locally compact. -/
 theorem locallyCompactSpace [NumberField K] : LocallyCompactSpace (FiniteAdeleRing R K) := by
   refine LocallyCompactSpace.mk <| fun x N hN => let S := support x; ?_
-  have h := (algebraMap_inducing R K S).nhds_eq_comap (ofFiniteAdele_support x)
+  have h := (algebraMap_inducing R K S).nhds_eq_comap (ofFiniteAdeleSupport x)
   let ⟨M, hM⟩ := (FinsetAdeleRing.locallyCompactSpace R K S).local_compact_nhds
-    (ofFiniteAdele_support x) _ (h ▸ Filter.preimage_mem_comap hN)
+    (ofFiniteAdeleSupport x) _ (h ▸ Filter.preimage_mem_comap hN)
   refine ⟨ι(S) '' M, ?_, Set.image_subset_iff.2 hM.2.1,
     (algebraMap_inducing R K S).isCompact_iff.1 hM.2.2⟩
-  have h := algebraMap_range_mem_nhds (ofFiniteAdele_support x)
+  have h := algebraMap_range_mem_nhds (ofFiniteAdeleSupport x)
   exact (algebraMap_inducing R K S).map_nhds_of_mem _ h ▸ Filter.image_mem_map hM.1
 
 end FiniteAdeleRing
