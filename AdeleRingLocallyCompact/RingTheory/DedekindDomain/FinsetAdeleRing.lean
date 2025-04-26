@@ -372,7 +372,7 @@ theorem algebraMap_range_mem_nhds (x : FinsetAdeleRing R K S) :
 variable (R K S)
 
 /-- The finite adele ring is locally compact. -/
-theorem locallyCompactSpace [NumberField K] : LocallyCompactSpace (FiniteAdeleRing R K) := by
+instance locallyCompactSpace [NumberField K] : LocallyCompactSpace (FiniteAdeleRing R K) := by
   refine LocallyCompactSpace.mk <| fun x N hN => let S := support x; ?_
   have h := (algebraMap_inducing R K S).nhds_eq_comap (ofFiniteAdeleSupport x)
   let ⟨M, hM⟩ := (FinsetAdeleRing.locallyCompactSpace R K S).local_compact_nhds

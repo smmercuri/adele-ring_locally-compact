@@ -67,9 +67,8 @@ theorem algebraMap_injective : Function.Injective (algebraMap K (AdeleRing K)) :
   fun _ _ hxy => (algebraMap K (InfiniteAdeleRing K)).injective (Prod.ext_iff.1 hxy).1
 
 /-- The adele ring of a number field is a locally compact space. -/
-instance locallyCompactSpace : LocallyCompactSpace (AdeleRing K) := by
-  letI := FiniteAdeleRing.locallyCompactSpace (𝓞 K) K
-  exact Prod.locallyCompactSpace _ _
+instance locallyCompactSpace : LocallyCompactSpace (AdeleRing K) :=
+  Prod.locallyCompactSpace _ _
 
 /-- The subgroup of principal adeles `(x)ᵥ` where `x ∈ K`. -/
 def principalSubgroup : AddSubgroup (AdeleRing K) :=
