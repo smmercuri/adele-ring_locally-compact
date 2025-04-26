@@ -246,13 +246,13 @@ variable (K v)
 
 open Set Valued in
 /-- The `v`-adic integers are closed in the `v`-adic completion of `K`. -/
-theorem isClosed : IsClosed (v.adicCompletionIntegers K : Set (v.adicCompletion K)) := by
+theorem isClosed : IsClosed (v.adicCompletionIntegers K).carrier := by
   refine isClosed_iff_nhds.2 fun x hx => ?_
-  simp only [isClosed_iff_nhds, SetLike.mem_coe, mem_adicCompletionIntegers, not_le] at hx ⊢
+  simp [isClosed_iff_nhds, mem_adicCompletionIntegers] at hx ⊢
   contrapose! hx
   refine ⟨{y | Valued.v y = Valued.v x}, loc_const (ne_zero_of_lt hx),
     subset_empty_iff.1 fun y ⟨hy₁, hy₂⟩ => ?_⟩
-  rw [SetLike.mem_coe, mem_adicCompletionIntegers] at hy₂
+  simp [SetLike.mem_coe, mem_adicCompletionIntegers] at hy₂
   exact (not_lt_of_le <| hy₂) <| hy₁.symm ▸ hx
 
 open WithZero Multiplicative Ideal in
@@ -288,13 +288,12 @@ theorem totallyBounded [NumberField K] : TotallyBounded (v.adicCompletionInteger
 instance completeSpace : CompleteSpace (v.adicCompletionIntegers K) :=
   IsClosed.completeSpace_coe (isClosed K v)
 
-/-- The `v`-adic integers is compact. -/
+/-- The `v`-adic integers is compact inside `v.adicCompletion K`. -/
 theorem isCompact [NumberField K] : IsCompact (v.adicCompletionIntegers K).carrier :=
-  isCompact_iff_totallyBounded_isComplete.2
-    ⟨totallyBounded K v, IsClosed.isComplete (isClosed K v)⟩
+  isCompact_iff_totallyBounded_isComplete.2 ⟨totallyBounded K v, (isClosed K v).isComplete⟩
 
 instance compactSpace [NumberField K] : CompactSpace (v.adicCompletionIntegers K) :=
-  CompactSpace.mk (isCompact_iff_isCompact_univ.1 <| isCompact K v)
+  isCompact_iff_compactSpace.1 <| isCompact K v
 
 end adicCompletionIntegers
 
