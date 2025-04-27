@@ -63,6 +63,11 @@ namespace AbsoluteValue
 
 variable {K : Type*} [Field K] (v : AbsoluteValue K ℝ)
 
+/-! ## Field instance for WithAbs design -/
+
+instance [CompletableTopField (WithAbs v)] : Field v.Completion :=
+  UniformSpace.Completion.instField
+
 /-! ## Design alternative: using dependent constructors -/
 
 instance normedFieldCons : NormedField K where
@@ -79,6 +84,11 @@ instance normedFieldCons : NormedField K where
 abbrev CompletionCons :=
   letI := v.normedFieldCons -- Explicit instance required
   UniformSpace.Completion K
+
+instance [letI := v.normedFieldCons; CompletableTopField K] :
+    Field v.CompletionCons :=
+  letI := v.normedFieldCons -- Explicit instance required
+  UniformSpace.Completion.instField
 
 end AbsoluteValue
 
@@ -120,6 +130,11 @@ instance [WithAbsReal K] : NormedField K := WithAbsReal.v.normedFieldCons
 abbrev CompletionClass :=
   letI := WithAbsReal.mk v
   UniformSpace.Completion K
+
+instance [letI := WithAbsReal.mk v; CompletableTopField K] :
+    Field v.CompletionClass :=
+  letI := WithAbsReal.mk v -- Explicit instance required
+  UniformSpace.Completion.instField
 
 end AbsoluteValue
 
