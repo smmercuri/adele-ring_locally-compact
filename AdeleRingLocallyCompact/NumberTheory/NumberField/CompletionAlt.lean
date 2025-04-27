@@ -128,7 +128,7 @@ variable {K : Type*} [Field K] (v : AbsoluteValue K ℝ)
 instance [WithAbsReal K] : NormedField K := WithAbsReal.v.normedFieldCons
 
 abbrev CompletionClass :=
-  letI := WithAbsReal.mk v
+  letI := WithAbsReal.mk v -- Explicit instance required
   UniformSpace.Completion K
 
 instance [letI := WithAbsReal.mk v; CompletableTopField K] :
