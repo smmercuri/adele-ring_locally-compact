@@ -1,15 +1,15 @@
 # Local Compactness of the Adele Ring of a Number Field
 
-This repository contains the source code for the paper [_Formalising the local compactness of the adele ring_](https://arxiv.org/pdf/2405.19270v1).
-This code requires Lean 4.10.0 and uses mathlib's version [eaede86](https://github.com/leanprover-community/mathlib4/tree/eaede86aa7777630a3826cd8f3fbf0cbaafa53e6).
+This repository contains the source code for the paper [_Formalising the local compactness of the adele ring_](https://arxiv.org/pdf/2405.19270).
+This code requires Lean 4.10.0 and uses mathlib's version [caac5b1](https://github.com/leanprover-community/mathlib4/tree/caac5b13fb72ba0c5d0b35a0067de108db65e964).
 
 The adele ring of a number field is a central object in modern number theory and its status as a locally compact topological ring is one of the key reasons why, leading to its widespread use within the Langlands Program. 
-In this repository, we build upon [the work](https://drops.dagstuhl.de/storage/00lipics/lipics-vol237-itp2022/LIPIcs.ITP.2022.14/LIPIcs.ITP.2022.14.pdf) of Maria Inés de Frutos-Fernández who first formalised the adele ring of global fields in Lean, much of which has been subsequently integrated into mathlib.
+In this repository, we build upon [the work](https://drops.dagstuhl.de/storage/00lipics/lipics-vol237-itp2022/LIPIcs.ITP.2022.14/LIPIcs.ITP.2022.14.pdf) of Maria Inés de Frutos-Fernández who first formalised the adele ring of global fields in Lean, much of which was subsequently upstreamed into mathlib.
 The main result within this code is the proof that the adele ring of a number field is locally compact.
-Along the way, we formalise Archimedean completion of a number field using recent advances in mathlib, and use this to re-formalise the infinite adele ring as the finite product of all such completions.
+Along the way, we formalise Archimedean completion of a number field and use this to re-formalise the infinite adele ring as the finite product of all such completions.
 We also formalise the local compactness of all completions of a number field, the compactness of the ring of integers of non-Archimedean completions of a number field, and the finite $S$-adele ring, all of which are important tools for proving the local compactness of the adele ring.
 
-We also port some foundational results on discrete valuations from more [recent work](https://github.com/mariainesdff/local_fields_journal/tree/0b408ff3af36e18f991f9d4cb87be3603cfc3fc3) by Maria Inés de Frutos-Fernández and Filippo A. E. Nuccio.
+We port some foundational results on discrete valuations from more [recent work](https://github.com/mariainesdff/LocalClassFieldTheory/) of Maria Inés de Frutos-Fernández and Filippo A. E. Nuccio.
 In particular we have an outstanding `sorry` in our result which follows immediately from that code.
 
 ## Documentation
@@ -52,6 +52,5 @@ This project requires Lean 4 and mathlib. To install Lean follow the instruction
 After installation of Lean 4, this project can be installed by running `git clone https://github.com/smmercuri/adele-ring_locally-compact.git` from a terminal in the location you wish to place this project, and then `cd adele-ring_locally_compact`. 
 This will install all branches and version history of the project. 
 To obtain the version described in the paper and contained within this branch, follow up with the command `git checkout journal`. 
-The project be installed by first running `source ~/.profile` (or `source ~/.bash_profile` depending on the OS) and then running `lake exe cache get`.
 
 See [this page](https://leanprover-community.github.io/install/project.html) for further details on setting up Lean projects.
