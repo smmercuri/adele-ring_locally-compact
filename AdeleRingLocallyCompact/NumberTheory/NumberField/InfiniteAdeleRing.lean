@@ -88,9 +88,9 @@ def ringEquivMixedSpace :
     (RingEquiv.piEquivPiSubtypeProd (fun (v : InfinitePlace K) => IsReal v)
       (fun (v : InfinitePlace K) => v.Completion))
     (RingEquiv.prodMap
-      (RingEquiv.piCongrRight (fun ⟨_, hv⟩ => Completion.ringEquiv_real_of_isReal hv))
+      (RingEquiv.piCongrRight (fun ⟨_, hv⟩ => Completion.ringEquivRealOfIsReal hv))
       (RingEquiv.trans
-        (RingEquiv.piCongrRight (fun v => Completion.ringEquiv_complex_of_isComplex
+        (RingEquiv.piCongrRight (fun v => Completion.ringEquivComplexOfIsComplex
           ((not_isReal_iff_isComplex.1 v.2))))
         (RingEquiv.piCongrLeft (fun _ => ℂ) <|
           Equiv.subtypeEquivRight (fun _ => not_isReal_iff_isComplex))))
@@ -99,9 +99,9 @@ def ringEquivMixedSpace :
 theorem ringEquivMixedSpace_apply (x : InfiniteAdeleRing K) :
     ringEquivMixedSpace K x =
       (fun (v : {w : InfinitePlace K // IsReal w}) =>
-        ringEquiv_real_of_isReal v.2 (x v),
+        ringEquivRealOfIsReal v.2 (x v),
       fun (v : {w : InfinitePlace K // IsComplex w}) =>
-        ringEquiv_complex_of_isComplex v.2 (x v)) :=
+        ringEquivComplexOfIsComplex v.2 (x v)) :=
   rfl
 
 /-- Transfers the embedding of `x ↦ (x)ᵥ` of the number field `K` into its infinite adele
@@ -109,9 +109,9 @@ ring to the mixed embedding `x ↦ (φᵢ(x))ᵢ` of `K` into the space `ℝ ^ r
 `(r₁, r₂)` is the signature of `K` and `φᵢ` are the complex embeddings of `K`. -/
 theorem mixedEmbedding_eq_algebraMap_comp {x : K} :
     mixedEmbedding K x = ringEquivMixedSpace K (algebraMap K (InfiniteAdeleRing K) x) := by
-  ext v <;> simp only [ringEquivMixedSpace_apply, algebraMap_apply, ringEquiv_real_of_isReal,
-    ringEquiv_complex_of_isComplex, extensionEmbedding, extensionEmbedding_of_isReal,
-    extensionEmbedding_of_comp, RingEquiv.coe_ofBijective, RingHom.coe_mk, MonoidHom.coe_mk,
+  ext v <;> simp only [ringEquivMixedSpace_apply, algebraMap_apply, ringEquivRealOfIsReal,
+    ringEquivComplexOfIsComplex, extensionEmbedding, extensionEmbeddingOfIsReal,
+    extensionEmbeddingOfComp, RingEquiv.coe_ofBijective, RingHom.coe_mk, MonoidHom.coe_mk,
     OneHom.coe_mk, UniformSpace.Completion.extensionHom]
   · rw [UniformSpace.Completion.extension_coe
       (WithAbs.uniformInducing_of_comp <| v.1.norm_embedding_of_isReal v.2).uniformContinuous x]

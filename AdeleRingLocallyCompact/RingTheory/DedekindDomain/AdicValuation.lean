@@ -307,7 +307,7 @@ variable (v)
 theorem isCompact_nhds_zero [NumberField K] {γ : ℤₘ₀ˣ} (hγ : γ ≤ 1) :
     IsCompact { y : v.adicCompletion K | Valued.v y < γ } :=
   (isCompact K v).of_isClosed_subset (isClosed_nhds_zero K v γ)
-      <| fun _ hx => le_of_lt (lt_of_lt_of_le (Set.mem_setOf.1 hx) hγ)
+    <| fun _ hx => le_of_lt (lt_of_lt_of_le (Set.mem_setOf.1 hx) hγ)
 
 set_option synthInstance.maxHeartbeats 80000 in
 /-- The `v`-adic completion of `K` is locally compact.
